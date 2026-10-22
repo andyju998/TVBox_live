@@ -179,3 +179,41 @@ CHC动作电影,http://38.75.136.137:98/gslb/dsdqpub/chcdz.m3u8?auth=testpub
 凤凰香港,https://epg.pw/stream/8770e89223a086eb1b8a0c931e42296d772a8069ad3eb72540e0c434e7cb3e93.m3u8
 三立新闻,https://epg.pw/stream/6b49e3faa38adda85abab446f032dc1e686baa0760a9cfa66e2df8fd6fe3b445.m3u8
 寰宇新闻,http://222.128.55.152:9080/live/hy.m3u8
+港澳台,#genre#
+翡翠台,http://r.jdshipin.com/qClQf
+明珠台,https://hls-gateway.vpstv.net/streams/476936.m3u8
+无线新闻,https://h5cdn3.kylintv.tv/live/tvbnews_iphone.m3u8
+J2,https://hls-gateway.vpstv.net/streams/476932.m3u8
+Viutv,http://r.jdshipin.com/vSJvl
+TVB星河,http://cdn9.163189.xyz/smt1.1.php
+黄金翡翠台,http://jxiptv.dpdns.org/stream/tvb/null-7/master.m3u8
+千禧经典台,http://php.jdshipin.com/smt.php
+TVB Plus,http://cdn.132.us.kg/live/tvbp/stream.m3u8
+娱乐新闻台,http://v2h.jdshipin.com/enew/enew.stream/chunklist.m3u8
+有线新闻,https://smart.pendy.dpdns.org/Smart.php?id=hoycaijing_twn
+now新闻,http://mytv.cdn.com.mp/live/now/stream.m3u8
+HOYTV,https://stream1.freetv.fun/hoy-tv-3.m3u8
+RTHK 31,http://free.cnlive.club/channel/n8badbb5/index.m3u8?q=1752629214236
+RTHK 32,http://free.cnlive.club/channel/n8badbb4/index.m3u8?q=1752629214236
+澳门莲花,http://php.jdshipin.com/amlh.php
+凤凰中文,https://7612-5516-affc-d88b.kylintv.tv/live/pxinhd_iphone.m3u8
+凤凰卫视,https://7612-5516-affc-d88b.kylintv.tv/live/pxinhd_iphone.m3u8
+凤凰资讯,http://43.152.224.209/qctv.fengshows.cn/live/0701pin72.flv
+凤凰香港,http://r.jdshipin.com/yDoTN
+香港卫视,http://cctvtxyh5c.liveplay.myqcloud.com/cstv/xianggangweishi_2/index.m3u8
+三立台湾,https://hls-gateway.vpstv.net/streams/477050.m3u8
+三立新闻,https://stream1.freetv.fun/san-li-xin-wen-4.m3u8
+东森综合,https://hls-gateway.vpstv.net/streams/476987.m3u8
+东森超视,http://38.64.72.148:80/hls/modn/list/2013/chunklist1.m3u8
+东森电影,https://hls-gateway.vpstv.net/streams/476995.m3u8
+中天新闻台,http://docker.livednow.dpdns.org/4gtv-4gtv009/index.m3u8
+中视,http://docker.livednow.dpdns.org/4gtv-4gtv040/index.m3u8
+华视,http://docker.livednow.dpdns.org/4gtv-4gtv041/index.m3u8
+纬来体育,https://smart.pendy.dpdns.org/Smart.php?id=videolandsport
+纬来育乐,https://hls-gateway.vpstv.net/streams/477081.m3u8
+靖天电影,https://tv.iill.top/litv/4gtv-4gtv061
+龙华电影台,https://cdn8.163189.xyz/live/lhdy/stream.m3u8
+龙华日韩台,https://cdn8.163189.xyz/live/lhrh/stream.m3u8
+美亚电影台,https://mysupertv.pendy.dpdns.org/CMAM/cmam.m3u8
+Animax,https://live.tvfix.org/live/animax/index.m3u8
+TVBS亚洲,http://38.64.72.148:80/hls/modn/list/4005/playlist.m3u8
