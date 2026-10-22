@@ -63,10 +63,6 @@ CCTV15音乐,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221225601/index
 CCTV15音乐,https://xykt-fix.github.io/play/a02e/index.m3u8
 CCTV15音乐,http://198.204.228.26/live/cctv15hd.m3u8
 CCTV15音乐,http://74.91.26.218:82/live/cctv15hd.m3u8
-CCTV16奥林匹克,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226100/index.m3u8
-CCTV16奥林匹克,https://piccpndali.v.myalicdn.com/audio/cctv16_2.m3u8
-CCTV16奥林匹克,http://74.91.26.218:82/live/cctv16hd.m3u8
-CCTV16奥林匹克,http://38.75.136.137:98/gslb/dsdqbv/cctv16hd.m3u8?auth=test20251009
 北京卫视4K超高清,http://120.211.62.180:8000/hls/35/index.m3u8
 北京卫视4K超高清,http://38.75.136.137:98/gslb/dsdqbv/bjwshd.m3u8?auth=test20251009
 上视新闻综合,http://hlsztemgsplive.miguvideo.com:8080/wd_r4/dfl/xinwenzonghehd/600/index.m3u8?msisdn=20261022200301abbd39184717450fb2a7dd8189803261&mdspid=&spid=600697&netType=0&sid=5910022325&pid=2028597139&timestamp=20261022200301&Channel_ID=0116_2600000900-99000-201600010010027&ProgramID=651632657&ParentNodeID=-99&assertID=5910022325&client_ip=171.8.79.254&SecurityKey=20261022200301&promotionId=&mvid=5100001716&mcid=500020&playurlVersion=ZQ-A1-9.10.1-SNAPSHOT&userid=&jmhm=&videocodec=h264&appCode=miguvideo_android&bean=mgspad&tid=android&conFee=0&encrypt=ce9ccdd78e3678626315e21ffca4e5e0
