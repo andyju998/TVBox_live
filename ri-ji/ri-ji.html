@@ -112,6 +112,128 @@
   }
   .cal-grid button.day.selected .lbl { color: rgba(255,255,255,.85); }
   .cal-hint { margin: 8px 2px 0; font-size: 13px; color: var(--dim); min-height: 20px; }
+  /* 写新日记按钮行（与空间日记同位置：日历下面） */
+  .action-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+  .btn-new {
+    border: 0; border-radius: 999px; background: var(--accent); color: #fff;
+    padding: 10px 20px; font-size: 15px; font-weight: 500; cursor: pointer;
+    font-family: inherit; box-shadow: 0 1px 4px rgba(0,0,0,.12);
+  }
+  .btn-new:active { opacity: .85; }
+  .list-hint { font-size: 13px; color: var(--dim); }
+  /* 本地日记卡片的编辑/删除/分享 */
+  .card .head-btns { display: flex; flex-shrink: 0; gap: 4px; margin-left: auto; }
+  .card .head-btns button {
+    border: 0; border-radius: 999px; background: transparent;
+    padding: 6px 12px; font-size: 14px; cursor: pointer; font-family: inherit;
+  }
+  .card .head-btns button.edit, .card .head-btns button.share { color: var(--accent); }
+  .card .head-btns button.del { color: var(--clay); }
+  .card .head-btns button:active { background: var(--accent-soft); }
+  .card .emojis { margin-top: 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+  .card .emojis span { font-size: 20px; line-height: 32px; }
+  .card .emojis .fu {
+    display: inline-flex; width: 24px; height: 24px; transform: rotate(45deg);
+    align-items: center; justify-content: center; border-radius: 3px; background: #d43d2a;
+  }
+  .card .emojis .fu i { transform: rotate(-45deg); font-style: normal; font-size: 14px; font-weight: 700; line-height: 1; color: #fff; }
+  /* 编辑器（全屏浮层） */
+  .editor {
+    position: fixed; inset: 0; z-index: 60; display: none;
+    background: var(--surface); overflow-y: auto;
+  }
+  .editor.open { display: block; }
+  .editor .ed-wrap { max-width: 880px; margin: 0 auto; padding: 16px 18px 60px; }
+  .editor .ed-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .editor .ed-top .back {
+    border: 0; background: transparent; color: var(--text);
+    font-size: 16px; cursor: pointer; font-family: inherit; padding: 6px 0;
+  }
+  .editor .ed-top .acts { display: flex; gap: 8px; }
+  .editor .ed-top .acts button {
+    border: 0; border-radius: 999px; padding: 8px 16px;
+    font-size: 14px; cursor: pointer; font-family: inherit;
+  }
+  .editor .ed-top .acts .preview-btn { background: var(--accent-soft); color: var(--accent); }
+  .editor .ed-top .acts .save-btn { background: var(--accent); color: #fff; font-weight: 500; }
+  .editor h2 { margin: 4px 0 12px; font-family: "FZJingLeiA", "Songti SC", "STSong", serif; font-size: 24px; font-weight: 400; }
+  .editor label.lbl, .editor p.lbl { display: block; margin-top: 14px; font-size: 14px; color: var(--dim); }
+  .editor input[type="date"], .editor input[type="text"], .editor textarea {
+    width: 100%; margin-top: 6px; border: 0; border-bottom: 1px solid var(--border);
+    background: transparent; color: var(--text); font-size: 16px; outline: none;
+    font-family: "FZJingLeiA", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+    padding: 6px 0;
+  }
+  .editor textarea { min-height: 160px; resize: vertical; line-height: 1.8; }
+  .editor .note { margin-top: 6px; font-size: 12px; line-height: 20px; color: var(--dim); }
+  .editor .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .editor .chip {
+    border: 1px solid var(--border); border-radius: 999px; background: transparent;
+    padding: 6px 14px; font-size: 14px; color: var(--dim); cursor: pointer; font-family: inherit;
+  }
+  .editor .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 500; }
+  .editor .chip:active { background: var(--accent-soft); }
+  .editor .emoji-picked { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+  .editor .emoji-picked .picked {
+    display: flex; align-items: center; justify-content: center;
+    min-width: 36px; height: 36px; border-radius: 999px;
+    background: var(--accent-soft); font-size: 20px; cursor: pointer; border: 0;
+  }
+  .editor .emoji-picked .add-emoji {
+    border: 1px dashed var(--accent); border-radius: 999px; background: transparent;
+    padding: 6px 14px; font-size: 14px; color: var(--accent); cursor: pointer; font-family: inherit;
+  }
+  .editor .insert-btn {
+    flex: 1; border: 1px dashed var(--border); border-radius: 8px; background: transparent;
+    padding: 12px; font-size: 14px; color: var(--dim); cursor: pointer; font-family: inherit;
+  }
+  .editor .insert-btn:active { background: var(--accent-soft); color: var(--accent); }
+  .editor .photo-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+  .editor .photo-thumbs .thumb { position: relative; aspect-ratio: 1 / 1; border-radius: 6px; overflow: hidden; background: var(--border); }
+  .editor .photo-thumbs .thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .editor .photo-thumbs .thumb button {
+    position: absolute; top: 4px; right: 4px; width: 24px; height: 24px;
+    border: 0; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff;
+    font-size: 14px; cursor: pointer;
+  }
+  .editor .save-note { margin-top: 20px; font-size: 12px; line-height: 20px; color: var(--dim); text-align: center; }
+  .editor .ed-bottom { display: flex; gap: 10px; margin-top: 16px; }
+  .editor .ed-bottom button {
+    flex: 1; border: 0; border-radius: 999px; padding: 12px;
+    font-size: 16px; cursor: pointer; font-family: inherit;
+  }
+  .editor .ed-bottom .preview-btn { background: var(--accent-soft); color: var(--accent); }
+  .editor .ed-bottom .save-btn { background: var(--accent); color: #fff; font-weight: 500; }
+  /* 表情面板（底部浮层） */
+  .sheet { position: fixed; inset: 0; z-index: 70; display: none; }
+  .sheet.open { display: block; }
+  .sheet .mask { position: absolute; inset: 0; background: rgba(0,0,0,.3); }
+  .sheet .panel {
+    position: absolute; left: 0; right: 0; bottom: 0; margin: 0 auto; max-width: 880px;
+    background: var(--surface); border-radius: 16px 16px 0 0; padding: 12px 16px 24px;
+    max-height: 62vh; overflow-y: auto;
+  }
+  .sheet .panel h3 { margin: 4px 0 8px; font-family: "FZJingLeiA", "Songti SC", serif; font-size: 18px; font-weight: 400; }
+  .sheet .cats { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; }
+  .sheet .cats button {
+    flex-shrink: 0; border: 1px solid var(--border); border-radius: 999px; background: transparent;
+    padding: 5px 12px; font-size: 13px; color: var(--dim); cursor: pointer; font-family: inherit;
+  }
+  .sheet .cats button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .sheet .items { display: flex; flex-wrap: wrap; gap: 4px; }
+  .sheet .items button {
+    width: 40px; height: 40px; border: 0; border-radius: 8px; background: transparent;
+    font-size: 24px; cursor: pointer;
+  }
+  .sheet .items button.on { background: var(--accent-soft); }
+  .sheet .items button:active { background: var(--accent-soft); }
+  /* 预览（全屏浮层） */
+  .preview { position: fixed; inset: 0; z-index: 65; display: none; background: var(--bg); overflow-y: auto; }
+  .preview.open { display: block; }
+  .preview .pv-wrap { max-width: 880px; margin: 0 auto; padding: 16px 18px 60px; }
+  .preview .pv-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .preview .pv-top .back { border: 0; background: transparent; color: var(--text); font-size: 16px; cursor: pointer; font-family: inherit; padding: 6px 0; }
+  .preview .pv-top .save-btn { border: 0; border-radius: 999px; background: var(--accent); color: #fff; padding: 8px 16px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit; }
   /* 日记卡片 */
   article.card {
     margin-top: 14px;
@@ -197,7 +319,7 @@
 <div class="wrap">
   <header class="top">
     <h1>光影随记</h1>
-    <div class="sub">示例公开版 · 只含示例日记与日历</div>
+    <div class="sub">示例公开版 · 示例日记＋你的本地日记</div>
   </header>
 
   <section class="calendar" aria-label="日历">
@@ -214,19 +336,81 @@
   </section>
   <p class="cal-hint" id="calHint"></p>
 
-  <article class="card" id="entryCard">
-    <div class="date-row">
-      <span class="d" id="dateRow"></span>
-      <span class="badge">示例</span>
-    </div>
-    <h3 class="title">一顿热乎的晚饭</h3>
-    <p class="body">下午泡了壶茶，翻了翻旧相册。晚上自己做了顿热乎饭，厨房里雾气腾腾的，窗外天都黑了。这样平平常常的一天，也值得记下来。</p>
-    <div class="grid9" id="grid9"></div>
-    <p class="sign"><span class="dash">—— </span>左岸咖啡<span class="dot">·</span>muse 日记</p>
-  </article>
+  <div class="action-row">
+    <button type="button" class="btn-new" id="newEntryBtn">＋ 写新日记</button>
+    <span class="list-hint" id="listHint"></span>
+  </div>
 
-  <p class="foot">公开版仅含示例日记与日历，不含个人日记。</p>
+  <div id="entries"></div>
+
+  <p class="foot">公开版仅含示例日记；你写的日记只保存在本机浏览器，仅本设备可见。</p>
 </div>
+
+<!-- 编辑器 -->
+<div class="editor" id="editor" role="dialog" aria-label="写新日记">
+  <div class="ed-wrap">
+    <div class="ed-top">
+      <button type="button" class="back" id="edBack">‹ 返回</button>
+      <div class="acts">
+        <button type="button" class="preview-btn" id="edPreviewBtn">预览</button>
+        <button type="button" class="save-btn" id="edSaveBtn">保存</button>
+      </div>
+    </div>
+    <h2 id="edTitle">写新日记</h2>
+    <label class="lbl" for="edDate">日期</label>
+    <input type="date" id="edDate" />
+    <label class="lbl" for="edTitleInput">标题（可不填）</label>
+    <input type="text" id="edTitleInput" placeholder="给今天起个小标题" />
+    <p class="lbl">天气（可不填，可多选）</p>
+    <div class="chips" id="edWeather"></div>
+    <p class="note">一天里天气变了，可以选两个。</p>
+    <p class="lbl">节气（可不填，只能选一个）</p>
+    <div class="chips" id="edTerm"></div>
+    <p class="note">日期正好是节气那天，会自动带出来；不对就点别的改，再点一下选中的可以取消。没有节气的日子就空着。</p>
+    <p class="lbl">表情（可不填，可多选）</p>
+    <div class="emoji-picked" id="edEmojiPicked"></div>
+    <p class="note">点「😊 选表情」，挑几个合今天心情的表情；点一下选上，再点取消。选中的表情会显示在日记卡片上。</p>
+    <p class="lbl">照片</p>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button type="button" class="insert-btn" id="edAddPhoto">＋ 插入照片</button>
+    </div>
+    <div class="photo-thumbs" id="edPhotoThumbs"></div>
+    <p class="note">从本机选照片（可多选），保存前会缩到适合日记的大小。</p>
+    <label class="lbl" for="edBody">正文</label>
+    <textarea id="edBody" placeholder="写点什么吧……"></textarea>
+    <label class="lbl" for="edSig">签名（可不填）</label>
+    <input type="text" id="edSig" placeholder="请输入你的签名" />
+    <p class="note">比如名字或昵称，会显示在日记卡片和分享图上，不填就不显示。</p>
+    <div class="ed-bottom">
+      <button type="button" class="preview-btn" id="edPreviewBtn2">预览</button>
+      <button type="button" class="save-btn" id="edSaveBtn2">保存</button>
+    </div>
+    <p class="save-note">保存在本机浏览器，仅本设备可见，不会同步到别处。</p>
+  </div>
+</div>
+
+<!-- 表情面板 -->
+<div class="sheet" id="emojiSheet" role="dialog" aria-label="表情">
+  <div class="mask" id="emojiMask"></div>
+  <div class="panel">
+    <h3>表情</h3>
+    <div class="cats" id="emojiCats"></div>
+    <div class="items" id="emojiItems"></div>
+  </div>
+</div>
+
+<!-- 预览 -->
+<div class="preview" id="preview" role="dialog" aria-label="预览">
+  <div class="pv-wrap">
+    <div class="pv-top">
+      <button type="button" class="back" id="pvBack">‹ 返回编辑</button>
+      <button type="button" class="save-btn" id="pvSaveBtn">保存</button>
+    </div>
+    <div id="pvCard"></div>
+  </div>
+</div>
+
+<input type="file" id="photoInput" accept="image/*" multiple hidden />
 
 <div class="lightbox" id="lightbox" role="dialog" aria-label="放大看图">
   <button class="close" id="lbClose" aria-label="关闭">×</button>
@@ -270,6 +454,24 @@ var SOLAR_TERMS = {
   "2027-11-22": "小雪", "2027-12-07": "大雪", "2027-12-22": "冬至"
 };
 var WEEKDAYS = ["日", "一", "二", "三", "四", "五", "六"];
+/* 节气名（与空间日记同一顺序） */
+var SOLAR_TERM_NAMES = [
+  "立春", "雨水", "惊蛰", "春分", "清明", "谷雨",
+  "立夏", "小满", "芒种", "夏至", "小暑", "大暑",
+  "立秋", "处暑", "白露", "秋分", "寒露", "霜降",
+  "立冬", "小雪", "大雪", "冬至", "小寒", "大寒"
+];
+var WEATHER_OPTS = ["晴", "多云", "阴天", "雨", "雪", "雨夹雪"];
+/* 表情七套（与空间日记同一套：苹果手机自带表情字符） */
+var EMOJI_CATS = [
+  { name: "笑脸", items: ["😀", "😃", "😄", "😁", "😆", "😅", "🤣", "😂", "🙂", "🙃", "😊", "😇", "🥰", "😍", "🤩", "😘", "😗", "😚", "😙", "😋", "😛", "😜", "🤪", "😝", "🤗", "🤭", "🤫", "🤔", "😐", "😑", "😏", "😒", "😌", "😔", "😪", "😴", "😷", "🤒", "🤧", "🥵", "🥶", "🥴", "😵", "🤯", "🥳", "😎", "😕", "😟", "😮", "😲", "😳", "🥺", "😦", "😨", "😰", "😥", "😢", "😭", "😱", "😖", "😞", "😓", "😩", "😫", "🥱", "😤", "😡", "😠"] },
+  { name: "天气", items: ["☀️", "🌤️", "⛅", "🌥️", "🌦️", "🌧️", "⛈️", "🌩️", "🌨️", "❄️", "☃️", "⛄", "🌬️", "💨", "🌪️", "🌫️", "🌈", "☂️", "🌂", "⚡", "🔥", "💧", "🌊", "🌙", "⭐", "🌟", "✨", "☁️", "🌡️", "🧊"] },
+  { name: "食品饮品", items: ["🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈", "🍒", "🍑", "🥭", "🍍", "🥝", "🍅", "🥑", "🥦", "🥬", "🥒", "🌽", "🥕", "🍞", "🥐", "🧀", "🍳", "🥞", "🍔", "🍟", "🍕", "🌭", "🥪", "🌮", "🥗", "🍝", "🍜", "🍲", "🍛", "🍣", "🍱", "🥟", "🍤", "🍚", "🍙", "🍥", "🍡", "🍧", "🍨", "🍦", "🧁", "🍰", "🎂", "🍮", "🍭", "🍬", "🍫", "🍿", "🍩", "🍪", "🍯", "☕️", "🍵", "🫖", "🧉", "🥛", "🧃", "🥤", "🧋", "🍺", "🍻", "🥂", "🍷", "🥃", "🍸", "🍹", "🍶", "🍾", "🫗", "🧊"] },
+  { name: "旗子", items: ["🇨🇳", "🇭🇰", "🇹🇼", "🇲🇴", "🇺🇸", "🇬🇧", "🇯🇵", "🇰🇷", "🇫🇷", "🇩🇪", "🇮🇹", "🇪🇸", "🇷🇺", "🇮🇳", "🇧🇷", "🇨🇦", "🇦🇺", "🇸🇬", "🇹🇭", "🇻🇳", "🇲🇾", "🇮🇩", "🇵🇭", "🇲🇽", "🇦🇷", "🇨🇭", "🇸🇪", "🇳🇴", "🇩🇰", "🇫🇮", "🇳🇱", "🇧🇪", "🇦🇹", "🇵🇱", "🇹🇷", "🇿🇦", "🇪🇬", "🇳🇿", "🏳️", "🏴", "🚩", "🏁"] },
+  { name: "数码", items: ["📱", "📲", "💻", "🖥️", "⌨️", "🖱️", "🖨️", "💾", "💿", "📀", "📷", "📸", "📹", "🎥", "📺", "📻", "🎙️", "🎧", "🎮", "🕹️", "⌚", "⏰", "⏱️", "🔋", "🔌", "💡", "🔦", "📡", "📶", "📞", "☎️", "🔍", "🔎", "💳", "📟", "🧮", "🎛️", "🎚️"] },
+  { name: "花卉植物", items: ["🌸", "💐", "🌺", "🌻", "🌼", "🌷", "🌹", "🥀", "🪷", "🪻", "🌾", "🌿", "☘️", "🍀", "🌱", "🌴", "🌵", "🌲", "🌳", "🎋", "🪴", "🍃", "🍂", "🍁", "🍄", "🌰", "🪵", "🌊", "🏵️", "🎍"] },
+  { name: "手势", items: ["👍", "👎", "👏", "🙌", "👐", "🤲", "🤝", "🙏", "👋", "🤚", "🖐️", "✋", "🖖", "👌", "🤌", "🤏", "✌️", "🤞", "🫰", "🤟", "🤘", "🤙", "👈", "👉", "👆", "👇", "☝️", "✊", "👊", "🤛", "🤜", "💪", "✍️", "💅", "🖕", "🫶", "🫵", "🫳", "🫴"] }
+];
 function pad(n) { return (n < 10 ? "0" : "") + n; }
 function dsOf(y, m, d) { return y + "-" + pad(m + 1) + "-" + pad(d); }
 function todayStr() {
@@ -323,15 +525,15 @@ function renderCalendar() {
       b.type = "button";
       b.className = "day";
       if (ds === selected) b.classList.add("selected");
-      if (ds === EXAMPLE_DATE) b.classList.add("has-diary");
+      if (hasEntryOn(ds)) b.classList.add("has-diary");
       var label = dayLabelFor(ds);
-      b.setAttribute("aria-label", (viewM + 1) + "月" + d + "日" + (label ? "，" + label : "") + (ds === EXAMPLE_DATE ? "，有日记" : ""));
+      b.setAttribute("aria-label", (viewM + 1) + "月" + d + "日" + (label ? "，" + label : "") + (hasEntryOn(ds) ? "，有日记" : ""));
       var num = document.createElement("span");
       num.textContent = d;
       b.appendChild(num);
       var mark = document.createElement("span");
       mark.className = "mark";
-      if (ds === EXAMPLE_DATE) {
+      if (hasEntryOn(ds)) {
         var dot = document.createElement("span");
         dot.className = "dot";
         mark.appendChild(dot);
@@ -356,14 +558,15 @@ function renderCalendar() {
 }
 function selectDate(ds) {
   selected = ds;
-  renderCalendar();
+renderCalendar();
   var hint = document.getElementById("calHint");
-  if (ds === EXAMPLE_DATE) {
+  if (hasEntryOn(ds)) {
     hint.textContent = "";
-    document.getElementById("entryCard").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    var card = document.querySelector('[data-entry-date="' + ds + '"]');
+    if (card) card.scrollIntoView({ behavior: "smooth", block: "nearest" });
   } else {
     var p = ds.split("-");
-    hint.textContent = p[1] + "月" + (+p[2]) + "日没有公开的日记，仅示例（今日）可看。";
+    hint.textContent = p[1] + "月" + (+p[2]) + "日没有日记，点「＋ 写新日记」写一篇吧。";
   }
 }
 document.getElementById("prevM").addEventListener("click", function () {
@@ -380,49 +583,169 @@ document.getElementById("goToday").addEventListener("click", function () {
   selectDate(todayStr());
 });
 
-/* ---- 示例卡片日期行（示例日期＝当天，节气按日期查） ---- */
-(function renderDateRow() {
-  var p = EXAMPLE_DATE.split("-");
-  var d = new Date(+p[0], +p[1] - 1, +p[2]);
-  var term = SOLAR_TERMS[EXAMPLE_DATE] || "";
-  var row = document.getElementById("dateRow");
-  var b = document.createElement("b");
-  b.textContent = (+p[1]) + "月" + (+p[2]) + "日";
-  row.appendChild(b);
-  row.appendChild(document.createTextNode("  周" + WEEKDAYS[d.getDay()] + (term ? " " + term : "") + " · 晴"));
-})();
-
-/* ---- 九宫格 ---- */
-(function renderGrid() {
-  var g = document.getElementById("grid9");
-  MEDIA.forEach(function (m, i) {
-    var cell = document.createElement("button");
-    cell.type = "button";
-    cell.className = "cell";
-    cell.setAttribute("aria-label", "查看" + m.cap);
-    var img = document.createElement("img");
-    img.src = m.thumb || m.poster || m.src;
-    img.alt = m.cap;
-    img.loading = "lazy";
-    cell.appendChild(img);
-    if (m.kind === "video") {
-      var pl = document.createElement("span");
-      pl.className = "play";
-      pl.textContent = "▶";
-      cell.appendChild(pl);
-    }
-    cell.addEventListener("click", function () { openLightbox(i); });
-    g.appendChild(cell);
+/* ---- 本地日记（存在本机浏览器 localStorage，仅本设备可见） ---- */
+var LS_KEY = "riji-public-entries-v1";
+function loadLocalEntries() {
+  try {
+    var raw = localStorage.getItem(LS_KEY);
+    if (!raw) return [];
+    var arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) { return []; }
+}
+function saveLocalEntries(arr) {
+  localStorage.setItem(LS_KEY, JSON.stringify(arr));
+}
+var localEntries = loadLocalEntries();
+/* 示例条目（日期每天滚到当天，与空间一致） */
+function exampleEntry() {
+  return {
+    id: "demo", is_demo: true, date: EXAMPLE_DATE,
+    title: "一顿热乎的晚饭",
+    body: "下午泡了壶茶，翻了翻旧相册。晚上自己做了顿热乎饭，厨房里雾气腾腾的，窗外天都黑了。这样平平常常的一天，也值得记下来。",
+    weather: ["晴"], term: SOLAR_TERMS[EXAMPLE_DATE] || "",
+    emojis: [], sig: "左岸咖啡 · muse 日记",
+    media: MEDIA
+  };
+}
+function allEntries() {
+  var list = [exampleEntry()].concat(localEntries);
+  list.sort(function (a, b) {
+    if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+    return (b.createdAt || 0) - (a.createdAt || 0);
   });
-})();
+  return list;
+}
+function hasEntryOn(ds) {
+  if (ds === EXAMPLE_DATE) return true;
+  for (var i = 0; i < localEntries.length; i++) if (localEntries[i].date === ds) return true;
+  return false;
+}
+/* 日期行：11月10日  周二 · 晴（有节气时节气在周几后、晴前） */
+function dateRowText(e) {
+  var p = e.date.split("-");
+  var d = new Date(+p[0], +p[1] - 1, +p[2]);
+  var t = e.term || SOLAR_TERMS[e.date] || "";
+  var s = (+p[1]) + "月" + (+p[2]) + "日  周" + WEEKDAYS[d.getDay()];
+  if (t) s += " " + t;
+  var w = (e.weather || []).join("、");
+  if (w) s += " · " + w;
+  return s;
+}
+function el(tag, cls, text) {
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+/* 一张卡片（示例与本地共用同一套版面，与空间日记一致） */
+function buildCard(e, opts) {
+  opts = opts || {};
+  var card = el("article", "card");
+  card.setAttribute("data-entry-date", e.date);
+  card.setAttribute("data-entry-id", e.id);
+  var head = el("div", "date-row");
+  var dateSpan = el("span", "d");
+  var p = e.date.split("-");
+  var b = el("b", null, (+p[1]) + "月" + (+p[2]) + "日");
+  dateSpan.appendChild(b);
+  var d = new Date(+p[0], +p[1] - 1, +p[2]);
+  var t = e.term || SOLAR_TERMS[e.date] || "";
+  var rest = "  周" + WEEKDAYS[d.getDay()];
+  if (t) rest += " " + t;
+  var w = (e.weather || []).join("、");
+  if (w) rest += " · " + w;
+  dateSpan.appendChild(document.createTextNode(rest));
+  head.appendChild(dateSpan);
+  if (e.is_demo) head.appendChild(el("span", "badge", "示例"));
+  if (!e.is_demo && !opts.preview) {
+    var btns = el("div", "head-btns");
+    var eb = el("button", "edit", "编辑");
+    eb.type = "button";
+    eb.addEventListener("click", function () { openEditor(e); });
+    var sb = el("button", "share", "分享");
+    sb.type = "button";
+    sb.addEventListener("click", function () { shareEntry(e); });
+    var db = el("button", "del", "删除");
+    db.type = "button";
+    db.addEventListener("click", function () { deleteEntry(e.id); });
+    btns.appendChild(eb); btns.appendChild(sb); btns.appendChild(db);
+    head.appendChild(btns);
+  }
+  card.appendChild(head);
+  if (e.title) card.appendChild(el("h3", "title", e.title));
+  if ((e.emojis || []).length > 0) {
+    var em = el("div", "emojis");
+    em.setAttribute("aria-label", "今天的表情：" + e.emojis.join("、"));
+    e.emojis.forEach(function (x) {
+      if (x === "福") {
+        var fu = el("span", "fu");
+        fu.appendChild(el("i", null, "福"));
+        em.appendChild(fu);
+      } else em.appendChild(el("span", null, x));
+    });
+    card.appendChild(em);
+  }
+  (e.body || "").split(/\n+/).forEach(function (para) {
+    if (!para.trim()) return;
+    card.appendChild(el("p", "body", para));
+  });
+  var media = e.media || (e.photos || []).map(function (ph) {
+    return { kind: "photo", src: ph.src, cap: ph.cap || "照片" };
+  });
+  if (media.length > 0) {
+    var g = el("div", "grid9");
+    media.forEach(function (m, i) {
+      var cell = document.createElement("button");
+      cell.type = "button";
+      cell.className = "cell";
+      cell.setAttribute("aria-label", "查看" + m.cap);
+      var img = document.createElement("img");
+      img.src = m.thumb || m.poster || m.src;
+      img.alt = m.cap;
+      img.loading = "lazy";
+      cell.appendChild(img);
+      if (m.kind === "video") {
+        cell.appendChild(el("span", "play", "▶"));
+      }
+      cell.addEventListener("click", function () { openLightbox(media, i); });
+      g.appendChild(cell);
+    });
+    card.appendChild(g);
+  }
+  var sig = e.is_demo ? "左岸咖啡 · muse 日记" : (e.sig || "");
+  if (sig) {
+    var sign = el("p", "sign");
+    var dash = el("span", "dash", "—— ");
+    sign.appendChild(dash);
+    var parts = sig.split("·");
+    if (parts.length === 2) {
+      sign.appendChild(document.createTextNode(parts[0]));
+      sign.appendChild(el("span", "dot", "·"));
+      sign.appendChild(document.createTextNode(parts[1]));
+    } else {
+      sign.appendChild(document.createTextNode(sig));
+    }
+    card.appendChild(sign);
+  }
+  return card;
+}
+function renderEntries() {
+  var box = document.getElementById("entries");
+  box.innerHTML = "";
+  var list = allEntries();
+  list.forEach(function (e) { box.appendChild(buildCard(e)); });
+  var hint = document.getElementById("listHint");
+  hint.textContent = localEntries.length > 0 ? "已保存 " + localEntries.length + " 篇本地日记" : "";
+}
 
 /* ---- 灯箱 ---- */
-var lbIndex = 0;
+var lbList = MEDIA, lbIndex = 0;
 var lightbox = document.getElementById("lightbox");
 var stage = document.getElementById("lbStage");
 var cap = document.getElementById("lbCap");
 function showLb() {
-  var m = MEDIA[lbIndex];
+  var m = lbList[lbIndex];
   stage.innerHTML = "";
   if (m.kind === "video") {
     var v = document.createElement("video");
@@ -440,9 +763,10 @@ function showLb() {
     img.alt = m.cap;
     stage.appendChild(img);
   }
-  cap.textContent = (lbIndex + 1) + " / " + MEDIA.length + " · " + m.cap;
+  cap.textContent = (lbIndex + 1) + " / " + lbList.length + " · " + m.cap;
 }
-function openLightbox(i) {
+function openLightbox(list, i) {
+  lbList = list;
   lbIndex = i;
   showLb();
   lightbox.classList.add("open");
@@ -457,21 +781,429 @@ document.getElementById("lbClose").addEventListener("click", closeLightbox);
 lightbox.addEventListener("click", function (e) { if (e.target === lightbox) closeLightbox(); });
 document.getElementById("lbPrev").addEventListener("click", function (e) {
   e.stopPropagation();
-  lbIndex = (lbIndex + MEDIA.length - 1) % MEDIA.length;
+  lbIndex = (lbIndex + lbList.length - 1) % lbList.length;
   showLb();
 });
 document.getElementById("lbNext").addEventListener("click", function (e) {
   e.stopPropagation();
-  lbIndex = (lbIndex + 1) % MEDIA.length;
+  lbIndex = (lbIndex + 1) % lbList.length;
   showLb();
 });
 document.addEventListener("keydown", function (e) {
   if (!lightbox.classList.contains("open")) return;
   if (e.key === "Escape") closeLightbox();
-  if (e.key === "ArrowLeft") { lbIndex = (lbIndex + MEDIA.length - 1) % MEDIA.length; showLb(); }
-  if (e.key === "ArrowRight") { lbIndex = (lbIndex + 1) % MEDIA.length; showLb(); }
+  if (e.key === "ArrowLeft") { lbIndex = (lbIndex + lbList.length - 1) % lbList.length; showLb(); }
+  if (e.key === "ArrowRight") { lbIndex = (lbIndex + 1) % lbList.length; showLb(); }
 });
 
+/* ---- 编辑器 ---- */
+var edState = null;
+var edDate = document.getElementById("edDate");
+var edTitleInput = document.getElementById("edTitleInput");
+var edBody = document.getElementById("edBody");
+var edSig = document.getElementById("edSig");
+function openEditor(entry) {
+  var d = entry ? entry.date : (selected || todayStr());
+  edState = {
+    editingId: entry ? entry.id : null,
+    createdAt: entry ? (entry.createdAt || Date.now()) : Date.now(),
+    weather: entry ? (entry.weather || []).slice() : [],
+    term: entry ? (entry.term || "") : (SOLAR_TERMS[d] || ""),
+    termTouched: false,
+    emojis: entry ? (entry.emojis || []).slice() : [],
+    photos: entry ? (entry.photos || []).map(function (p) { return { src: p.src, cap: p.cap || "照片" }; }) : []
+  };
+  document.getElementById("edTitle").textContent = entry ? "编辑日记" : "写新日记";
+  edDate.value = d;
+  edTitleInput.value = entry ? (entry.title || "") : "";
+  edBody.value = entry ? (entry.body || "") : "";
+  edSig.value = entry ? (entry.sig || "") : "";
+  renderWeatherChips();
+  renderTermChips();
+  renderEmojiPicked();
+  renderPhotoThumbs();
+  document.getElementById("editor").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeEditor() {
+  document.getElementById("editor").classList.remove("open");
+  document.body.style.overflow = "";
+}
+function renderWeatherChips() {
+  var box = document.getElementById("edWeather");
+  box.innerHTML = "";
+  WEATHER_OPTS.forEach(function (w) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip" + (edState.weather.indexOf(w) >= 0 ? " on" : "");
+    b.textContent = w;
+    b.setAttribute("aria-pressed", edState.weather.indexOf(w) >= 0 ? "true" : "false");
+    b.addEventListener("click", function () {
+      var i = edState.weather.indexOf(w);
+      if (i >= 0) edState.weather.splice(i, 1); else edState.weather.push(w);
+      renderWeatherChips();
+    });
+    box.appendChild(b);
+  });
+}
+function renderTermChips() {
+  var box = document.getElementById("edTerm");
+  box.innerHTML = "";
+  SOLAR_TERM_NAMES.forEach(function (t) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip" + (edState.term === t ? " on" : "");
+    b.textContent = t;
+    b.setAttribute("aria-pressed", edState.term === t ? "true" : "false");
+    b.addEventListener("click", function () {
+      edState.termTouched = true;
+      edState.term = (edState.term === t) ? "" : t;
+      renderTermChips();
+    });
+    box.appendChild(b);
+  });
+}
+function renderEmojiPicked() {
+  var box = document.getElementById("edEmojiPicked");
+  box.innerHTML = "";
+  edState.emojis.forEach(function (e) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "picked";
+    b.textContent = e;
+    b.setAttribute("aria-label", "取消表情 " + e);
+    b.addEventListener("click", function () {
+      edState.emojis = edState.emojis.filter(function (x) { return x !== e; });
+      renderEmojiPicked();
+    });
+    box.appendChild(b);
+  });
+  var add = document.createElement("button");
+  add.type = "button";
+  add.className = "add-emoji";
+  add.textContent = "😊 选表情";
+  add.addEventListener("click", function () { openEmojiSheet(); });
+  box.appendChild(add);
+}
+/* 表情面板 */
+var emojiCat = "笑脸";
+function openEmojiSheet() {
+  emojiCat = EMOJI_CATS[0].name;
+  renderEmojiSheet();
+  document.getElementById("emojiSheet").classList.add("open");
+}
+function closeEmojiSheet() {
+  document.getElementById("emojiSheet").classList.remove("open");
+}
+function renderEmojiSheet() {
+  var cats = document.getElementById("emojiCats");
+  cats.innerHTML = "";
+  EMOJI_CATS.forEach(function (c) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = c.name === emojiCat ? "on" : "";
+    b.textContent = c.name;
+    b.addEventListener("click", function () { emojiCat = c.name; renderEmojiSheet(); });
+    cats.appendChild(b);
+  });
+  var items = document.getElementById("emojiItems");
+  items.innerHTML = "";
+  var cat = EMOJI_CATS.filter(function (c) { return c.name === emojiCat; })[0];
+  (cat ? cat.items : []).forEach(function (e) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = edState.emojis.indexOf(e) >= 0 ? "on" : "";
+    b.textContent = e;
+    b.setAttribute("aria-label", "表情 " + e);
+    b.addEventListener("click", function () {
+      var i = edState.emojis.indexOf(e);
+      if (i >= 0) edState.emojis.splice(i, 1); else edState.emojis.push(e);
+      renderEmojiPicked();
+      renderEmojiSheet();
+    });
+    items.appendChild(b);
+  });
+}
+document.getElementById("emojiMask").addEventListener("click", closeEmojiSheet);
+/* 照片：本机上传，保存前缩到长边最多 1600px */
+function compressPhoto(file) {
+  return new Promise(function (resolve, reject) {
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function () {
+      URL.revokeObjectURL(url);
+      var w = img.naturalWidth, h = img.naturalHeight;
+      var scale = Math.min(1, 1600 / Math.max(w, h));
+      var cv = document.createElement("canvas");
+      cv.width = Math.max(1, Math.round(w * scale));
+      cv.height = Math.max(1, Math.round(h * scale));
+      var ctx = cv.getContext("2d");
+      ctx.drawImage(img, 0, 0, cv.width, cv.height);
+      var data = cv.toDataURL("image/jpeg", 0.82);
+      if (data.length > 1200000) data = cv.toDataURL("image/jpeg", 0.7);
+      resolve(data);
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); reject(new Error("bad image")); };
+    img.src = url;
+  });
+}
+function renderPhotoThumbs() {
+  var box = document.getElementById("edPhotoThumbs");
+  box.innerHTML = "";
+  edState.photos.forEach(function (p, i) {
+    var d = document.createElement("div");
+    d.className = "thumb";
+    var img = document.createElement("img");
+    img.src = p.src;
+    img.alt = p.cap || "照片";
+    d.appendChild(img);
+    var x = document.createElement("button");
+    x.type = "button";
+    x.textContent = "×";
+    x.setAttribute("aria-label", "删除这张照片");
+    x.addEventListener("click", function () {
+      edState.photos.splice(i, 1);
+      renderPhotoThumbs();
+    });
+    d.appendChild(x);
+    box.appendChild(d);
+  });
+}
+document.getElementById("edAddPhoto").addEventListener("click", function () {
+  document.getElementById("photoInput").click();
+});
+document.getElementById("photoInput").addEventListener("change", function () {
+  var files = Array.prototype.slice.call(this.files || []);
+  this.value = "";
+  if (files.length === 0) return;
+  var failed = 0;
+  var jobs = files.map(function (f) {
+    return compressPhoto(f).then(function (data) {
+      edState.photos.push({ src: data, cap: "照片" });
+    }).catch(function () { failed++; });
+  });
+  Promise.all(jobs).then(function () {
+    renderPhotoThumbs();
+    if (failed > 0) alert("有 " + failed + " 张照片打不开，已跳过。");
+  });
+});
+edDate.addEventListener("change", function () {
+  if (!edState.termTouched) {
+    edState.term = SOLAR_TERMS[edDate.value] || "";
+    renderTermChips();
+  }
+});
+function editorEntry() {
+  return {
+    id: edState.editingId || ("local-" + Date.now()),
+    date: edDate.value || todayStr(),
+    title: edTitleInput.value.trim(),
+    body: edBody.value.trim(),
+    weather: edState.weather.slice(),
+    term: edState.term,
+    emojis: edState.emojis.slice(),
+    photos: edState.photos.map(function (p) { return { src: p.src, cap: p.cap || "照片" }; }),
+    sig: edSig.value.trim(),
+    createdAt: edState.createdAt
+  };
+}
+function saveEditor() {
+  var e = editorEntry();
+  if (!e.body && e.photos.length === 0) {
+    alert("写点什么或加张照片吧。");
+    return;
+  }
+  var idx = -1;
+  if (edState.editingId) {
+    for (var i = 0; i < localEntries.length; i++) {
+      if (localEntries[i].id === edState.editingId) { idx = i; break; }
+    }
+  }
+  var backup = localEntries.slice();
+  if (idx >= 0) localEntries[idx] = e; else localEntries.push(e);
+  try {
+    saveLocalEntries(localEntries);
+  } catch (err) {
+    localEntries = backup;
+    alert("本机存储空间不够了，请删掉一些照片再保存。");
+    return;
+  }
+  closePreview();
+  closeEditor();
+  renderEntries();
+  renderCalendar();
+  selectDate(e.date);
+}
+function deleteEntry(id) {
+  if (!window.confirm("确定删除这篇日记吗？")) return;
+  localEntries = localEntries.filter(function (x) { return x.id !== id; });
+  saveLocalEntries(localEntries);
+  renderEntries();
+  renderCalendar();
+}
+/* 预览：与保存后卡片同一组件 */
+function showPreview() {
+  var e = editorEntry();
+  var box = document.getElementById("pvCard");
+  box.innerHTML = "";
+  box.appendChild(buildCard(e, { preview: true }));
+  document.getElementById("preview").classList.add("open");
+}
+function closePreview() {
+  document.getElementById("preview").classList.remove("open");
+}
+document.getElementById("newEntryBtn").addEventListener("click", function () { openEditor(null); });
+document.getElementById("edBack").addEventListener("click", function () {
+  if (edBody.value.trim() || edTitleInput.value.trim() || edState.photos.length > 0) {
+    if (!window.confirm("还没保存，确定返回吗？")) return;
+  }
+  closeEditor();
+});
+document.getElementById("edSaveBtn").addEventListener("click", saveEditor);
+document.getElementById("edSaveBtn2").addEventListener("click", saveEditor);
+document.getElementById("edPreviewBtn").addEventListener("click", showPreview);
+document.getElementById("edPreviewBtn2").addEventListener("click", showPreview);
+document.getElementById("pvBack").addEventListener("click", closePreview);
+document.getElementById("pvSaveBtn").addEventListener("click", saveEditor);
+
+/* ---- 分享图（810×1080 JPG，落款用自定义签名） ---- */
+function loadImage(src) {
+  return new Promise(function (resolve, reject) {
+    var img = new Image();
+    img.onload = function () { resolve(img); };
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+function wrapText(ctx, text, maxW) {
+  var lines = [], cur = "";
+  for (var i = 0; i < text.length; i++) {
+    var ch = text[i];
+    if (ch === "\n") { lines.push(cur); cur = ""; continue; }
+    if (ctx.measureText(cur + ch).width > maxW && cur) { lines.push(cur); cur = ch; }
+    else cur += ch;
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+function shareEntry(e) {
+  var done = function () {};
+  var p = (document.fonts ? document.fonts.load('32px FZJingLeiA', "日").catch(function () {}) : Promise.resolve());
+  p.then(function () {
+    var W = 810, H = 1080;
+    var cv = document.createElement("canvas");
+    cv.width = W; cv.height = H;
+    var ctx = cv.getContext("2d");
+    ctx.fillStyle = "#fffdf8";
+    ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = "#7a8a7f";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, W - 2, H - 2);
+    var y = 92;
+    /* 日期行居中 */
+    var dp = e.date.split("-");
+    var dd = new Date(+dp[0], +dp[1] - 1, +dp[2]);
+    var term = e.term || SOLAR_TERMS[e.date] || "";
+    var dateLine = (+dp[0]) + "年" + (+dp[1]) + "月" + (+dp[2]) + "日　周" + WEEKDAYS[dd.getDay()];
+    if (term) dateLine += " " + term;
+    var w = (e.weather || []).join("、");
+    if (w) dateLine += " · " + w;
+    ctx.fillStyle = "#000";
+    ctx.font = '32px FZJingLeiA, "Songti SC", serif';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText(dateLine, W / 2, y);
+    y += 56;
+    /* 表情居中 */
+    if ((e.emojis || []).length > 0) {
+      ctx.font = "36px sans-serif";
+      ctx.fillText(e.emojis.join(" "), W / 2, y);
+      y += 52;
+    }
+    /* 标题居中 */
+    if (e.title) {
+      ctx.fillStyle = "#000";
+      ctx.font = '54px FZJingLeiA, "Songti SC", serif';
+      wrapText(ctx, e.title, 690).slice(0, 2).forEach(function (ln) {
+        ctx.fillText(ln, W / 2, y);
+        y += 66;
+      });
+      y += 8;
+    }
+    /* 正文左对齐 */
+    ctx.fillStyle = "#000";
+    ctx.font = '45px FZJingLeiA, "Songti SC", serif';
+    ctx.textAlign = "left";
+    var bodyLines = [];
+    (e.body || "").split("\n").forEach(function (para) {
+      if (!para.trim()) { bodyLines.push(""); return; }
+      bodyLines = bodyLines.concat(wrapText(ctx, para, 690));
+    });
+    bodyLines.forEach(function (ln) {
+      ctx.fillText(ln, 60, y);
+      y += 76;
+    });
+    /* 照片：最多两行，每行三张 */
+    var photos = (e.photos || []).slice(0, 6);
+    var drawPhotos = function () {
+      /* 落款 */
+      var sig = e.sig || "";
+      if (sig) {
+        ctx.textAlign = "left";
+        ctx.font = '38px FZJingLeiA, "Songti SC", serif';
+        var sigW = ctx.measureText(sig).width;
+        ctx.font = '38px "Songti SC", serif';
+        var dashW = ctx.measureText("—— ").width;
+        var sx = 750 - dashW - sigW;
+        ctx.fillStyle = "#7a8a7f";
+        ctx.fillText("—— ", sx, 1010);
+        ctx.font = '38px FZJingLeiA, "Songti SC", serif';
+        ctx.fillText(sig, sx + dashW, 1010);
+      }
+      cv.toBlob(function (blob) {
+        if (!blob) { alert("分享图生成失败，请再试一次。"); return; }
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "日记分享图-" + e.date + ".jpg";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+      }, "image/jpeg", 0.9);
+    };
+    if (photos.length === 0) { drawPhotos(); return; }
+    var cell = 224, gap = 8, startX = 60;
+    var rows = (y + cell <= 940) ? 2 : ((y + cell <= 940 + cell + gap) ? 1 : 0);
+    if (rows === 0) { drawPhotos(); return; }
+    var list = photos.slice(0, rows * 3);
+    var loaded = 0, imgs = [];
+    list.forEach(function (ph, i) {
+      loadImage(ph.src).then(function (img) { imgs[i] = img; }).catch(function () {}).then(function () {
+        loaded++;
+        if (loaded === list.length) {
+          list.forEach(function (ph, j) {
+            var img = imgs[j];
+            if (!img) return;
+            var cx = startX + (j % 3) * (cell + gap);
+            var cy = y + Math.floor(j / 3) * (cell + gap);
+            var iw = img.naturalWidth, ih = img.naturalHeight;
+            var s = Math.max(cell / iw, cell / ih);
+            var dw = iw * s, dh = ih * s;
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(cx, cy, cell, cell);
+            ctx.clip();
+            ctx.drawImage(img, cx + (cell - dw) / 2, cy + (cell - dh) / 2, dw, dh);
+            ctx.restore();
+          });
+          drawPhotos();
+        }
+      });
+    });
+  });
+}
+
+renderEntries();
 renderCalendar();
 </script>
 </body>
