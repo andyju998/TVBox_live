@@ -189,6 +189,9 @@
     padding: 12px; font-size: 14px; color: var(--dim); cursor: pointer; font-family: inherit;
   }
   .editor .insert-btn:active { background: var(--accent-soft); color: var(--accent); }
+  /* 文件选择框：微信 webview 里 hidden 的 input 用 label 也打不开，必须留在布局里、
+     只用透明 1px 藏起来（不用 display:none / visibility:hidden / hidden 属性） */
+  #photoInput { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
   .editor .photo-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
   .editor .photo-thumbs .thumb { position: relative; aspect-ratio: 1 / 1; border-radius: 6px; overflow: hidden; background: var(--border); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; cursor: grab; }
   .editor .photo-thumbs .thumb img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
@@ -431,7 +434,7 @@
   </div>
 </div>
 
-<input type="file" id="photoInput" accept="image/*,video/*" multiple hidden />
+<input type="file" id="photoInput" accept="image/*,video/*" multiple />
 
 <div class="lightbox" id="lightbox" role="dialog" aria-label="放大看图">
   <button class="close" id="lbClose" aria-label="关闭">×</button>
