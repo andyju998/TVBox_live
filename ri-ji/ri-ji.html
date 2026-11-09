@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="light dark" />
 <title>光影随记 — 示例</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-192.png" />
 <style>
   @font-face {
     font-family: "FZJingLeiA";
@@ -975,8 +977,9 @@ function renderEmojiSheet() {
 }
 document.getElementById("emojiMask").addEventListener("click", closeEmojiSheet);
 /* HEIC：苹果手机拍的照片。Safari 能原生解，Chrome/安卓微信解不了。
-   原生解失败时用下面内嵌的 heic2any（libheif）转成 JPEG 再走正常压缩。
-   解码库只在第一次遇到解不开的 HEIC 时才从页面里取出来执行，平时不加载。 */
+   原生解失败时用 heic2any（libheif）转成 JPEG 再走正常压缩。
+   解码库放在同目录的 heic2any.min.js 里，只在第一次遇到解不开的
+   HEIC 时才动态加载，平时不加载。 */
 function isHeicFile(file) {
   if (!file) return false;
   if (file.type === "image/heic" || file.type === "image/heif") return true;
@@ -987,15 +990,14 @@ function loadHeicDecoder() {
   if (window.heic2any) return Promise.resolve();
   if (heicDecoderPromise) return heicDecoderPromise;
   heicDecoderPromise = new Promise(function (resolve, reject) {
-    try {
-      var src = document.getElementById("heicDecoderSrc");
-      if (!src) return reject(new Error("no decoder"));
-      var s = document.createElement("script");
-      s.textContent = src.textContent;
-      document.head.appendChild(s);
+    var s = document.createElement("script");
+    s.src = "heic2any.min.js";
+    s.onload = function () {
       if (window.heic2any) resolve();
       else reject(new Error("decoder failed"));
-    } catch (e) { reject(e); }
+    };
+    s.onerror = function () { reject(new Error("decoder load failed")); };
+    document.head.appendChild(s);
   });
   return heicDecoderPromise;
 }
@@ -1037,7 +1039,7 @@ function compressPhoto(file) {
           triedDataUrl = true;
           readFileAsDataURL(file).then(function (d) { decode(d, false); }).catch(fail);
         } else if ((isHeicFile(file) || !file.type) && !triedHeic) {
-          /* 原生解不开的 HEIC（Chrome/安卓）：用内嵌解码器转成 JPEG 再解一次。
+          /* 原生解不开的 HEIC（Chrome/安卓）：用 heic2any.min.js 解码器转成 JPEG 再解一次。
              没类型的文件也试一次——微信/QQ 拖出来的 HEIC 常常既无类型也无扩展名。 */
           triedHeic = true;
           decodeHeicToJpeg(file).then(function (jpg) {
