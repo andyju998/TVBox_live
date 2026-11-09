@@ -401,7 +401,7 @@ document.getElementById("goToday").addEventListener("click", function () {
     cell.className = "cell";
     cell.setAttribute("aria-label", "查看" + m.cap);
     var img = document.createElement("img");
-    img.src = m.thumb || m.src;
+    img.src = m.thumb || m.poster || m.src;
     img.alt = m.cap;
     img.loading = "lazy";
     cell.appendChild(img);
