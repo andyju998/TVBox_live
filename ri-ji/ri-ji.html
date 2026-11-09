@@ -189,9 +189,12 @@
     padding: 12px; font-size: 14px; color: var(--dim); cursor: pointer; font-family: inherit;
   }
   .editor .insert-btn:active { background: var(--accent-soft); color: var(--accent); }
-  /* 文件选择框：微信 webview 里 hidden 的 input 用 label 也打不开，必须留在布局里、
-     只用透明 1px 藏起来（不用 display:none / visibility:hidden / hidden 属性） */
-  #photoInput { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+  /* 文件选择框：微信 webview 里 hidden 的 input 用 label 也打不开，
+     1px 透明 input 也没反应。改成 input 直接叠在按钮上面、盖满按钮
+     区域（透明、cursor:pointer），点按钮就是直接点 input，不经过
+     label 触发。不要 display:none / visibility:hidden / hidden 属性。 */
+  .editor .insert-wrap { position: relative; }
+  #photoInput { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
   .editor .photo-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
   .editor .photo-thumbs .thumb { position: relative; aspect-ratio: 1 / 1; border-radius: 6px; overflow: hidden; background: var(--border); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; cursor: grab; }
   .editor .photo-thumbs .thumb img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
@@ -211,7 +214,7 @@
   .editor .photo-thumbs .thumb button.mv { top: auto; bottom: 4px; }
   .editor .photo-thumbs .thumb button.mv.prev { left: 4px; }
   .editor .photo-thumbs .thumb button.mv.next { right: 4px; }
-  .editor .photo-thumbs.drop-hot, .editor .photo-empty.drop-hot, .editor .insert-btn.drop-hot { outline: 2px dashed var(--accent); outline-offset: 2px; }
+  .editor .photo-thumbs.drop-hot, .editor .photo-empty.drop-hot, .editor .insert-btn.drop-hot, .editor .insert-wrap.drop-hot { outline: 2px dashed var(--accent); outline-offset: 2px; }
   .editor .photo-empty {
     display: none; margin-top: 8px; min-height: 96px;
     border: 1px dashed var(--border); border-radius: 8px;
@@ -394,8 +397,9 @@
     <div class="emoji-picked" id="edEmojiPicked"></div>
     <p class="note">点「😊 选表情」，挑几个合今天心情的表情；点一下选上，再点取消。选中的表情会显示在日记卡片上。</p>
     <p class="lbl">照片</p>
-    <div style="display:flex;gap:8px;margin-top:8px;">
+    <div class="insert-wrap" id="edAddPhotoWrap" style="display:flex;gap:8px;margin-top:8px;">
       <label class="insert-btn" id="edAddPhoto" for="photoInput">＋ 插入照片或视频</label>
+      <input type="file" id="photoInput" accept="image/*,video/*" multiple />
     </div>
     <div class="photo-thumbs" id="edPhotoThumbs"></div>
     <div class="photo-empty" id="edPhotoEmpty">把照片或视频拖到这里，也可以点上面按钮从本机选</div>
@@ -434,7 +438,7 @@
   </div>
 </div>
 
-<input type="file" id="photoInput" accept="image/*,video/*" multiple />
+</div>
 
 <div class="lightbox" id="lightbox" role="dialog" aria-label="放大看图">
   <button class="close" id="lbClose" aria-label="关闭">×</button>
@@ -1266,9 +1270,10 @@ function addEditorFiles(files) {
   });
   return picked.length;
 }
-/* 「＋ 插入照片或视频」是 label，直接关联 file input，点它原生触发
-   系统文件框，不走 JS 的 input.click()——微信 webview 常拦截程序化
-   点击，label 点按是用户手势，不会被拦。 */
+/* 「＋ 插入照片或视频」按钮：file input 直接叠在按钮上面、盖满按钮
+   区域（透明），点按钮就是直接点 input 开系统文件框，不走 JS 的
+   input.click()、也不经过 label 触发——微信 webview 拦程序化点击，
+   label＋1px 透明 input 两轮都试过没反应。 */
 document.getElementById("photoInput").addEventListener("change", function () {
   var files = this.files;
   this.value = "";
@@ -1280,7 +1285,9 @@ function setupDropZones() {
   var zones = [
     document.getElementById("edPhotoThumbs"),
     document.getElementById("edPhotoEmpty"),
-    document.getElementById("edAddPhoto")
+    /* 按钮投放区绑在包着按钮和 input 的 wrapper 上：input 叠在按钮上面，
+       拖到按钮上的事件落到 input、冒泡到 wrapper，到不了 label。 */
+    document.getElementById("edAddPhotoWrap")
   ];
   zones.forEach(function (z) {
     if (!z) return;
