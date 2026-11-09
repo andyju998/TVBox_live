@@ -184,7 +184,8 @@
     padding: 6px 14px; font-size: 14px; color: var(--accent); cursor: pointer; font-family: inherit;
   }
   .editor .insert-btn {
-    flex: 1; border: 1px dashed var(--border); border-radius: 8px; background: transparent;
+    flex: 1; display: block; box-sizing: border-box; text-align: center;
+    border: 1px dashed var(--border); border-radius: 8px; background: transparent;
     padding: 12px; font-size: 14px; color: var(--dim); cursor: pointer; font-family: inherit;
   }
   .editor .insert-btn:active { background: var(--accent-soft); color: var(--accent); }
@@ -391,7 +392,7 @@
     <p class="note">点「😊 选表情」，挑几个合今天心情的表情；点一下选上，再点取消。选中的表情会显示在日记卡片上。</p>
     <p class="lbl">照片</p>
     <div style="display:flex;gap:8px;margin-top:8px;">
-      <button type="button" class="insert-btn" id="edAddPhoto">＋ 插入照片或视频</button>
+      <label class="insert-btn" id="edAddPhoto" for="photoInput">＋ 插入照片或视频</label>
     </div>
     <div class="photo-thumbs" id="edPhotoThumbs"></div>
     <div class="photo-empty" id="edPhotoEmpty">把照片或视频拖到这里，也可以点上面按钮从本机选</div>
@@ -952,23 +953,35 @@ document.getElementById("emojiMask").addEventListener("click", closeEmojiSheet);
 /* 照片：本机上传，保存前缩到长边最多 1600px */
 function compressPhoto(file) {
   return new Promise(function (resolve, reject) {
-    var url = URL.createObjectURL(file);
-    var img = new Image();
-    img.onload = function () {
-      URL.revokeObjectURL(url);
-      var w = img.naturalWidth, h = img.naturalHeight;
-      var scale = Math.min(1, 1600 / Math.max(w, h));
-      var cv = document.createElement("canvas");
-      cv.width = Math.max(1, Math.round(w * scale));
-      cv.height = Math.max(1, Math.round(h * scale));
-      var ctx = cv.getContext("2d");
-      ctx.drawImage(img, 0, 0, cv.width, cv.height);
-      var data = cv.toDataURL("image/jpeg", 0.82);
-      if (data.length > 1200000) data = cv.toDataURL("image/jpeg", 0.7);
-      resolve(data);
-    };
-    img.onerror = function () { URL.revokeObjectURL(url); reject(new Error("bad image")); };
-    img.src = url;
+    var done = false, triedDataUrl = false;
+    function finish(data) { if (!done) { done = true; resolve(data); } }
+    function fail(err) { if (!done) { done = true; reject(err); } }
+    function decode(url, revoke) {
+      var img = new Image();
+      img.onload = function () {
+        if (revoke) URL.revokeObjectURL(url);
+        var w = img.naturalWidth, h = img.naturalHeight;
+        var scale = Math.min(1, 1600 / Math.max(w, h));
+        var cv = document.createElement("canvas");
+        cv.width = Math.max(1, Math.round(w * scale));
+        cv.height = Math.max(1, Math.round(h * scale));
+        var ctx = cv.getContext("2d");
+        ctx.drawImage(img, 0, 0, cv.width, cv.height);
+        var data = cv.toDataURL("image/jpeg", 0.82);
+        if (data.length > 1200000) data = cv.toDataURL("image/jpeg", 0.7);
+        finish(data);
+      };
+      img.onerror = function () {
+        if (revoke) URL.revokeObjectURL(url);
+        /* 有些 webview 里对象 URL 读图失败，改用 FileReader 再解码一次。 */
+        if (!triedDataUrl) {
+          triedDataUrl = true;
+          readFileAsDataURL(file).then(function (d) { decode(d, false); }).catch(fail);
+        } else fail(new Error("bad image"));
+      };
+      img.src = url;
+    }
+    decode(URL.createObjectURL(file), true);
   });
 }
 /* ---- 照片组拖拽（与空间日记同一套） ---- */
@@ -1193,7 +1206,11 @@ function isVideoFile(f) {
 }
 function isMediaFile(f) {
   if (f.type) return f.type.indexOf("image/") === 0 || f.type.indexOf("video/") === 0;
-  return /\.(jpe?g|png|webp|gif|bmp|avif|heic|heif|mp4|mov|m4v|webm)$/i.test(f.name || "");
+  if (/\.(jpe?g|png|webp|gif|bmp|avif|heic|heif|mp4|mov|m4v|webm)$/i.test(f.name || "")) return true;
+  /* 微信相册选出的文件有时既无 type、文件名也没有扩展名：文件框本身
+     只放行照片/视频（accept="image/*,video/*"），这种来源不明的文件
+     也认作媒体，交给后面的解码去验，验不过再提示。 */
+  return !(f.name && /\./.test(f.name));
 }
 /* 从一次 drop 里取文件：先取 dataTransfer.files，空了再从 items 里
    getAsFile() 取（有些来源只给 items 不给 files）。 */
@@ -1214,8 +1231,12 @@ function filesFromDrop(e) {
 /* 插入照片/视频的同一通道：点按钮选文件和外面拖进来都走这里。
    视频量时长截封面，超过 64MB 整批拦下。返回本次认出的媒体文件数。 */
 function addEditorFiles(files) {
-  var picked = Array.prototype.slice.call(files || []).filter(isMediaFile);
-  if (picked.length === 0) return 0;
+  var list = Array.prototype.slice.call(files || []);
+  var picked = list.filter(isMediaFile);
+  if (picked.length === 0) {
+    if (list.length > 0) alert("没认出选中的照片或视频，换一张再试，或直接把照片拖到这里。");
+    return 0;
+  }
   var over = picked.some(function (f) {
     return isVideoFile(f) && f.size > VIDEO_MAX_BYTES;
   });
@@ -1242,9 +1263,9 @@ function addEditorFiles(files) {
   });
   return picked.length;
 }
-document.getElementById("edAddPhoto").addEventListener("click", function () {
-  document.getElementById("photoInput").click();
-});
+/* 「＋ 插入照片或视频」是 label，直接关联 file input，点它原生触发
+   系统文件框，不走 JS 的 input.click()——微信 webview 常拦截程序化
+   点击，label 点按是用户手势，不会被拦。 */
 document.getElementById("photoInput").addEventListener("change", function () {
   var files = this.files;
   this.value = "";
