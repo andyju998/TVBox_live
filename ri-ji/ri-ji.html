@@ -189,13 +189,32 @@
   }
   .editor .insert-btn:active { background: var(--accent-soft); color: var(--accent); }
   .editor .photo-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
-  .editor .photo-thumbs .thumb { position: relative; aspect-ratio: 1 / 1; border-radius: 6px; overflow: hidden; background: var(--border); }
-  .editor .photo-thumbs .thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .editor .photo-thumbs .thumb { position: relative; aspect-ratio: 1 / 1; border-radius: 6px; overflow: hidden; background: var(--border); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; cursor: grab; }
+  .editor .photo-thumbs .thumb img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+  .editor .photo-thumbs .thumb.dragging { z-index: 30; cursor: grabbing; box-shadow: 0 10px 16px rgba(0,0,0,.35); }
+  .editor .photo-thumbs .thumb.drop-target { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .editor .photo-thumbs .thumb .vbadge {
+    position: absolute; top: 4px; left: 4px; border-radius: 999px;
+    background: rgba(0,0,0,.55); color: #fff; padding: 2px 8px;
+    font-size: 10px; pointer-events: none;
+  }
   .editor .photo-thumbs .thumb button {
-    position: absolute; top: 4px; right: 4px; width: 24px; height: 24px;
+    position: absolute; width: 24px; height: 24px;
     border: 0; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff;
     font-size: 14px; cursor: pointer;
   }
+  .editor .photo-thumbs .thumb button.x { top: 4px; right: 4px; }
+  .editor .photo-thumbs .thumb button.mv { top: auto; bottom: 4px; }
+  .editor .photo-thumbs .thumb button.mv.prev { left: 4px; }
+  .editor .photo-thumbs .thumb button.mv.next { right: 4px; }
+  .editor .photo-thumbs.drop-hot, .editor .photo-empty.drop-hot, .editor .insert-btn.drop-hot { outline: 2px dashed var(--accent); outline-offset: 2px; }
+  .editor .photo-empty {
+    display: none; margin-top: 8px; min-height: 96px;
+    border: 1px dashed var(--border); border-radius: 8px;
+    color: var(--dim); font-size: 13px; text-align: center;
+    align-items: center; justify-content: center; padding: 16px;
+  }
+  .editor .photo-empty.show { display: flex; }
   .editor .save-note { margin-top: 20px; font-size: 12px; line-height: 20px; color: var(--dim); text-align: center; }
   .editor .ed-bottom { display: flex; gap: 10px; margin-top: 16px; }
   .editor .ed-bottom button {
@@ -372,10 +391,11 @@
     <p class="note">点「😊 选表情」，挑几个合今天心情的表情；点一下选上，再点取消。选中的表情会显示在日记卡片上。</p>
     <p class="lbl">照片</p>
     <div style="display:flex;gap:8px;margin-top:8px;">
-      <button type="button" class="insert-btn" id="edAddPhoto">＋ 插入照片</button>
+      <button type="button" class="insert-btn" id="edAddPhoto">＋ 插入照片或视频</button>
     </div>
     <div class="photo-thumbs" id="edPhotoThumbs"></div>
-    <p class="note">从本机选照片（可多选），保存前会缩到适合日记的大小。</p>
+    <div class="photo-empty" id="edPhotoEmpty">把照片或视频拖到这里，也可以点上面按钮从本机选</div>
+    <p class="note">从本机选照片或视频（可多选），也可以直接拖进来；照片保存前会缩到适合日记的大小，视频超过 64MB 存不进来。</p>
     <label class="lbl" for="edBody">正文</label>
     <textarea id="edBody" placeholder="写点什么吧……"></textarea>
     <label class="lbl" for="edSig">签名（可不填）</label>
@@ -410,7 +430,7 @@
   </div>
 </div>
 
-<input type="file" id="photoInput" accept="image/*" multiple hidden />
+<input type="file" id="photoInput" accept="image/*,video/*" multiple hidden />
 
 <div class="lightbox" id="lightbox" role="dialog" aria-label="放大看图">
   <button class="close" id="lbClose" aria-label="关闭">×</button>
@@ -691,6 +711,7 @@ function buildCard(e, opts) {
     card.appendChild(el("p", "body", para));
   });
   var media = e.media || (e.photos || []).map(function (ph) {
+    if (ph.kind === "video") return { kind: "video", src: ph.src, poster: ph.poster || "", duration: ph.duration || null, cap: ph.cap || "视频" };
     return { kind: "photo", src: ph.src, cap: ph.cap || "照片" };
   });
   if (media.length > 0) {
@@ -811,7 +832,10 @@ function openEditor(entry) {
     term: entry ? (entry.term || "") : (SOLAR_TERMS[d] || ""),
     termTouched: false,
     emojis: entry ? (entry.emojis || []).slice() : [],
-    photos: entry ? (entry.photos || []).map(function (p) { return { src: p.src, cap: p.cap || "照片" }; }) : []
+    photos: entry ? (entry.photos || []).map(function (p) {
+      if (p.kind === "video") return { kind: "video", src: p.src, poster: p.poster || "", duration: p.duration || null, cap: p.cap || "视频" };
+      return { kind: "photo", src: p.src, cap: p.cap || "照片" };
+    }) : []
   };
   document.getElementById("edTitle").textContent = entry ? "编辑日记" : "写新日记";
   edDate.value = d;
@@ -947,46 +971,293 @@ function compressPhoto(file) {
     img.src = url;
   });
 }
+/* ---- 照片组拖拽（与空间日记同一套） ---- */
+var VIDEO_MAX_BYTES = 64 * 1024 * 1024;
+var dragState = null;
+var suppressZoomUntil = 0;
+function swallowNextClick() {
+  var h = function (ev) { ev.stopPropagation(); ev.preventDefault(); };
+  window.addEventListener("click", h, { capture: true, once: true });
+  window.setTimeout(function () { window.removeEventListener("click", h, { capture: true }); }, 500);
+}
+function formatDuration(sec) {
+  if (sec == null || !isFinite(sec)) return "";
+  var total = Math.max(0, Math.round(sec));
+  var m = Math.floor(total / 60), s = total % 60;
+  return m + ":" + (s < 10 ? "0" : "") + s;
+}
+/* 拖拽落位：把第 from 项抽出来插到第 to 格，中间的依次顺移 */
+function movePhotoTo(from, to) {
+  var n = edState.photos.length;
+  if (from === to || from < 0 || to < 0 || from >= n || to >= n) return;
+  var moved = edState.photos.splice(from, 1)[0];
+  edState.photos.splice(to, 0, moved);
+}
+/* 组内拖拽排序：按住组里任意一项开始拖。移动 ≤8px 松手仍是点击
+   （放大查看）；超过才进入拖拽，被拖项跟随指针，落点格描边高亮，
+   松手落到那一格。落点按网格几何算（3 列、间距 8，格高读现值）。 */
+function startItemDrag(e, index) {
+  if (e.pointerType === "mouse" && e.button !== 0) return;
+  if (e.target.closest("button")) return;
+  var grid = document.getElementById("edPhotoThumbs");
+  var st = {
+    index: index,
+    startX: e.clientX, startY: e.clientY,
+    active: false, target: index,
+    len: edState.photos.length
+  };
+  dragState = st;
+  var onMove = function (ev) {
+    var dx = ev.clientX - st.startX, dy = ev.clientY - st.startY;
+    if (!st.active && Math.hypot(dx, dy) <= 8) return;
+    st.active = true;
+    var r = grid.getBoundingClientRect();
+    var pitchX = (r.width - 16) / 3 + 8;
+    var col = Math.min(2, Math.max(0, Math.floor((ev.clientX - r.left) / pitchX)));
+    var first = grid.querySelector(".thumb");
+    var cellH = first ? first.getBoundingClientRect().height : 0;
+    var pitchY = cellH + 8;
+    var row = pitchY > 0 ? Math.max(0, Math.floor((ev.clientY - r.top) / pitchY)) : 0;
+    st.target = Math.min(st.len - 1, row * 3 + col);
+    var thumbs = grid.querySelectorAll(".thumb");
+    var dragged = thumbs[st.index];
+    if (dragged) {
+      dragged.classList.add("dragging");
+      dragged.style.transform = "translate(" + dx + "px," + dy + "px)";
+    }
+    for (var k = 0; k < thumbs.length; k++) {
+      if (k === st.target && k !== st.index) thumbs[k].classList.add("drop-target");
+      else thumbs[k].classList.remove("drop-target");
+    }
+  };
+  var clearDragLook = function () {
+    var thumbs = grid.querySelectorAll(".thumb");
+    for (var k = 0; k < thumbs.length; k++) {
+      thumbs[k].classList.remove("dragging");
+      thumbs[k].classList.remove("drop-target");
+      thumbs[k].style.transform = "";
+    }
+  };
+  var cleanup = function () {
+    window.removeEventListener("pointermove", onMove);
+    window.removeEventListener("pointerup", onUp);
+    window.removeEventListener("pointercancel", onCancel);
+  };
+  var onUp = function () {
+    cleanup();
+    if (st.active) {
+      suppressZoomUntil = Date.now() + 400;
+      swallowNextClick();
+      if (st.target !== st.index) {
+        movePhotoTo(st.index, st.target);
+        renderPhotoThumbs();
+      } else {
+        clearDragLook();
+      }
+    }
+    dragState = null;
+  };
+  var onCancel = function () {
+    cleanup();
+    clearDragLook();
+    dragState = null;
+  };
+  window.addEventListener("pointermove", onMove);
+  window.addEventListener("pointerup", onUp);
+  window.addEventListener("pointercancel", onCancel);
+}
+function editorMediaList() {
+  return edState.photos.map(function (p) {
+    if (p.kind === "video") return { kind: "video", src: p.src, poster: p.poster || "", duration: p.duration || null, cap: p.cap || "视频" };
+    return { kind: "photo", src: p.src, cap: p.cap || "照片" };
+  });
+}
 function renderPhotoThumbs() {
   var box = document.getElementById("edPhotoThumbs");
   box.innerHTML = "";
   edState.photos.forEach(function (p, i) {
     var d = document.createElement("div");
     d.className = "thumb";
+    d.setAttribute("data-index", String(i));
     var img = document.createElement("img");
-    img.src = p.src;
-    img.alt = p.cap || "照片";
+    img.src = p.kind === "video" ? (p.poster || p.src) : p.src;
+    img.alt = p.cap || (p.kind === "video" ? "视频" : "照片");
+    img.draggable = false;
     d.appendChild(img);
+    if (p.kind === "video") {
+      var vb = document.createElement("span");
+      vb.className = "vbadge";
+      vb.textContent = "▶" + (p.duration ? " " + formatDuration(p.duration) : "");
+      d.appendChild(vb);
+    }
     var x = document.createElement("button");
     x.type = "button";
+    x.className = "x";
     x.textContent = "×";
-    x.setAttribute("aria-label", "删除这张照片");
-    x.addEventListener("click", function () {
+    x.setAttribute("aria-label", p.kind === "video" ? "删除这段视频" : "删除这张照片");
+    x.addEventListener("click", function (ev) {
+      ev.stopPropagation();
       edState.photos.splice(i, 1);
       renderPhotoThumbs();
     });
     d.appendChild(x);
+    if (i > 0) {
+      var prev = document.createElement("button");
+      prev.type = "button";
+      prev.className = "mv prev";
+      prev.textContent = "‹";
+      prev.setAttribute("aria-label", "往前移");
+      prev.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        movePhotoTo(i, i - 1);
+        renderPhotoThumbs();
+      });
+      d.appendChild(prev);
+    }
+    if (i < edState.photos.length - 1) {
+      var next = document.createElement("button");
+      next.type = "button";
+      next.className = "mv next";
+      next.textContent = "›";
+      next.setAttribute("aria-label", "往后移");
+      next.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        movePhotoTo(i, i + 1);
+        renderPhotoThumbs();
+      });
+      d.appendChild(next);
+    }
+    d.addEventListener("pointerdown", function (ev) { startItemDrag(ev, i); });
+    d.addEventListener("click", function (ev) {
+      if (ev.target.closest("button")) return;
+      if (Date.now() < suppressZoomUntil) return;
+      openLightbox(editorMediaList(), i);
+    });
     box.appendChild(d);
+  });
+  document.getElementById("edPhotoEmpty").classList.toggle("show", edState.photos.length === 0);
+}
+/* 选好一段视频后，先在本地量出时长、截一帧当封面。量不到时长或
+   截不到帧也不拦着插入——视频本体能存能播就行。 */
+function probeVideoFile(file) {
+  return new Promise(function (resolve) {
+    var url = URL.createObjectURL(file);
+    var video = document.createElement("video");
+    var dur = null, done = false;
+    var timer = window.setTimeout(function () { finish(null); }, 8000);
+    function finish(poster) {
+      if (done) return;
+      done = true;
+      window.clearTimeout(timer);
+      URL.revokeObjectURL(url);
+      resolve({ duration: dur, poster: poster });
+    }
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = "auto";
+    video.onloadedmetadata = function () {
+      if (isFinite(video.duration)) dur = video.duration;
+      try { video.currentTime = Math.min(0.5, (video.duration || 1) / 2); }
+      catch (err) { finish(null); }
+    };
+    video.onseeked = function () {
+      try {
+        var w = video.videoWidth || 640, h = video.videoHeight || 360;
+        var scale = Math.min(1, 960 / Math.max(w, h));
+        var cv = document.createElement("canvas");
+        cv.width = Math.max(2, Math.round(w * scale));
+        cv.height = Math.max(2, Math.round(h * scale));
+        var cx = cv.getContext("2d");
+        if (!cx) { finish(null); return; }
+        cx.drawImage(video, 0, 0, cv.width, cv.height);
+        finish(cv.toDataURL("image/jpeg", 0.82));
+      } catch (err) { finish(null); }
+    };
+    video.onerror = function () { finish(null); };
+    video.src = url;
+  });
+}
+function readFileAsDataURL(file) {
+  return new Promise(function (resolve, reject) {
+    var r = new FileReader();
+    r.onload = function () { resolve(r.result); };
+    r.onerror = function () { reject(new Error("read failed")); };
+    r.readAsDataURL(file);
+  });
+}
+/* 插入照片/视频的同一通道：点按钮选文件和外面拖进来都走这里。
+   视频量时长截封面，超过 64MB 整批拦下。 */
+function addEditorFiles(files) {
+  var picked = Array.prototype.slice.call(files || []).filter(function (f) {
+    return f.type.indexOf("image/") === 0 || f.type.indexOf("video/") === 0;
+  });
+  if (picked.length === 0) return;
+  var over = picked.some(function (f) {
+    return f.type.indexOf("video/") === 0 && f.size > VIDEO_MAX_BYTES;
+  });
+  if (over) {
+    alert("选中的视频里有超过 64MB 的，太大了存不进来。可以在剪映里导出时选 1080p 或 720p，再回来试。");
+    return;
+  }
+  var failed = 0;
+  var jobs = picked.map(function (f) {
+    if (f.type.indexOf("video/") === 0) {
+      return probeVideoFile(f).then(function (info) {
+        return readFileAsDataURL(f).then(function (data) {
+          edState.photos.push({ kind: "video", src: data, poster: info.poster || "", duration: info.duration, cap: "视频" });
+        });
+      }).catch(function () { failed++; });
+    }
+    return compressPhoto(f).then(function (data) {
+      edState.photos.push({ kind: "photo", src: data, cap: "照片" });
+    }).catch(function () { failed++; });
+  });
+  Promise.all(jobs).then(function () {
+    renderPhotoThumbs();
+    if (failed > 0) alert("有 " + failed + " 个文件打不开，已跳过。");
   });
 }
 document.getElementById("edAddPhoto").addEventListener("click", function () {
   document.getElementById("photoInput").click();
 });
 document.getElementById("photoInput").addEventListener("change", function () {
-  var files = Array.prototype.slice.call(this.files || []);
+  var files = this.files;
   this.value = "";
-  if (files.length === 0) return;
-  var failed = 0;
-  var jobs = files.map(function (f) {
-    return compressPhoto(f).then(function (data) {
-      edState.photos.push({ src: data, cap: "照片" });
-    }).catch(function () { failed++; });
-  });
-  Promise.all(jobs).then(function () {
-    renderPhotoThumbs();
-    if (failed > 0) alert("有 " + failed + " 张照片打不开，已跳过。");
-  });
+  addEditorFiles(files);
 });
+/* 电脑文件拖入：照片组、空框、「＋ 插入照片或视频」按钮都是投放区。
+   编辑器根兜底拦住文件拖拽的默认行为，防浏览器直接打开文件。 */
+function setupDropZones() {
+  var zones = [
+    document.getElementById("edPhotoThumbs"),
+    document.getElementById("edPhotoEmpty"),
+    document.getElementById("edAddPhoto")
+  ];
+  zones.forEach(function (z) {
+    if (!z) return;
+    z.addEventListener("dragover", function (e) {
+      if (!e.dataTransfer || Array.prototype.indexOf.call(e.dataTransfer.types, "Files") < 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+      e.dataTransfer.dropEffect = "copy";
+      z.classList.add("drop-hot");
+    });
+    z.addEventListener("dragleave", function (e) {
+      if (!z.contains(e.relatedTarget)) z.classList.remove("drop-hot");
+    });
+    z.addEventListener("drop", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      z.classList.remove("drop-hot");
+      addEditorFiles(e.dataTransfer.files);
+    });
+  });
+  var editor = document.getElementById("editor");
+  editor.addEventListener("dragover", function (e) {
+    if (e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types, "Files") >= 0) e.preventDefault();
+  });
+  editor.addEventListener("drop", function (e) { e.preventDefault(); });
+}
 edDate.addEventListener("change", function () {
   if (!edState.termTouched) {
     edState.term = SOLAR_TERMS[edDate.value] || "";
@@ -1002,7 +1273,10 @@ function editorEntry() {
     weather: edState.weather.slice(),
     term: edState.term,
     emojis: edState.emojis.slice(),
-    photos: edState.photos.map(function (p) { return { src: p.src, cap: p.cap || "照片" }; }),
+    photos: edState.photos.map(function (p) {
+      if (p.kind === "video") return { kind: "video", src: p.src, poster: p.poster || "", duration: p.duration || null, cap: p.cap || "视频" };
+      return { kind: "photo", src: p.src, cap: p.cap || "照片" };
+    }),
     sig: edSig.value.trim(),
     createdAt: edState.createdAt
   };
@@ -1178,7 +1452,7 @@ function shareEntry(e) {
     var list = photos.slice(0, rows * 3);
     var loaded = 0, imgs = [];
     list.forEach(function (ph, i) {
-      loadImage(ph.src).then(function (img) { imgs[i] = img; }).catch(function () {}).then(function () {
+      loadImage(ph.poster || ph.src).then(function (img) { imgs[i] = img; }).catch(function () {}).then(function () {
         loaded++;
         if (loaded === list.length) {
           list.forEach(function (ph, j) {
@@ -1205,6 +1479,7 @@ function shareEntry(e) {
 
 renderEntries();
 renderCalendar();
+setupDropZones();
 </script>
 </body>
 </html>
