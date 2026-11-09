@@ -628,7 +628,7 @@
               <button type="button" class="mini-btn" id="photoRemoveBtn">全部移除</button>
             </div>
           </div>
-          <input type="file" id="photoInput" accept="image/*" multiple hidden />
+          <input type="file" id="photoInput" accept="image/*,.heic,.heif" multiple hidden />
         </div>
 
         <div class="field">
@@ -1595,6 +1595,66 @@
         if (rtWrap) { rtWrap.innerHTML = ""; rtWrap.hidden = true; }
       }
 
+      // ---------- HEIC（苹果手机照片）：Safari 能原生解，Chrome/安卓解不了。
+      // 原生解失败时懒加载同目录的 heic2any.min.js（libheif）转成 JPEG 再解，
+      // 和公开版日记同一套办法；平时不加载，JPG/PNG 的路径一字不变。 ----------
+      function isHeicFile(f) {
+        if (!f) return false;
+        if (f.type === "image/heic" || f.type === "image/heif") return true;
+        return /\.(heic|heif)$/i.test(f.name || "");
+      }
+      var heicDecoderPromise = null;
+      function loadHeicDecoder() {
+        if (window.heic2any) return Promise.resolve();
+        if (heicDecoderPromise) return heicDecoderPromise;
+        heicDecoderPromise = new Promise(function (resolve, reject) {
+          var s = document.createElement("script");
+          s.src = "heic2any.min.js";
+          s.onload = function () {
+            if (window.heic2any) resolve();
+            else reject(new Error("decoder failed"));
+          };
+          s.onerror = function () { reject(new Error("decoder load failed")); };
+          document.head.appendChild(s);
+        });
+        heicDecoderPromise.catch(function () { heicDecoderPromise = null; });
+        return heicDecoderPromise;
+      }
+      function decodeHeicToJpeg(file) {
+        return loadHeicDecoder().then(function () {
+          return window.heic2any({ blob: file, toType: "image/jpeg", quality: 0.85 });
+        }).then(function (out) {
+          var blob = Array.isArray(out) ? out[0] : out;
+          if (!blob) throw new Error("empty decode");
+          var base = (file.name || "photo").replace(/\.[^.]*$/, "") || "photo";
+          return new File([blob], base + ".jpg", { type: "image/jpeg" });
+        });
+      }
+      // 一张照片文件 → { url, profile }；解不开返回 null。HEIC 原生解失败时
+      // 先转 JPEG 再解一次，槽里的 url 换成转好那张的，保证九宫格缩略图
+      // 在这台设备上也显示得出来。
+      function loadPhotoSlot(file) {
+        return new Promise(function (resolve) {
+          function attempt(f, isRetry) {
+            var url = URL.createObjectURL(f);
+            var img = new Image();
+            img.onload = function () {
+              resolve({ url: url, profile: analyzePhoto(img) });
+            };
+            img.onerror = function () {
+              URL.revokeObjectURL(url);
+              if (!isRetry && (isHeicFile(file) || !file.type)) {
+                decodeHeicToJpeg(file).then(function (jpg) {
+                  attempt(jpg, true);
+                }).catch(function () { resolve(null); });
+              } else resolve(null);
+            };
+            img.src = url;
+          }
+          attempt(file, false);
+        });
+      }
+
       function handlePhotoFiles(fileList) {
         if (!fileList || !fileList.length) return;
         var files = Array.prototype.slice.call(fileList);
@@ -1602,8 +1662,11 @@
         if (remain <= 0) { showToast("最多放 9 张，已经满了"); return; }
         var skippedType = 0;
         var validFiles = files.filter(function (f) {
-          if (f.type.indexOf("image/") !== 0) { skippedType++; return false; }
-          return true;
+          if (f.type.indexOf("image/") === 0) return true;
+          // 拖进来的照片常常没类型：按扩展名认（HEIC 也在这里放行，
+          // 后面原生解不开会走 HEIC 转码），扩展名也认不出的才跳过。
+          if (!f.type && /\.(jpe?g|png|gif|webp|bmp|avif|heic|heif)$/i.test(f.name || "")) return true;
+          skippedType++; return false;
         });
         if (skippedType) showToast("有 " + skippedType + " 个不是照片，已跳过");
         if (validFiles.length > remain) {
@@ -1614,20 +1677,11 @@
         var pending = validFiles.length;
         var slots = validFiles.map(function () { return null; });
         validFiles.forEach(function (file, i) {
-          var url = URL.createObjectURL(file);
-          var img = new Image();
-          img.onload = function () {
-            slots[i] = { url: url, profile: analyzePhoto(img) };
+          loadPhotoSlot(file).then(function (slot) {
+            slots[i] = slot || false;
             pending--;
             if (pending === 0) finishAdd(slots);
-          };
-          img.onerror = function () {
-            URL.revokeObjectURL(url);
-            slots[i] = false;
-            pending--;
-            if (pending === 0) finishAdd(slots);
-          };
-          img.src = url;
+          });
         });
         function finishAdd(list) {
           var added = 0, failed = 0;
