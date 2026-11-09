@@ -58,16 +58,14 @@
   }
   @media (prefers-color-scheme: dark) { header.top h1 { color: var(--text); } }
   header.top .sub { margin-top: 2px; font-size: 13px; color: var(--dim); }
-  /* 日历 */
+  /* 日历：高度随内容自适应，不固定高度、不截断（微信 webview 字体偏大时 6 行日期装不下会溢出卡片） */
   .calendar {
     display: flex; flex-direction: column;
-    height: 230px;
     background: var(--surface);
     border-radius: var(--radius);
     padding: 6px 10px;
     box-shadow: 0 1px 4px rgba(0,0,0,.06);
   }
-  @media (min-width: 640px) { .calendar { height: 220px; } }
   .cal-head { display: flex; align-items: center; justify-content: space-between; }
   .cal-head button.nav {
     display: flex; align-items: center; justify-content: center;
@@ -88,7 +86,7 @@
     font-size: 11px; color: var(--dim);
   }
   .cal-week div { padding: 0; line-height: 13px; }
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); flex: 1; grid-auto-rows: 1fr; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: minmax(30px, 1fr); }
   .cal-grid button.day {
     position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
     width: 100%; max-width: 56px; margin: 0 auto; padding: 0;
