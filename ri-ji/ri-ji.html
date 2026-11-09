@@ -1185,23 +1185,47 @@ function readFileAsDataURL(file) {
     r.readAsDataURL(file);
   });
 }
+/* 有些拖拽来源（微信/QQ 聊天窗口、个别文件夹）不给 type，
+   或 dataTransfer.files 为空：按文件名扩展名再认一次媒体文件。 */
+function isVideoFile(f) {
+  if (f.type) return f.type.indexOf("video/") === 0;
+  return /\.(mp4|mov|m4v|webm)$/i.test(f.name || "");
+}
+function isMediaFile(f) {
+  if (f.type) return f.type.indexOf("image/") === 0 || f.type.indexOf("video/") === 0;
+  return /\.(jpe?g|png|webp|gif|bmp|avif|heic|heif|mp4|mov|m4v|webm)$/i.test(f.name || "");
+}
+/* 从一次 drop 里取文件：先取 dataTransfer.files，空了再从 items 里
+   getAsFile() 取（有些来源只给 items 不给 files）。 */
+function filesFromDrop(e) {
+  var dt = e.dataTransfer || {};
+  var out = [];
+  if (dt.files && dt.files.length) {
+    out = Array.prototype.slice.call(dt.files);
+  } else if (dt.items) {
+    for (var i = 0; i < dt.items.length; i++) {
+      var it = dt.items[i];
+      var f = (it && it.kind === "file" && it.getAsFile) ? it.getAsFile() : null;
+      if (f) out.push(f);
+    }
+  }
+  return out;
+}
 /* 插入照片/视频的同一通道：点按钮选文件和外面拖进来都走这里。
-   视频量时长截封面，超过 64MB 整批拦下。 */
+   视频量时长截封面，超过 64MB 整批拦下。返回本次认出的媒体文件数。 */
 function addEditorFiles(files) {
-  var picked = Array.prototype.slice.call(files || []).filter(function (f) {
-    return f.type.indexOf("image/") === 0 || f.type.indexOf("video/") === 0;
-  });
-  if (picked.length === 0) return;
+  var picked = Array.prototype.slice.call(files || []).filter(isMediaFile);
+  if (picked.length === 0) return 0;
   var over = picked.some(function (f) {
-    return f.type.indexOf("video/") === 0 && f.size > VIDEO_MAX_BYTES;
+    return isVideoFile(f) && f.size > VIDEO_MAX_BYTES;
   });
   if (over) {
     alert("选中的视频里有超过 64MB 的，太大了存不进来。可以在剪映里导出时选 1080p 或 720p，再回来试。");
-    return;
+    return 0;
   }
   var failed = 0;
   var jobs = picked.map(function (f) {
-    if (f.type.indexOf("video/") === 0) {
+    if (isVideoFile(f)) {
       return probeVideoFile(f).then(function (info) {
         return readFileAsDataURL(f).then(function (data) {
           edState.photos.push({ kind: "video", src: data, poster: info.poster || "", duration: info.duration, cap: "视频" });
@@ -1216,6 +1240,7 @@ function addEditorFiles(files) {
     renderPhotoThumbs();
     if (failed > 0) alert("有 " + failed + " 个文件打不开，已跳过。");
   });
+  return picked.length;
 }
 document.getElementById("edAddPhoto").addEventListener("click", function () {
   document.getElementById("photoInput").click();
@@ -1235,8 +1260,16 @@ function setupDropZones() {
   ];
   zones.forEach(function (z) {
     if (!z) return;
+    /* 注意：dragover 必须无条件 preventDefault，否则浏览器根本不触发
+       drop。之前只在 types 含 "Files" 时才放行，从微信/QQ 等来源拖
+       照片时 types 里没有 Files，drop 永远到不了，一直静默失败。 */
+    z.addEventListener("dragenter", function (e) {
+      if (!e.dataTransfer) return;
+      e.preventDefault();
+      e.stopPropagation();
+    });
     z.addEventListener("dragover", function (e) {
-      if (!e.dataTransfer || Array.prototype.indexOf.call(e.dataTransfer.types, "Files") < 0) return;
+      if (!e.dataTransfer) return;
       e.preventDefault();
       e.stopPropagation();
       e.dataTransfer.dropEffect = "copy";
@@ -1249,12 +1282,19 @@ function setupDropZones() {
       e.preventDefault();
       e.stopPropagation();
       z.classList.remove("drop-hot");
-      addEditorFiles(e.dataTransfer.files);
+      var files = filesFromDrop(e);
+      if (files.length === 0) {
+        alert("没读到拖进来的照片，请用「＋ 插入照片或视频」按钮从本机选照片。");
+        return;
+      }
+      if (addEditorFiles(files) === 0) {
+        alert("拖进来的不是照片或视频，换个文件再试，或用「＋ 插入照片或视频」按钮从本机选。");
+      }
     });
   });
   var editor = document.getElementById("editor");
   editor.addEventListener("dragover", function (e) {
-    if (e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types, "Files") >= 0) e.preventDefault();
+    if (e.dataTransfer) e.preventDefault();
   });
   editor.addEventListener("drop", function (e) { e.preventDefault(); });
 }
