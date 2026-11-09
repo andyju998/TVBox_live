@@ -401,7 +401,7 @@
     <p class="lbl">照片</p>
     <div class="insert-wrap" id="edAddPhotoWrap" style="display:flex;gap:8px;margin-top:8px;">
       <label class="insert-btn" id="edAddPhoto" for="photoInput">＋ 插入照片或视频</label>
-      <input type="file" id="photoInput" accept="image/*,video/*" multiple />
+      <input type="file" id="photoInput" accept="image/*,.heic,.heif,video/*" multiple />
     </div>
     <p class="wx-hint" id="edWxHint"></p>
     <div class="photo-thumbs" id="edPhotoThumbs"></div>
@@ -974,10 +974,45 @@ function renderEmojiSheet() {
   });
 }
 document.getElementById("emojiMask").addEventListener("click", closeEmojiSheet);
+/* HEIC：苹果手机拍的照片。Safari 能原生解，Chrome/安卓微信解不了。
+   原生解失败时用下面内嵌的 heic2any（libheif）转成 JPEG 再走正常压缩。
+   解码库只在第一次遇到解不开的 HEIC 时才从页面里取出来执行，平时不加载。 */
+function isHeicFile(file) {
+  if (!file) return false;
+  if (file.type === "image/heic" || file.type === "image/heif") return true;
+  return /\.(heic|heif)$/i.test(file.name || "");
+}
+var heicDecoderPromise = null;
+function loadHeicDecoder() {
+  if (window.heic2any) return Promise.resolve();
+  if (heicDecoderPromise) return heicDecoderPromise;
+  heicDecoderPromise = new Promise(function (resolve, reject) {
+    try {
+      var src = document.getElementById("heicDecoderSrc");
+      if (!src) return reject(new Error("no decoder"));
+      var s = document.createElement("script");
+      s.textContent = src.textContent;
+      document.head.appendChild(s);
+      if (window.heic2any) resolve();
+      else reject(new Error("decoder failed"));
+    } catch (e) { reject(e); }
+  });
+  return heicDecoderPromise;
+}
+function decodeHeicToJpeg(file) {
+  return loadHeicDecoder().then(function () {
+    return window.heic2any({ blob: file, toType: "image/jpeg", quality: 0.85 });
+  }).then(function (out) {
+    var blob = Array.isArray(out) ? out[0] : out;
+    if (!blob) throw new Error("empty decode");
+    var base = (file.name || "photo").replace(/\.[^.]*$/, "") || "photo";
+    return new File([blob], base + ".jpg", { type: "image/jpeg" });
+  });
+}
 /* 照片：本机上传，保存前缩到长边最多 1600px */
 function compressPhoto(file) {
   return new Promise(function (resolve, reject) {
-    var done = false, triedDataUrl = false;
+    var done = false, triedDataUrl = false, triedHeic = false;
     function finish(data) { if (!done) { done = true; resolve(data); } }
     function fail(err) { if (!done) { done = true; reject(err); } }
     function decode(url, revoke) {
@@ -1001,6 +1036,13 @@ function compressPhoto(file) {
         if (!triedDataUrl) {
           triedDataUrl = true;
           readFileAsDataURL(file).then(function (d) { decode(d, false); }).catch(fail);
+        } else if ((isHeicFile(file) || !file.type) && !triedHeic) {
+          /* 原生解不开的 HEIC（Chrome/安卓）：用内嵌解码器转成 JPEG 再解一次。
+             没类型的文件也试一次——微信/QQ 拖出来的 HEIC 常常既无类型也无扩展名。 */
+          triedHeic = true;
+          decodeHeicToJpeg(file).then(function (jpg) {
+            decode(URL.createObjectURL(jpg), true);
+          }).catch(fail);
         } else fail(new Error("bad image"));
       };
       img.src = url;
@@ -1292,7 +1334,9 @@ function addEditorFiles(files) {
    input.click()、也不经过 label 触发——微信 webview 拦程序化点击，
    label＋1px 透明 input 两轮都试过没反应。 */
 document.getElementById("photoInput").addEventListener("change", function () {
-  var files = this.files;
+  /* input.files 是 live FileList：先拷成真数组再清空 value，否则
+     this.value="" 会把 files 也清掉，选了照片也加不进来、还不报错。 */
+  var files = Array.prototype.slice.call(this.files || []);
   this.value = "";
   addEditorFiles(files);
 });
