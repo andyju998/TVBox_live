@@ -166,6 +166,10 @@
   }
   .editor textarea { min-height: 160px; resize: vertical; line-height: 1.8; }
   .editor .note { margin-top: 6px; font-size: 12px; line-height: 20px; color: var(--dim); }
+  /* 微信提示：只在微信里打开时显示（JS 按 User-Agent 判 MicroMessenger），
+     平时 display:none。微信 webview 拦住了文件选择框，按钮点不开。 */
+  .editor .wx-hint { display: none; margin-top: 6px; font-size: 12px; line-height: 20px; color: var(--dim); }
+  .editor .wx-hint.show { display: block; }
   .editor .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .editor .chip {
     border: 1px solid var(--border); border-radius: 999px; background: transparent;
@@ -401,6 +405,7 @@
       <label class="insert-btn" id="edAddPhoto" for="photoInput">＋ 插入照片或视频</label>
       <input type="file" id="photoInput" accept="image/*,video/*" multiple />
     </div>
+    <p class="wx-hint" id="edWxHint"></p>
     <div class="photo-thumbs" id="edPhotoThumbs"></div>
     <div class="photo-empty" id="edPhotoEmpty">把照片或视频拖到这里，也可以点上面按钮从本机选</div>
     <p class="note">从本机选照片或视频（可多选），也可以直接拖进来；照片保存前会缩到适合日记的大小，视频超过 64MB 存不进来。</p>
@@ -536,6 +541,20 @@ var viewY, viewM, selected;
 (function init() {
   var t = new Date();
   viewY = t.getFullYear(); viewM = t.getMonth(); selected = todayStr();
+  /* 微信里打开时，文件选择框被微信 webview 拦住、按钮点不开，
+     在按钮下方显示一句提示。按系统分两句：苹果是“在 Safari 中打开”，
+     安卓是“在浏览器中打开”到安卓自带浏览器。非微信不显示。 */
+  if (/MicroMessenger/i.test(navigator.userAgent)) {
+    var wxHint = document.getElementById("edWxHint");
+    if (wxHint) {
+      if (/Android/i.test(navigator.userAgent)) {
+        wxHint.textContent = "微信里点按钮选不了照片，请点右上角“···”选“在浏览器中打开”，到安卓自带浏览器里打开链接再点按钮，或直接把照片拖进来。";
+      } else {
+        wxHint.textContent = "微信里点按钮选不了照片，请点右上角“···”选“在 Safari 中打开”，或直接把照片拖进来。";
+      }
+      wxHint.classList.add("show");
+    }
+  }
 })();
 function renderCalendar() {
   document.getElementById("calTitle").textContent = viewY + "年" + (viewM + 1) + "月";
