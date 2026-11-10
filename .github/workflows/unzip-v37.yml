@@ -8,10 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Unzip v37 and replace folder
+      - name: Download zip from temp release and replace folder
         run: |
           set -e
-          test -f da-qia-wen-an-v37.zip
+          curl -L -o da-qia-wen-an-v37.zip https://github.com/andyju998/TVBox_live/releases/download/v37-temp/da-qia-wen-an-v37.zip
+          ls -la da-qia-wen-an-v37.zip
+          echo "610b8408ded0b90e19476b2488c1e348b59dbbd3f1250bd3a38a75aecbd9c906  da-qia-wen-an-v37.zip" | sha256sum -c -
           rm -rf /tmp/v37 && mkdir -p /tmp/v37
           unzip -o da-qia-wen-an-v37.zip -d /tmp/v37
           echo "extracted files: $(find /tmp/v37/da-qia-wen-an -type f | wc -l)"
@@ -30,3 +32,10 @@ jobs:
           git status --short
           git commit -m "更新打卡文案至 v37（图库 125 张）" || echo "nothing to commit"
           git push
+      - name: Delete temp release and tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RID=$(gh api repos/andyju998/TVBox_live/releases/tags/v37-temp --jq .id) || true
+          if [ -n "$RID" ]; then gh api -X DELETE "repos/andyju998/TVBox_live/releases/$RID" || true; fi
+          git push origin :refs/tags/v37-temp || true
