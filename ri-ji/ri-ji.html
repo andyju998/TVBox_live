@@ -219,6 +219,10 @@
   .editor .photo-thumbs .thumb button.mv.prev { left: 4px; }
   .editor .photo-thumbs .thumb button.mv.next { right: 4px; }
   .editor .photo-thumbs.drop-hot, .editor .photo-empty.drop-hot, .editor .insert-btn.drop-hot, .editor .insert-wrap.drop-hot { outline: 2px dashed var(--accent); outline-offset: 2px; }
+  /* 配图库拖出的跟手小图：fixed 定位跟指针走，pointer-events:none，
+     这样 elementFromPoint 才能透过它看到下面的投放区。 */
+  .lib-drag-ghost { position: fixed; z-index: 200; width: 76px; height: 76px; margin: -38px 0 0 -38px; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 16px rgba(0,0,0,.35); opacity: .95; pointer-events: none; }
+  .lib-drag-ghost img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .editor .photo-empty {
     display: none; margin-top: 8px; min-height: 96px;
     border: 1px dashed var(--border); border-radius: 8px;
@@ -241,8 +245,9 @@
   .sheet .lib-cell {
     position: relative; display: block; width: 100%; padding: 0; border: 1px solid var(--border);
     border-radius: 8px; overflow: hidden; background: var(--surface); cursor: pointer; font-family: inherit;
+    touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
   }
-  .sheet .lib-cell img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; background: var(--border); }
+  .sheet .lib-cell img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; background: var(--border); pointer-events: none; }
   .sheet .lib-cell .nm { display: block; padding: 4px 6px; font-size: 12px; line-height: 16px; color: var(--text); text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sheet .lib-cell .ord {
     position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; border-radius: 50%;
@@ -1093,6 +1098,7 @@ function renderLibSheet() {
     img.src = it.thumb;
     img.alt = it.name;
     img.loading = "lazy";
+    img.draggable = false;
     cell.appendChild(img);
     var nm = document.createElement("span");
     nm.className = "nm";
@@ -1110,6 +1116,7 @@ function renderLibSheet() {
       if (i >= 0) libPicked.splice(i, 1); else libPicked.push(it.id);
       renderLibSheet();
     });
+    cell.addEventListener("pointerdown", function (ev) { startLibDrag(ev, it); });
     grid.appendChild(cell);
   });
 }
@@ -1125,6 +1132,118 @@ document.getElementById("libDoneBtn").addEventListener("click", function () {
   if (picked.length > 0) renderPhotoThumbs();
   closeLibSheet();
 });
+/* 配图库拖出：按住一张图拖到照片组上松手就加进去（与空间日记同一套）。
+   电脑鼠标：按住拖过 8px 就开始拖；触摸：按住停一下（约 300ms）再拖，
+   免得和上下滑动翻图库打架。开始拖就把图库浮层收起来，露出下面的
+   编辑器；拖到照片组、空框或「＋ 插入照片或视频」按钮上松手就加进
+   去，落到别处松手取消、图库重新打开。拖动时跟手显示一张小图。 */
+var libDragState = null;
+function libDragZones() {
+  return [
+    document.getElementById("edPhotoThumbs"),
+    document.getElementById("edPhotoEmpty"),
+    document.getElementById("edAddPhotoWrap")
+  ].filter(function (z) { return !!z; });
+}
+function libDragZoneAt(x, y) {
+  var el = document.elementFromPoint(x, y);
+  if (!el) return null;
+  var zones = libDragZones();
+  for (var i = 0; i < zones.length; i++) {
+    if (zones[i] === el || zones[i].contains(el)) return zones[i];
+  }
+  return null;
+}
+function clearLibDragHot() {
+  libDragZones().forEach(function (z) { z.classList.remove("drop-hot"); });
+}
+function startLibDrag(e, item) {
+  if (e.pointerType === "mouse" && e.button !== 0) return;
+  if (libDragState) return;
+  var st = {
+    item: item,
+    startX: e.clientX, startY: e.clientY,
+    isTouch: (e.pointerType || "mouse") !== "mouse",
+    active: false,
+    holdTimer: null,
+    ghost: null
+  };
+  libDragState = st;
+  var moveGhost = function (x, y) {
+    if (st.ghost) { st.ghost.style.left = x + "px"; st.ghost.style.top = y + "px"; }
+  };
+  var activate = function () {
+    if (!libDragState || libDragState !== st || st.active) return;
+    st.active = true;
+    closeLibSheet();
+    var g = document.createElement("div");
+    g.className = "lib-drag-ghost";
+    var img = document.createElement("img");
+    img.src = item.thumb;
+    img.alt = item.name;
+    g.appendChild(img);
+    document.body.appendChild(g);
+    st.ghost = g;
+    moveGhost(st.startX, st.startY);
+  };
+  var cleanup = function () {
+    window.removeEventListener("pointermove", onMove);
+    window.removeEventListener("pointerup", onUp);
+    window.removeEventListener("pointercancel", onCancel);
+    window.removeEventListener("touchmove", onTouchMove);
+    if (st.holdTimer) { window.clearTimeout(st.holdTimer); st.holdTimer = null; }
+    if (st.ghost) { st.ghost.remove(); st.ghost = null; }
+    clearLibDragHot();
+    libDragState = null;
+  };
+  var onMove = function (ev) {
+    if (!st.active) {
+      var dx = ev.clientX - st.startX, dy = ev.clientY - st.startY;
+      if (Math.hypot(dx, dy) <= 8) return;
+      if (st.isTouch) {
+        /* 触摸没停够就挪动了，是在翻图库，不是拖图：放手让滚动接管。 */
+        cleanup();
+        return;
+      }
+      activate();
+      return;
+    }
+    moveGhost(ev.clientX, ev.clientY);
+    var zone = libDragZoneAt(ev.clientX, ev.clientY);
+    libDragZones().forEach(function (z) {
+      if (z === zone) z.classList.add("drop-hot");
+      else z.classList.remove("drop-hot");
+    });
+  };
+  var onUp = function (ev) {
+    var wasActive = st.active;
+    var zone = wasActive ? libDragZoneAt(ev.clientX, ev.clientY) : null;
+    cleanup();
+    if (!wasActive) return; /* 没拖起来，就是一次普通点选 */
+    swallowNextClick();
+    if (zone) {
+      edState.photos.push({ kind: "photo", src: st.item.full, cap: st.item.name });
+      renderPhotoThumbs();
+    } else {
+      /* 落到别处：取消，图库重新打开，恢复原样。 */
+      document.getElementById("libSheet").classList.add("open");
+    }
+  };
+  var onCancel = function () {
+    var wasActive = st.active;
+    cleanup();
+    if (wasActive) document.getElementById("libSheet").classList.add("open");
+  };
+  var onTouchMove = function (ev) {
+    /* 拖起来以后才拦住触摸滚动；还没拖起来时不拦，图库照常能滑。 */
+    if (libDragState === st && st.active) ev.preventDefault();
+  };
+  if (st.isTouch) st.holdTimer = window.setTimeout(activate, 300);
+  window.addEventListener("pointermove", onMove);
+  window.addEventListener("pointerup", onUp);
+  window.addEventListener("pointercancel", onCancel);
+  window.addEventListener("touchmove", onTouchMove, { passive: false });
+}
 /* HEIC：苹果手机拍的照片。Safari 能原生解，Chrome/安卓微信解不了。
    原生解失败时用 heic2any（libheif）转成 JPEG 再走正常压缩。
    解码库放在同目录的 heic2any.min.js 里，只在第一次遇到解不开的
@@ -1446,12 +1565,14 @@ function filesFromDrop(e) {
   return out;
 }
 /* 插入照片/视频的同一通道：点按钮选文件和外面拖进来都走这里。
-   视频量时长截封面，超过 64MB 整批拦下。返回本次认出的媒体文件数。 */
+   视频量时长截封面，超过 64MB 整批拦下。返回本次认出的媒体文件数；
+   0 表示一个都没认出（由调用处按场景提示一次）；超过 64MB 时已弹
+   过提示，返回 -1，调用处不要再补弹。 */
 function addEditorFiles(files) {
   var list = Array.prototype.slice.call(files || []);
   var picked = list.filter(isMediaFile);
   if (picked.length === 0) {
-    if (list.length > 0) alert("没认出选中的照片或视频，换一张再试，或直接把照片拖到这里。");
+    /* 没认出：这里不弹提示，由调用处按场景自己提示（按钮/拖入各一句），免得弹两次。 */
     return 0;
   }
   var over = picked.some(function (f) {
@@ -1459,7 +1580,7 @@ function addEditorFiles(files) {
   });
   if (over) {
     alert("选中的视频里有超过 64MB 的，太大了存不进来。可以在剪映里导出时选 1080p 或 720p，再回来试。");
-    return 0;
+    return -1;
   }
   var failed = 0;
   var jobs = picked.map(function (f) {
@@ -1489,7 +1610,9 @@ document.getElementById("photoInput").addEventListener("change", function () {
      this.value="" 会把 files 也清掉，选了照片也加不进来、还不报错。 */
   var files = Array.prototype.slice.call(this.files || []);
   this.value = "";
-  addEditorFiles(files);
+  if (addEditorFiles(files) === 0 && files.length > 0) {
+    alert("没认出选中的照片或视频，换一张再试，或直接把照片拖到这里。");
+  }
 });
 /* 电脑文件拖入：照片组、空框、「＋ 插入照片或视频」按钮都是投放区。
    编辑器根兜底拦住文件拖拽的默认行为，防浏览器直接打开文件。 */
@@ -1530,7 +1653,8 @@ function setupDropZones() {
         alert("没读到拖进来的照片，请用「＋ 插入照片或视频」按钮从本机选照片。");
         return;
       }
-      if (addEditorFiles(files) === 0) {
+      var added = addEditorFiles(files);
+      if (added === 0) {
         alert("拖进来的不是照片或视频，换个文件再试，或用「＋ 插入照片或视频」按钮从本机选。");
       }
     });
