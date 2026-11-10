@@ -1,0 +1,32 @@
+name: unzip-v37
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unzip v37 and replace folder
+        run: |
+          set -e
+          test -f da-qia-wen-an-v37.zip
+          rm -rf /tmp/v37 && mkdir -p /tmp/v37
+          unzip -o da-qia-wen-an-v37.zip -d /tmp/v37
+          echo "extracted files: $(find /tmp/v37/da-qia-wen-an -type f | wc -l)"
+          rm -rf da-qia-wen-an
+          mv /tmp/v37/da-qia-wen-an ./da-qia-wen-an
+          rm -f da-qia-wen-an-v37.zip
+          rm -f .github/workflows/unzip-v37.yml
+          echo "tuku: $(find da-qia-wen-an/assets/tuku -maxdepth 1 -type f | wc -l)"
+          echo "th: $(find da-qia-wen-an/assets/tuku/th -maxdepth 1 -type f | wc -l)"
+          echo "sm: $(find da-qia-wen-an/assets/tuku/sm -maxdepth 1 -type f | wc -l)"
+      - name: Commit and push
+        run: |
+          git config user.name "andyju998"
+          git config user.email "andyju998@users.noreply.github.com"
+          git add -A
+          git status --short
+          git commit -m "更新打卡文案至 v37（图库 125 张）" || echo "nothing to commit"
+          git push
