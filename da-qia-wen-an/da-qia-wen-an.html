@@ -731,10 +731,10 @@
         <div class="field">
           <div class="label">照片 <span class="hint">最多 9 张</span><span class="photo-count-badge" id="photoCountBadge" hidden>0 / 9</span></div>
           <div class="drop" id="drop">
-            <div class="drop-text" id="dropText">
+            <label class="drop-text" id="dropText" for="photoInput">
               <span class="drop-big">＋ 插入照片 · 最多 9 张</span>
               <span class="drop-small">点这里一次选 1–9 张，或把照片拖进来<br />JPG、PNG、HEIC 都可以<span class="dot-sep"> · </span><span class="drop-seg2">3 张、6 张、9 张都行</span></span>
-            </div>
+            </label>
             <div class="photo-grid" id="photoGrid" hidden></div>
             <div class="drop-add-hint" id="dropAddHint" hidden>已放 <b id="addedCount">0</b> 张，还能再加 <b id="remainCount">9</b> 张 · 点空白处继续添加</div>
           </div>
@@ -747,7 +747,7 @@
               <button type="button" class="mini-btn" id="photoRemoveBtn">全部移除</button>
             </div>
           </div>
-          <input type="file" id="photoInput" accept="image/*,.heic,.heif" multiple hidden />
+          <input type="file" id="photoInput" accept="image/*,.heic,.heif,image/heic,image/heif" multiple hidden />
         </div>
 
         <div class="field">
@@ -1692,6 +1692,15 @@
       tabLib.addEventListener("click", function () { showView("lib"); });
       tabImg.addEventListener("click", function () { showView("img"); });
       tabXhs.addEventListener("click", function () { showView("xhs"); });
+      // 备用通道：电脑微信内核偶发某个按钮自己的监听没接上、点着没反应时，
+      // 页签栏这一层再兜一次底；showView 重复调用没有副作用，不会切错页
+      var tabViewById = { tabGen: "gen", tabLib: "lib", tabImg: "img", tabXhs: "xhs" };
+      var tabsNav = document.querySelector(".tabs");
+      if (tabsNav) tabsNav.addEventListener("click", function (e) {
+        var t = e.target;
+        while (t && t !== tabsNav && !(t.id && tabViewById[t.id])) t = t.parentNode;
+        if (t && t.id && tabViewById[t.id]) showView(tabViewById[t.id]);
+      });
       // 主脚本已就绪：页签先行脚本从这里起退场；加载时用户已点过的页签，立刻正式切过去
       window.__mainReady = true;
       if (window.__earlyView && window.__earlyView !== currentView) showView(window.__earlyView);
@@ -1973,7 +1982,7 @@
           var timer = setTimeout(function () { if (done) return; done = true; tryConvert(); }, 8000);
           function tryConvert() {
             URL.revokeObjectURL(url);
-            if (!retried && (isHeic(file) || !file.type)) toJpeg(file).then(function (jpg) { resolve(loadSlot(jpg, true)); }, function () { resolve(null); });
+            if (!retried && (isHeic(file) || !file.type || file.type === "application/octet-stream")) toJpeg(file).then(function (jpg) { resolve(loadSlot(jpg, true)); }, function () { resolve(null); });
             else resolve(null);
           }
           img.onload = function () { if (done) return; done = true; clearTimeout(timer); resolve({ url: url, profile: analyzePhoto(img) }); };
@@ -1982,7 +1991,16 @@
         });
       }
 
+      // 加图请求排队执行：一批（尤其带 HEIC 转换）还没处理完时又来一批，
+      // 两批各自算「还能加几张」会算错、进度提示也会互相打架，排成一队就稳了
+      var addQueue = Promise.resolve();
       function handlePhotoFiles(fileList) {
+        if (!fileList || !fileList.length) return;
+        var batch = Array.prototype.slice.call(fileList);
+        addQueue = addQueue.then(function () { return processPhotoFiles(batch); }, function () { return processPhotoFiles(batch); });
+      }
+
+      function processPhotoFiles(fileList) {
         if (!fileList || !fileList.length) return;
         var files = Array.prototype.slice.call(fileList);
         var remain = MAX_PHOTOS - photos.length;
@@ -1991,6 +2009,9 @@
         var validFiles = files.filter(function (f) {
           if (f.type.indexOf("image/") === 0 || isHeic(f)) return true;
           if (!f.type) return true; // 微信、QQ 拖入或系统不给类型和扩展名的照片，先收下再试着打开
+          // 电脑端拖入的 PNG、HEIC 常被标成通用类型（application/octet-stream），
+          // 类型看着不像照片、但扩展名是图片的，一样收下，别误判成「不是照片」
+          if (/\.(jpe?g|png|gif|webp|bmp|heic|heif|avif)$/i.test(f.name || "")) return true;
           skippedType++; return false;
         });
         if (skippedType) showToast("有 " + skippedType + " 个不是照片，已跳过");
@@ -2015,7 +2036,7 @@
             return loadSlot(file, false).then(function (slot) { slots[i] = slot || false; });
           });
         });
-        chain.then(function () {
+        return chain.then(function () {
           if (status) { status.hidden = true; status.textContent = ""; }
           finishAdd(slots);
         });
@@ -2031,33 +2052,97 @@
         }
       }
 
-      drop.addEventListener("click", function () {
-        if (photos.length >= MAX_PHOTOS) { showToast("最多放 9 张，已经满了"); return; }
-        photoInput.click();
+      // ---------- 打开选图（电脑微信内置浏览器专项加固） ----------
+      // 那个内核里，隔着一层用程序去点文件框，偶尔会被吞掉（点了没反应）；
+      // 文件框在选图窗里被取消过一次后，还可能「粘住」再也打不开，只能
+      // 退出重进。两手对策：①空状态的大框本身就是文件框的 label（见页面
+      // 里 dropText），点它由浏览器顺着原生手势直接打开选图，最稳；
+      // ②文件框只要经历过一次选图（选好或取消），就换成全新的一个，
+      // 下次打开永远是干净状态，不会粘住。
+      var pickerSession = false; // 选图窗这一程开着时为 true
+      function bindPhotoInput(el) {
+        el.addEventListener("change", function () {
+          pickerSession = false;
+          if (el.files && el.files.length) handlePhotoFiles(el.files);
+        });
+      }
+      bindPhotoInput(photoInput);
+      function freshPhotoInput() {
+        var fresh = document.createElement("input");
+        fresh.type = "file";
+        fresh.id = "photoInput";
+        fresh.accept = photoInput.accept;
+        fresh.multiple = true;
+        fresh.hidden = true;
+        photoInput.parentNode.replaceChild(fresh, photoInput);
+        photoInput = fresh;
+        bindPhotoInput(photoInput);
+        return photoInput;
+      }
+      // 选图窗关掉、焦点回到页面时，这一程若没选成（取消了）就换新文件框
+      window.addEventListener("focus", function () {
+        if (!pickerSession) return;
+        pickerSession = false;
+        freshPhotoInput();
       });
-      drop.addEventListener("dragover", function (e) { e.preventDefault(); drop.classList.add("over"); });
+      function openPhotoPicker() {
+        if (photos.length >= MAX_PHOTOS) { showToast("最多放 9 张，已经满了"); return; }
+        pickerSession = true;
+        freshPhotoInput().click();
+      }
+      // 空状态大框走 label 原生打开：这里只记一笔「选图开始了」；
+      // 满 9 张时拦下，别让选图窗弹出来
+      dropText.addEventListener("click", function (e) {
+        if (photos.length >= MAX_PHOTOS) { e.preventDefault(); showToast("最多放 9 张，已经满了"); return; }
+        pickerSession = true;
+      });
+      drop.addEventListener("click", function (e) {
+        if (dropText.contains(e.target)) return; // label 自己会打开选图，不再用程序点一次（防连弹两次）
+        openPhotoPicker();
+      });
+
+      // ---------- 拖拽加图（同上，针对电脑微信加固） ----------
+      function dragHasFiles(e) {
+        var dt = e.dataTransfer;
+        if (!dt) return false;
+        if (!dt.types) return true;
+        for (var i = 0; i < dt.types.length; i++) if (dt.types[i] === "Files") return true;
+        return false;
+      }
+      function filesFromDataTransfer(dt) {
+        if (!dt) return [];
+        if (dt.files && dt.files.length) return Array.prototype.slice.call(dt.files);
+        var out = [];
+        if (dt.items) { // 有的来源（如从聊天窗口拖出）只有 items、没有 files，从 items 里取
+          for (var i = 0; i < dt.items.length; i++) {
+            var it = dt.items[i];
+            if (it.kind === "file" && it.getAsFile) { var f = it.getAsFile(); if (f) out.push(f); }
+          }
+        }
+        return out;
+      }
+      // dragenter 和 dragover 都要拦下，drop 才会被放行（少拦一个，有些内核就不给放）
+      drop.addEventListener("dragenter", function (e) { e.preventDefault(); if (dragHasFiles(e)) drop.classList.add("over"); });
+      drop.addEventListener("dragover", function (e) { e.preventDefault(); if (e.dataTransfer) e.dataTransfer.dropEffect = "copy"; drop.classList.add("over"); });
       drop.addEventListener("dragleave", function () { drop.classList.remove("over"); });
       drop.addEventListener("drop", function (e) {
         e.preventDefault();
         drop.classList.remove("over");
-        var dt = e.dataTransfer;
-        if (!dt) return;
-        if (dt.files && dt.files.length) { handlePhotoFiles(dt.files); return; }
-        if (dt.items) { // 有的来源拖入时只有 items、没有 files，从 items 里取文件
-          var fs = [];
-          for (var i = 0; i < dt.items.length; i++) {
-            if (dt.items[i].kind === "file") { var f = dt.items[i].getAsFile(); if (f) fs.push(f); }
-          }
-          if (fs.length) handlePhotoFiles(fs);
-        }
+        var fs = filesFromDataTransfer(e.dataTransfer);
+        if (fs.length) handlePhotoFiles(fs);
       });
-      photoInput.addEventListener("change", function () {
-        if (photoInput.files.length) handlePhotoFiles(photoInput.files);
+      // 电脑微信里拖拽的落点有时对不准框：文件拖到页面任何位置都先拦下，
+      // 别让浏览器把图片直接打开、把页面顶掉（看起来就像拖了没反应）；
+      // 停在「生成文案」页时，落点不在框内也顺手把图收进照片区
+      document.addEventListener("dragover", function (e) { if (dragHasFiles(e)) e.preventDefault(); });
+      document.addEventListener("drop", function (e) {
+        if (!dragHasFiles(e)) return;
+        e.preventDefault();
+        if (currentView !== "gen" || drop.contains(e.target)) return;
+        var fs = filesFromDataTransfer(e.dataTransfer);
+        if (fs.length) handlePhotoFiles(fs);
       });
-      document.getElementById("photoAddBtn").addEventListener("click", function () {
-        if (photos.length >= MAX_PHOTOS) { showToast("最多放 9 张，已经满了"); return; }
-        photoInput.click();
-      });
+      document.getElementById("photoAddBtn").addEventListener("click", openPhotoPicker);
       document.getElementById("photoRemoveBtn").addEventListener("click", clearPhoto);
       document.getElementById("photoGenBtn").addEventListener("click", function () {
         applyProfile(true);
