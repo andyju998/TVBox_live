@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- 打卡文案 · v47（2026-11-11）：只修公开链接打开慢、点页签卡、整体不顺——五份文案语料（约 35KB）从主脚本挪进 JSON 文本块，第一次生成或打开文案库时才解析，主脚本瘦身约三分之一，打开时要解析执行的活少一截、按钮更早能点；图片库高清补图在 3G 及以下慢网不再后台抢带宽。v46 的 HEIC WASM 解码、转好一张先放一张、点选与拖拽、文案与版面一字未动 -->
+<!-- 打卡文案 · v48（2026-11-11）：只修打开慢（电脑微信、手机都慢），功能、格式、版面一字未动——语料 JSON（约 35KB）从主脚本前面挪到主脚本后面，和图片库数据放一起，主脚本下载完就能先跑、首屏按钮先出来，不必再等语料下完；语料块在文件尾部还没下完时就点生成/文案库，会等它到了再继续，不会报错；顺手清掉主脚本里的注释、压紧语料 JSON，整页再瘦约 13KB。v47 的语料懒解析、v46 的 HEIC WASM 解码、点选与拖拽全部保留 -->
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
@@ -870,51 +870,34 @@
     </div>
     <div class="toast" id="toast">已复制，去粘贴吧</div>
 
-    <script type="application/json" id="corpusData">{"MOODS": {"开心": ["快乐有了回音", "好心情正在营业", "笑意藏都藏不住", "快乐超标，申请加时", "今天的运气和心情都在线", "把开心明目张胆地写在脸上"], "治愈": ["心被轻轻熨平了", "烦恼暂时下线", "慢下来，连风都是软的", "被这一刻温柔以待", "给心情放了个短假", "世界放轻了脚步"], "疲惫": ["电量告急，来此充电", "累是真的，值得也是真的", "给紧绷的神经松松绑", "歇一歇，再出发", "把疲惫留在这里，不带走", "今天先对自己好一点"], "平静": ["心里不起波澜，只有微风", "不慌不忙，自有回响", "安安静静，也是一种圆满", "时光清浅，岁月安然", "把日子过成了散文", "心有定境，不负清欢"], "浪漫": ["心动有了落点", "晚风也懂我的心事", "把心动藏进这一刻", "遇见的都是温柔", "心跳漏了一拍，又悄悄补了回来", "连空气都变得甜丝丝"], "感慨": ["时间走得真快，我们也是", "有些日子，值得回头看看", "人生的故事又翻了一页", "来路虽远，步步生花", "这一刻，想留给很多年以后", "平凡日子里，也有闪闪发光的片段"], "兴奋": ["心跳加速，快乐起飞", "多巴胺正在全速分泌", "这一刻值得大声喊出来", "热血正在沸腾", "激动的心情根本压不住", "快乐直接拉满"], "想静静": ["想把世界调成静音", "一个人，也很自在", "给心情留一点空白", "热闹是他们的，我只要安静", "独处不是孤独，是充电", "把喧嚣关在了门外"], "日常": ["把日子过成喜欢的样子", "平凡也浪漫", "小确幸正在发生", "今天也很好", "认真生活，快乐自来", "日子明朗，万物可爱"]}, "TEMPLATES": {"文艺小清新": ["{S}，{M}。时光在这里放慢了脚步，连风都变得温柔起来，想把这一幕好好记下来，留给往后的日子慢慢回味。", "风经过{S}，把这一刻轻轻写进了今天。街道、光影，还有此刻的心情，都刚刚好，不多不少，值得打卡留念。", "今日打卡：{S}。日子不声不响，却处处藏着诗意，抬头是风景，低头是欢喜，平凡的一天也因此闪闪发光。", "在{S}停下脚步，{M}，连时间都放慢了脚步。走走停停，看看风景，也看看自己，原来幸福一直都在身边。", "{S}，是生活写给今天的一首小诗。字里行间没有喧闹，只有安安静静的美好，读着读着，心就软了下来。", "把心安放在{S}，剩下的交给晚风。不去想太远的事，只好好感受眼前这一刻，温暖、踏实，又带着一点小欢喜。", "偷得浮生半日闲——在{S}，{M}。茶也好，风也好，人也好，这半日的清闲，足够给往后的忙碌攒足力气。", "{S}的风，吹散了眉间的褶皱，也吹开了心里的结。原来日子可以这样慢，这样轻，这样让人舍不得离开。", "愿日子清净，所遇皆温柔。今日{S}，打卡留念。走过的每一步都算数，眼前的每一景，都值得被好好记住。", "生活有望穿秋水的等待，也有意想不到的欢喜，比如{S}。不期而遇的美好最动人，今天这一份，我先收下了。", "{S}打卡。山高路远，看世界，也找自己。这一路不只是看风景，更是把心情一点点整理好，再轻装出发。", "人间有味是清欢，今日份的清欢在{S}。不浓不淡，不急不缓，品一口是甘甜，回味起来满是安然。"], "简约高级": ["{S}，打卡。今天不赶路，只感受路，慢慢走，慢慢看，把喜欢的画面都留下来。", "今日份的{M}，已签收。{S}这一趟来得很值，风景好，心情更好，特意记录一下。", "{S}。简单，舒服，刚刚好。不需要太多修饰，这样的状态，就是最好的状态。", "{M}。——记{S}。短短一行装不下满心的欢喜，就让照片替我多说几句吧。", "{S}，留个纪念。若干年后再翻到今天，还是会记得这阵风、这片光，和此刻的好心情。", "今日行程：{S}。已完成。清单上又多了一项，回忆里又多了一页，今天过得很充实。", "{S}，{M}，足矣。日子不必处处热闹，有这样安安静静的一刻，就已经很圆满了。", "{S} · 打卡成功。把今天的好天气、好风景、好心情一并存档，留着往后慢慢看。", "平平无奇的一天，因为{S}有了光。原来让日子发亮的，从来都是这些小小的瞬间。", "记录一下：{S}，{M}。生活需要仪式感，这一笔，我认真地为今天记下了。", "{S}。不多不少，刚刚好。风景刚刚好，心情刚刚好，连时间都刚刚好。", "今日关键词：{S}，{M}。用两个词概括今天刚刚好，剩下的美好，都在照片里了。"], "幽默有趣": ["{S}打卡！快乐这不就来了吗，谁也别想把它带走。今天的任务很简单：好好吃、好好玩、好好拍照，一样都不能少。", "本来想低调，可{S}不允许啊。风景这么好看，不拍几张、不发个圈，实在对不起今天的好天气。", "来{S}主要是为了打卡，顺便{M}。主次必须分明，快乐必须到位，照片必须拍够，不虚此行。", "生活给了我很多选择，我选择了{S}，果然没选错。一路走一路看，越看越欢喜，这眼光我给自己打满分。", "别问，问就是在{S}，{M}。问就是心情很好，问就是不想回去，问就是还想再多待一会儿。", "{S}打卡成功，本人已被快乐绑架，不接受赎回。赎金也不用交了，就让我一直这样开心下去吧。", "今日宜：{S}。今日忌：想太多。出门之前把烦恼锁在家里，现在的我，只负责开心和拍照。", "{M}的一天，从{S}正式开始营业。快乐不打烊，好运不缺席，今天的营业额是满满的好心情。", "打卡{S}。不是我吹，这日子过得有滋有味。吃得香、看得美、拍得好，平平无奇的快乐最长久。", "{S}已打卡，烦恼已读乱回，快乐秒回。区别对待非常明显，今天谁也别想把我的好心情带走。", "出门前：随便逛逛。到了{S}：真香。脚步根本停不下来，相机根本放不下来，这地方有点东西。", "{S}，{M}。钱包表示情绪稳定，心情表示非常不稳定——开心得快要飞起来了，今天值了。"], "温暖治愈": ["{S}，{M}，日子再忙，也要留一点甜给自己。停下来歇一歇，看看风景，心里那点累就慢慢化开了。", "在{S}，把坏心情调成了静音。世界一下子安静下来，只剩下风声、笑声，和慢慢变好的心情。", "愿你眼里有光，心里有暖。今天的{S}，刚刚好，不晒不燥，不慌不忙，连日子都变得温柔起来。", "{S}打卡。慢慢来，一切都来得及。不必追赶谁的脚步，按自己的节奏走，风景自然会在路上等你。", "生活偶尔糟糕，但{S}这一刻，很温柔。它像一句轻轻的安慰，告诉我：没关系，一切都会慢慢好起来的。", "给自己一个拥抱，再给生活一个{S}。抱一抱那个努力的自己，然后笑着继续往前走，前面还有好多美好等着。", "{M}。今日的{S}，是疲惫生活里的解药。药效刚刚好，心里的褶皱被一点点抚平，又有力气啦。", "阳光正好，微风不燥，{S}打卡。这样的天气最适合出门走走，把好心情晒一晒，把烦恼晾一晾。", "愿所有的不安，都止步于{S}。从这里往后走的每一步，都带着今天的这份踏实和欢喜，稳稳当当。", "{S}，把烦恼清仓，把快乐囤货。仓里囤得满满当当，够往后的日子慢慢享用，想想就觉得安心。", "今天的快乐，是{S}给的。不贵重，却很珍贵，收进心里好好放着，往后哪天累了，拿出来回味一下。", "心怀暖阳，何惧岁月寒凉。{S}，打卡。只要心里有光，日子再平常，也能过得热气腾腾、有滋有味。"], "复古风": ["{S}，像一张微微泛黄的老照片。时光在这里慢了下来，连风都带着旧日子的味道，站在这里，仿佛和从前打了个照面。", "今日{S}，复古氛围拉满。老式的招牌、斑驳的墙面，还有空气里慢悠悠的节奏，都让人想起小时候的夏天。", "把今天过成老电影的样子：{S}，{M}。画面不用太鲜亮，带一点颗粒感，反而更有故事，值得慢慢回味。", "{S}打卡。今天不追新潮，就爱这份旧时光的踏实，一砖一瓦都有年头，一草一木都藏着回忆。", "时光是个小偷，偷走了匆匆，却留下了{S}这样的好地方。走一走，看一看，心里满是怀念和欢喜。", "{S}，{M}，连影子都像从旧画报里走出来的。这样的日子不用滤镜，本身就自带复古的味道。", "旧时光的味道，在{S}飘着。慢慢逛，慢慢拍，把这一份难得的怀旧，好好收进今天的相册里。", "{S}，是城市留给怀旧者的一封信。拆开慢慢读，字里行间都是从前的温柔和如今的安稳。"], "法式浪漫": ["{S}，把日子过成法式的慢调。不赶时间，不追行程，坐下来喝一杯、看会儿风景，浪漫就藏在这样的松弛里。", "今日份法式浪漫：{S}。阳光、微风和一点点慵懒刚刚好，连空气都变得柔软起来，心也跟着轻轻荡漾。", "{S}，{M}，像走进了巴黎街角的小咖啡馆。生活需要这样的仪式感，不隆重，却足够让人心动。", "法式的浪漫从不喧哗，它在{S}的午后悄悄发生：一束光、一阵风、一个微笑，就足够记上一整天。", "在{S}，把浪漫放在心里、挂在脸上。不必远行，眼前这一刻的优雅和自在，就是最好的法式风情。", "{S}打卡。今天做一回法式女主角，步子放慢，眼神放柔，连拍出来的照片都带着淡淡的电影感。", "浪漫是{S}这样的小事：花香飘过来，音乐响起来，喜欢的人在身边。平凡的日子，也能过得像诗一样。", "{S}，{M}。愿往后的日子，都带着一点法式的松弛和浪漫：不慌不忙，自在欢喜，美得很自然。"], "美拉德": ["{S}，是美拉德色调的一天。焦糖、棕褐、暖橘层层叠叠，像秋天亲手调的色，连拍出来的照片都自带暖暖的滤镜。", "今日走美拉德风，{S}打卡。棕色系的温柔最衬人，不张扬，却高级得恰到好处，看着就让人心情大好。", "{S}，{M}，满眼都是暖棕色的治愈。像一杯热可可，像一块烤得刚好的吐司，看着就让人心里暖暖的。", "美拉德的魅力，在于越看越耐看。{S}这一趟，把秋冬的温柔都穿在了身上、留在了照片里，越品越有味道。", "{S}打卡。大地色系的松弛感拉满，不用费力凹造型，站在暖暖的光里，随手一拍都是氛围感大片。", "把{S}过成美拉德的样子：温暖、醇厚、不动声色地好看。日子也一样，平平淡淡里藏着的回甘，最长久。", "{M}。今日份美拉德已上线——{S}。焦糖色的阳光洒下来，连影子都是暖的，心情也跟着变得绵软起来。", "{S}，像走进了秋天的调色盘。深棕、浅咖、奶油白，怎么搭都好看，这份高级的温暖，值得专门记录一下。"]}, "SCENE_BANKS": [{"keys": ["咖啡", "奶茶", "下午茶", "茶馆", "喝茶"], "lines": ["一杯咖啡的时间，把生活调回喜欢的频道。坐在窗边慢慢喝，看人来人往，心里的节奏也跟着慢了下来，真舒服。", "咖啡是成年人的续命水，续命又续快乐。这一杯下肚，疲惫散了大半，剩下的时光都用来发呆和欢喜。", "在咖啡香里，把日子过慢一点。香气一缕一缕飘着，一个人静静坐着，什么都不用想，这样不慌不忙的午后最难得。", "今日宜：发呆，喝咖啡，看人来人往。什么都不用赶，什么都不用想，把这一下午完完整整地留给自己。"]}, {"keys": ["海", "沙滩", "海岛"], "lines": ["大海和晚风，都在替我说话。想说的、没说出口的，海浪都懂，吹着海风站一会儿，心就敞亮了。", "面朝大海，把烦恼都交给浪花带走。一波一波的潮声听着听着，心里的结就松开了，人也轻松了。", "海风一吹，快乐就有了形状。是衣角飞扬的样子，是头发乱了也不在乎的样子，是忍不住笑出声的样子。", "收集了一整片海的蓝色，存进今天。往后哪天心情灰了，就翻出来看看，海还在，风还是一样温柔。"]}, {"keys": ["爬山", "登山", "徒步", "山顶", "上山"], "lines": ["山不就我，我来就山。登顶打卡！一路喘着气往上走，站到山顶那一刻才明白，所有的累都值得。", "一步一个脚印，山顶的风不会辜负赶路人。回头看看走过的路，再看看眼前的风景，心里满是成就感。", "爬山治百病，登顶治内耗。出了一身汗，吹了一阵风，脑子里那些乱七八糟的念头，全被留在了山脚下。", "把心愿说给山听，风会替我保管。下山的时候脚步特别轻，像是把心事卸在了半山腰，轻装回程。"]}, {"keys": ["西餐", "牛排", "意面", "披萨", "西式"], "lines": ["刀叉轻轻碰出声响，牛排的香气先一步报到。一口肉、一口红酒（饮料也行），把日子过出一点仪式感，慢悠悠吃完这一餐，心情都被熨得服服帖帖。", "意面卷起最后一圈，芝士拉着长长的丝。西餐吃的就是这份不慌不忙，摆盘好看，味道也对得起等待，吃饱了连脚步都变得优雅起来。", "今日份西餐打卡：从餐前面包吃到最后的甜点，一道都没落下。灯光柔柔的，盘子精致得很，这一顿吃得满足又体面，值得专门记录一下。", "把西餐吃出小假期的感觉。窗边的位置、刚好的火候、慢慢聊着的天，食物是主角，这份松弛的心情才是今天真正的收获。"]}, {"keys": ["日料", "寿司", "刺身", "拉面", "居酒屋", "日式"], "lines": ["寿司一颗一颗排得整整齐齐，蘸一点酱油，鲜味在嘴里慢慢散开。日料吃的是一份新鲜和讲究，吃完这一餐，连心情都变得清清爽爽。", "刺身切得透亮，入口是海的味道。再配一碗热乎乎的味噌汤，胃里暖了，心里也静了，这样简单又精致的一餐，最治愈。", "在居酒屋坐下来，烤串滋滋作响，话也越聊越热。日料的快乐不在排场，在这一口鲜、这一串香，和身边一起吃饭的人。", "拉面端上来先喝一口汤，浓郁又踏实。面条吸溜着吃完，额头微微冒汗，今日份日料打卡完成，满足感直接拉满。"]}, {"keys": ["火锅", "烧烤", "美食", "吃饭", "餐厅", "甜品", "蛋糕", "小吃", "夜市"], "lines": ["人间烟火气，最抚凡人心。今日份美食已签收，热气腾腾端上桌的那一刻，一天的疲惫就先散了一半。", "手机先吃，快乐随后就到。拍完照赶紧动筷子，好吃的东西要趁热吃，好心情也要趁热分享给大家。", "没有什么是一顿好吃的解决不了的，如果有，就两顿。吃饱喝足之后再看世界，连烦恼都变小了。", "吃饱了，才有力气热爱生活。这一餐吃得心满意足，胃里暖暖的，心里也暖暖的，今天圆满了。"]}, {"keys": ["跑步", "夜跑", "晨跑", "健身", "瑜伽", "游泳", "骑行", "运动"], "lines": ["汗水是最好的护肤品，打卡今日份运动。跑完洗个热水澡，整个人像重新充了电，清清爽爽。", "跑起来，连风都是甜的。脚步一步一步踩着节奏，烦恼一步一步落在身后，越跑心里越敞亮。", "自律给我自由，今天的运动量达标啦。说到做到这件事本身就很酷，给坚持下来的自己点个赞。", "每一次出汗，都是在和更好的自己打招呼。不求多快，不求多远，今天的我比昨天的我又进步了一点点。"]}, {"keys": ["读书", "看书", "图书馆", "书店", "学习"], "lines": ["在书页之间，偷一段安静的时光。外面世界再喧闹，翻开书的这一刻，心就慢慢沉了下来，安安稳稳。", "今日份精神食粮，已补充完毕。读到喜欢的句子就划下来，像是和作者隔着时空点了点头，心领神会。", "把日子过成散文，从翻开一本书开始。一页一页慢慢读，不赶时间，这样的午后最养人。", "书里写尽了远方，我在这里读到了安宁。合上书的时候天都快黑了，心里却亮堂堂的，收获满满。"]}, {"keys": ["自驾", "自驾游", "开车出游", "环岛自驾"], "lines": ["自驾出游打卡！方向盘在自己手里，想停就停，想走就走，沿途的风景一站一站解锁，这样自由自在的旅程，最合心意。", "油箱加满，歌单备好，自驾正式出发。窗外的风景一路变换，从高楼开到田野，心也跟着越开越敞亮，长途也不觉得累。", "自驾的好处，是风景都在路上。路过好看的湖就停下来拍张照，遇见好吃的小店就拐进去尝尝，不赶行程的旅行最舒服。", "今日自驾：把导航设为远方，把心情调成放假。一路哼着歌、吹着风，抵达目的地的时候，连晚霞都像在欢迎我们。"]}, {"keys": ["旅行", "旅游", "出游", "古镇", "机场", "火车"], "lines": ["出发，永远是最有意义的事情。不管去多远，迈出门的那一刻，心情就已经飞起来了，剩下的都是惊喜。", "风来自很远的地方，我去去也无妨。一路走一路看，把没见过的风景、没尝过的味道，都装进这次行程里。", "旅行的意义，是把向往变成脚印。以前只在照片里看过的地方，今天亲脚踩到了，这种感觉真好。", "世界那么大，今日又解锁了一小块。地图上多了一个标记，回忆里多了一段故事，这一趟没有白来。"]}, {"keys": ["日落", "黄昏", "晚霞", "夕阳"], "lines": ["晚霞是太阳写给天空的情书，我刚好读到。站在原地看了好久，从金黄看到橘红，字字句句都温柔得不行。", "追赶日落，是献给自己的一场浪漫。跑着去，笑着看，等天色一点点暗下来，心里的欢喜却越来越亮。", "黄昏作证，今天也是被温柔以待的一天。再忙再累，看到这一片晚霞，就觉得这一天过得值了。", "把晚霞装进口袋，把这一天好好收起来。带着满身的余晖慢慢往回走，连影子都镀上了一层金边。"]}, {"keys": ["下雨", "雨天", "雨中"], "lines": ["雨声是天空的白噪音，适合放空。听着雨点敲窗，泡一杯热茶，什么都不想，就这样静静坐着也很好。", "下雨天，适合想念，也适合打卡。空气洗得干干净净，心事也跟着清爽起来，撑着伞慢慢走，别有一番味道。", "撑一把伞，把喧嚣挡在雨幕之外。伞下是自己的小世界，脚步不慌不忙，连踩水花的声音都好听。", "雨会停，天会晴，就像此刻的心情。乌云总会散的，淋过这一场雨，往后的路只会越来越明朗。"]}, {"keys": ["下雪", "雪天", "雪中", "玩雪"], "lines": ["雪落人间，日子也变得轻盈起来。伸手接一片雪花，看它在掌心慢慢融化，冬天的小确幸就是这么简单。", "把冬天的心事，说给雪听。雪落无声，心事也有了着落，走在咯吱咯吱的雪地上，心里特别踏实。", "今日份浪漫，是雪给的。整个世界都白了、静了、软了，随便站在哪里拍一张，都是好看的画面。", "踩着雪走过的路，每一步都算数。回头望望那串脚印，歪歪扭扭，却一步一步走得很认真。"]}, {"keys": ["花", "樱花", "桂花", "赏花", "花海"], "lines": ["花开有时，快乐无价。趁花期正好，赶紧来看、赶紧来拍，错过了这一季，就要再等上一年啦。", "在花香里，把心情调成明媚模式。走一步香一步，看一朵笑一朵，连拍出来的照片都带着香气。", "花会沿路盛开，以后的路也是。看着这一片热热闹闹的花，就觉得往后的日子也一定会越来越好。", "今日宜：赏花，拍照，把美好存档。花开得这样用力，我们看花的人，也要开开心心地不辜负它。"]}, {"keys": ["猫", "撸猫", "猫咪"], "lines": ["今日份营业：可爱已送达，请签收。它往那儿一趴，眼睛一眯，我的心就化了，什么烦恼都没了。", "有猫的日子，快乐自动翻倍。它蹭一蹭、叫一声、打个滚儿，每一下都精准地戳中我的开心开关。", "撸猫一时爽，一直撸猫一直爽。手感这么好，脾气这么乖，难怪一下午的时间一眨眼就过去了。", "它负责可爱，我负责记录。镜头举了一下午，存了满满一相册，翻来翻去，每一张都舍不得删。"]}, {"keys": ["夜晚", "夜里", "星空", "月亮", "夜景"], "lines": ["夜色温柔，适合把心事说给星星听。白天没说出口的话，夜里慢慢说，星星不催不问，只是安安静静地陪着。", "城市睡了，我的故事才刚刚开始。灯火一盏一盏亮着，夜色里的每一步，都走得比白天更自在。", "今晚的月亮很亮，适合打卡留念。月光洒了一地，抬头看一眼，心里那点小情绪就被照得透透亮亮。", "把一天的疲惫，交给夜色保管。洗个热水澡，早点休息，明天醒来，又是元气满满的新一天。"]}, {"keys": ["看展", "展览", "博物馆", "美术馆", "画展"], "lines": ["在展品面前，时间慢了下来。一件一件慢慢看，脚步放轻，声音放低，心也跟着静了下来，特别治愈。", "看展，是给眼睛和心灵一起放假。看不懂也没关系，觉得好看、觉得心动，就已经不虚此行了。", "艺术不会说话，却治好了我的精神内耗。站在一幅画前发会儿呆，出来的时候，整个人都松弛了许多。", "今日份审美充值，已到账。看过的每一件好东西，都会悄悄变成眼界和底气，攒着攒着，人就不一样了。"]}, {"keys": ["同学聚会", "同学会", "老同学"], "lines": ["同学聚会打卡！毕业这么多年再坐到一张桌上，名字一喊还是当年的感觉，聊起上课传纸条、考试借橡皮的糗事，笑得眼泪都出来了。", "老同学见面，分外亲切。头发白了些，笑容没变样，一杯茶、一顿饭，把这些年没赶上的陪伴，慢慢补了回来。", "今日同学聚会：合影拍了一张又一张，生怕漏了谁。时光带走了青春，带不走同窗的情谊，愿我们下次相聚，不用等太久。", "和老同学聚在一起，话题永远绕不开当年。说着说着就笑了，笑着笑着又有点感慨，这样纯粹的情谊，是岁月给的礼物。"]}, {"keys": ["朋友", "聚会", "闺蜜", "老友", "同学聚"], "lines": ["和有趣的人在一起，连时间都变得可爱。聊起从前笑个不停，说到现在满是感慨，一转眼就到了要散场的时候。", "老友如酒，越陈越香。今日小聚，打卡。隔了这么久再见，一开口还是当年的感觉，一点都不生分。", "快乐的秘诀：和喜欢的人，做喜欢的事。不用刻意找话题，不用小心翼翼，怎么舒服怎么来，这就是老朋友。", "聚会结束，快乐续航中。回家的路上还在回味刚才的笑声，这份热闹，够我开心好一阵子了。"]}, {"keys": ["上班", "加班", "下班", "工作", "出差"], "lines": ["下班打卡！今天的班，就上到这里。关掉电脑，伸个懒腰，属于自己的时间正式开始，谁也别想占用。", "努力搬砖的人，连晚霞都格外好看。忙了一整天，抬头看到这一片天，忽然觉得辛苦也有了回报。", "工作再忙，也要记得抬头看看天。喝口水，站起来活动活动，日子是自己的，身体更是自己的，要照顾好。", "今日份打工完成，快乐正式开始。回家的路慢慢走，晚饭好好吃，今晚的时间，一分钟都不浪费。"]}, {"keys": ["宅家", "在家", "周末", "躺平", "休息日"], "lines": ["宅家的一天，舒服得不像话。睡到自然醒，吃点好吃的，窝在沙发里追剧发呆，这才是休息该有的样子。", "周末的意义，就是把闹钟调成静音。没有安排，没有催促，时间大把大把的，全由自己说了算。", "在家躺平，是对周末最基本的尊重。忙了一周了，今天谁也别想让我动弹，快乐就是这么朴素。", "慢悠悠的一天，幸福感拉满。不赶时间，不想事情，把日子过得松松垮垮、舒舒服服，真好。"]}, {"keys": ["早起", "清晨", "日出", "晨光", "早安"], "lines": ["新的一天，从打卡开始。早起的空气特别清新，深吸一口，整个人都清醒了，今天也要好好加油。", "晨光熹微，心情也跟着亮了起来。天一点点变亮，心里的计划也一点点清晰，新的一天，充满希望。", "一日之计在于晨，今日份元气已加载。早餐吃得饱饱的，出门的时候脚步都是轻快的，好运正在路上。", "迎着朝阳出发，好运正在路上。早起的人不会被辜负，今天的每一份努力，都会有回响。"]}, {"keys": ["散步", "逛街", "公园", "江边", "湖边", "河边"], "lines": ["慢慢走，沿途的风景都在打招呼。不用赶路，也不用目的地，走到哪儿算哪儿，心情却出奇地好。", "散步是和城市谈一场慢恋爱。走了这么多年的路，换个心情再走一遍，居然处处都是新发现。", "把烦恼留给风，把脚步留给路。一圈走下来，出了一身微汗，心里那些堵着的东西，也跟着散了。", "走着走着，心情就晴了。原来治愈自己不用花大钱，出门走走，吹吹风，看看人间烟火，就足够了。"]}, {"keys": ["小酒馆", "酒吧", "清吧", "微醺", "鸡尾酒", "精酿"], "lines": ["小酒馆的灯光是暖黄色的，酒杯轻轻一碰，叮的一声，把白天的疲惫都碰碎了。坐在吧台边慢慢喝，不赶时间，这一杯敬自己，也敬今天的好心情。", "找一家安静的小酒馆，点一杯招牌特调，看调酒师摇酒、倒酒，动作行云流水。酒还没喝，光是看着就已经心满意足，今晚注定是个好夜晚。", "微醺是结束一天最好的方式。在小酒馆里听着轻柔的音乐，和朋友聊些有的没的，笑声和酒香混在一起，这样松弛的夜晚，值得打卡纪念。", "小酒馆打卡：一杯下肚，话就多了，心也热了。不用多，一杯刚刚好，带着一点点飘飘然往家走，连路灯看起来都格外温柔。"]}, {"keys": ["音乐会", "交响乐", "演奏会", "古典音乐", "钢琴独奏"], "lines": ["音乐会开场，灯光暗下来，第一个音符响起的时候，心一下子就静了。坐在台下什么都不用想，只跟着旋律慢慢走，这一晚，耳朵和心都被温柔以待了。", "听一场音乐会，是给忙碌生活的一次暂停。琴声、弦乐声层层叠叠漫过来，安安静静坐着听完，走出音乐厅的时候，夜色都变得格外动人。", "今日份音乐会打卡。听不懂的地方就闭上眼睛感受，好听的旋律从不挑人，谢幕时掌声响了好久，心里还留着回声，这就是余音绕梁吧。", "把今晚交给音乐。从第一个音符到最后一曲，两个小时过得又慢又快，这样专注又美好的时光，是生活给耳朵发的一份奖金，收好了。"]}, {"keys": ["演唱会", "音乐节", "演唱", "安可"], "lines": ["演唱会现场，荧光棒汇成一片星海，歌声一响，全场一起大合唱。喊到嗓子微哑，跳到满头是汗，这样的夜晚，快乐是会传染的，我已经被传染了。", "等了好久的演唱会，今天终于坐在了现场。灯光亮起、音乐响起来的那一刻，心里又激动又感动——耳机里听了无数遍的歌，今天亲耳听到了，太值了。", "今日份快乐超标：演唱会打卡！从第一首跟唱到最后一首安可，手机拍满了，嗓子喊哑了，心也被填满了，回家的路上还在小声哼着刚才的旋律。", "演唱会的魅力，就是几千人一起为同一首歌心动。散场时耳朵还有点嗡嗡的，心里却热热的，这份热闹和感动，够我回味好长一段时间了。"]}, {"keys": ["圣诞", "平安夜"], "lines": ["圣诞树上的小灯一闪一闪，街边的橱窗都换上了节日的颜色。捧一杯热饮慢慢逛，把这份热热闹闹的圣诞气氛装进口袋，今晚连空气都是甜甜的。", "圣诞节打卡：给自己挑了一份小礼物，不贵，却足够开心。过节嘛，就是要找个理由对自己好一点，愿这个冬天，温暖和好运都如期而至。", "平安夜的灯光格外温柔，和喜欢的人一起吃顿饭、拆个礼物、互道一声圣诞快乐。仪式感不用多隆重，心意到了，这个节日就过得圆圆满满。", "圣诞的歌声飘满了大街小巷，站在挂满彩灯的圣诞树下拍张照。把这一年的辛苦都留在身后，带着满心的欢喜，开开心心迎接新的一年。"]}, {"keys": ["唱歌", "K歌", "KTV", "ktv", "卡拉OK", "练歌房"], "lines": ["话筒一拿，灯光一打，今天我就是全场最佳。老歌新歌轮番上，唱到高音处全场鼓掌，K歌的快乐就是这么直接，嗓子唱哑了也开心。", "去KTV唱歌打卡！包厢里点满了拿手曲目，从情歌对唱到摇滚嘶吼，压力随着歌声一起释放出去，唱完一身轻松，快乐充满电。", "唱歌是给心情开的一扇窗。在KTV里把喜欢的歌唱了一遍又一遍，跑调也没关系，开心最重要，今天的我们都是麦霸本霸。", "约上三五好友一起K歌，果盘饮料摆满桌，歌单从傍晚唱到夜里。那些平日说不出口的欢喜和疲惫，都在一首首歌里找到了出口。"]}, {"keys": ["拍照", "摄影", "自拍", "拍写真", "写真"], "lines": ["拍照打卡！今天的任务就是把好看的画面都收进相机，角度试了七八种，光线等了小半天，翻看成果的时候，每一张都舍不得删。", "出门拍照的一天，快乐是快门给的。咔嚓咔嚓一通拍，好看的风景、好看的心情，全都定格成了照片，往后翻起来都是甜的。", "拍照的意义，是把瞬间变成永恒。今天这一通拍，构图讲究、笑容自然，出片率高得惊人，朋友圈的九宫格有着落了。", "带上相机去拍照打卡。走走停停，看到好看的就举起镜头，拍的不只是风景，还有此刻闪闪发光的好心情。"]}, {"keys": ["听音乐", "听歌", "戴耳机", "单曲循环"], "lines": ["戴上耳机，整个世界都安静了，只剩下喜欢的旋律。听音乐的时光最自在，跟着节拍轻轻哼，心情被一个个音符熨得平平整整。", "今日份快乐是耳机给的。歌单从头播到尾，老歌听出回忆，新歌听出惊喜，一首接一首，舍不得按下暂停键。", "听音乐打卡：把音量调到刚好，把烦恼调成静音。旋律流淌的这一会儿，什么都不用想，只管让耳朵去旅行。", "单曲循环了一下午，同一首歌听了十几遍还是喜欢。音乐就是有这样的魔力，能把平平无奇的午后，变得闪闪发亮。"]}, {"keys": ["稻田", "金色稻田", "稻田边", "稻穗"], "lines": ["站在稻田边，风一吹，稻浪一层一层涌向远方，金灿灿的，连空气里都是谷物成熟的香气。这样的秋天，看一眼就醉了。", "稻田打卡！稻穗沉甸甸地低着头，像在向辛苦的人们鞠躬。走在田埂上慢慢拍，怎么拍都是一幅丰收的画。", "把心情放进金色的稻田里晒一晒。蓝天、白云、稻浪，随手一拍都是好看的画面，乡野的治愈，从来不用刻意找。", "今日在稻田边待了好久，听风吹稻浪的沙沙声，看白鹭慢慢飞过。这样安安静静的田野时光，把心里的浮躁都吹散了。"]}, {"keys": ["秋天", "秋日", "秋风", "落叶", "枫叶", "银杏"], "lines": ["秋天来了，风里有了凉意，也有了桂花的甜香。踩着落叶慢慢走，咯吱咯吱的声响里，藏着这个季节独有的温柔。", "秋日打卡：天高云淡，阳光不燥，微风正好。枫叶红了，银杏黄了，随便走走都是风景，这样的日子最适合出门拍照。", "把秋天装进口袋：一片落叶、一缕桂花香、一个暖洋洋的午后。不冷不热的天气里，连心情都变得软软的、慢慢的。", "秋天的快乐很简单，是一杯热茶、一条围巾、一次说走就走的散步。走在铺满落叶的路上，感觉整个人都被季节温柔以待。"]}], "UNIVERSAL": ["把平凡的日子，过出一点仪式感。不用等什么大事，认真吃一顿饭、好好走一段路，都是生活的小庆典。", "今天也很好，值得记一笔。把开心的瞬间写下来、拍下来，往后的日子翻一翻，心里还是暖的。", "生活明朗，万物可爱。天晴也好，下雨也罢，换个心情看世界，处处都是值得欢喜的小风景。", "认真生活的人，自带光芒。不慌不忙地过好每一天，光芒不用找，它会自己从日子里透出来。", "日子不慌不忙，我们来日方长。该来的都在路上，慢慢走，慢慢等，好事多磨，快乐也一样。", "小确幸，是生活里的小星星。一闪一闪不耀眼，却足够照亮普通日子里的每一个小角落。", "把开心存档，把烦恼删除。存档的要常常翻出来看看，删除的就别再想了，心要腾地方装快乐。", "人间值得，今天又多了一个证据。也许是一阵风、一顿饭、一个笑，证据虽小，分量却一点都不轻。", "慢一点没关系，风景都在路上。走得慢，才能看得清；看得清，才不会错过沿途的好风光。", "愿往后的日子，多的是不需要理由的快乐。想笑就笑，想走就走，日子简单一点，幸福就多一点。"], "STYLE_SAMPLES": [["海边看日落", "心动有了落点"], ["和老朋友喝咖啡", "笑意藏都藏不住"], ["在公园里散步", "心被轻轻熨平了"], ["爬山登顶", "热血正在沸腾"], ["在江边看晚霞", "晚风也懂我的心事"], ["宅家过周末", "一个人，也很自在"]]}</script>
-    <script>
-      // 刷新页面后始终停在最上面，不恢复到之前往下滚的位置
+        <script>
       if ("scrollRestoration" in history) { try { history.scrollRestoration = "manual"; } catch (e) {} }
       window.scrollTo(0, 0);
-      // ---------- 语料 ----------
       var MOODS = null, TEMPLATES = null, SCENE_BANKS = null, UNIVERSAL = null, STYLE_SAMPLES = null;
-      // 上面五份文案语料（约 35KB）改放在主脚本前面的 JSON 文本块（#corpusData）里，
-      // 第一次生成文案或打开文案库时才解析：以前它们是主脚本里的字面量，打开页面
-      // 必须先把这 35KB 全部解析执行完别的按钮才有反应，慢网慢机器上就是打开慢、点着卡。
       function ensureCorpus() {
-        if (MOODS) return;
-        var d = JSON.parse(document.getElementById("corpusData").textContent);
+        if (MOODS) return true;
+        var el = document.getElementById("corpusData");
+        if (!el) return false;
+        var d = JSON.parse(el.textContent);
         MOODS = d.MOODS; TEMPLATES = d.TEMPLATES; SCENE_BANKS = d.SCENE_BANKS;
         UNIVERSAL = d.UNIVERSAL; STYLE_SAMPLES = d.STYLE_SAMPLES;
+        return true;
       }
-
-      
-
-      // 场景关键词 → 专属文案
-      
-
       var GENERIC_SCENE = [
         "在{S}，把平凡的日子过出仪式感。不用多隆重，认真感受、好好记录，这一刻就变得闪闪发光了。",
         "{S}打卡，快乐存档成功。照片拍好了，文案写好了，往后翻起来，今天的开心还能再回味一遍。",
         "生活需要仪式感，{S}就是今天的仪式。小小的仪式感，是给平凡日子的一份温柔提醒：要好好生活呀。",
         "到过的地方，都要留下快乐的证据。脚印会淡，照片长存，今天这一页，我认认真真地记下来了。"
       ];
-
       var SCENE_CHIPS = ["海边看日落", "和朋友喝咖啡", "爬山登顶", "吃一顿火锅", "吃一顿西餐", "吃一顿日料", "公园赏花", "看一场展览", "老友小聚", "江边散步", "去小酒馆微醺", "听一场音乐会", "看一场演唱会", "过圣诞节", "去KTV唱歌", "同学聚会", "出去旅行", "自驾出游", "拍照打卡", "听音乐", "在稻田边", "秋日时光", "雨天", "咖啡茶饮"];
-
-      // ---------- 状态 ----------
       var state = { moods: [], styles: [], scenes: [], withDate: false };
       var lastBatch = [];
-      var currentBatch = []; // 当前屏幕上显示的这一批（带日期前缀后的文本）
-
-      // ---------- 不留存：打开页面就是全新空白，点「刷新」恢复默认 ----------
+      var currentBatch = [];
       var STORE_KEY = "daka-wenan-state-v1";
       function persist() {
-        // 不再保存任何选择；顺手清掉旧版本留下的存档，保证刷新后一个选项都不留
-        try { localStorage.removeItem(STORE_KEY); } catch (e) { /* 存储不可用时静默跳过 */ }
+        try { localStorage.removeItem(STORE_KEY); } catch (e) {  }
       }
       try { localStorage.removeItem(STORE_KEY); } catch (e) {}
-
-      // ---------- 工具 ----------
       function shuffle(arr) {
         var a = arr.slice();
         for (var i = a.length - 1; i > 0; i--) {
@@ -931,8 +914,6 @@
         var d = new Date();
         return d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日";
       }
-
-      // ---------- 界面构建 ----------
       var sceneInput = document.getElementById("scene");
       var sceneChipsEl = document.getElementById("sceneChips");
       function syncSceneChips() {
@@ -953,7 +934,6 @@
         b.addEventListener("click", function () { toggleScene(s); });
         sceneChipsEl.appendChild(b);
       });
-      // 当前生效的场景：多选的现成场景 + 输入框里自己填的（按顿号/逗号拆开），去重后合并
       function effectiveSceneParts() {
         var parts = state.scenes.slice();
         var custom = sceneInput.value.trim();
@@ -965,7 +945,6 @@
         }
         return parts;
       }
-
       var moodChipsEl = document.getElementById("moodChips");
       function syncMoodChips() {
         var all = moodChipsEl.querySelectorAll(".chip");
@@ -984,7 +963,6 @@
         syncMoodChips();
         persist();
       }
-      // 心情名与语料 MOODS 的键一一对应（语料懒解析、还没解析时先用这份名单建片）
       ["开心", "治愈", "疲惫", "平静", "浪漫", "感慨", "兴奋", "想静静", "日常"].forEach(function (m) {
         if (m === "日常") return;
         var b = document.createElement("button");
@@ -992,7 +970,6 @@
         b.addEventListener("click", function () { toggleMood(m); });
         moodChipsEl.appendChild(b);
       });
-
       function buildSeg(el, options, initial, onPick) {
         options.forEach(function (opt) {
           var b = document.createElement("button");
@@ -1026,7 +1003,6 @@
             if (zi !== -1) state.styles.splice(zi, 1);
             var idx = state.styles.indexOf(opt);
             if (idx === -1) state.styles.push(opt); else state.styles.splice(idx, 1);
-            // 允许全部取消：风格一个不选时，生成时按全部风格混搭
           }
           syncStyleSeg();
           persist();
@@ -1036,21 +1012,16 @@
       syncStyleSeg();
       buildSeg(document.getElementById("dateSeg"), ["不带日期", "带日期"], "不带日期", function (v) { state.withDate = (v === "带日期"); persist(); });
       sceneInput.addEventListener("input", persist);
-
-      // ---------- 生成 ----------
       function generate(noScroll) {
-        ensureCorpus();
+        if (!ensureCorpus()) { showToast("文案数据还在加载，稍等一下再点"); return; }
         var sceneParts = effectiveSceneParts();
         var scene = sceneParts.length ? sceneParts.join("、") : "这一刻";
-        // 多选心情：把选中的几种心情句子混成一个池子；没选就用「日常」
         var moodBank = [];
         (state.moods.length ? state.moods : ["日常"]).forEach(function (m) {
           (MOODS[m] || []).forEach(function (f) { moodBank.push(f); });
         });
         if (!moodBank.length) moodBank = MOODS["日常"].slice();
         var candidates = [];
-
-        // 场景专属文案：选中的每个场景命中的专属库都算，每个库最多取 2 条，总共最多 4 条
         var matchedBanks = [];
         SCENE_BANKS.forEach(function (bank) {
           for (var k = 0; k < bank.keys.length; k++) {
@@ -1066,16 +1037,12 @@
         } else {
           shuffle(GENERIC_SCENE.map(function (t) { return fill(t, scene, pick(moodBank)); })).slice(0, 2).forEach(function (l) { candidates.push(l); });
         }
-
-        // 风格模板：多选的几个风格混在一起；「综合」表示全部风格
         var styles = (state.styles.indexOf("综合") !== -1 || !state.styles.length) ? Object.keys(TEMPLATES) : state.styles;
         var pool = [];
         styles.forEach(function (s) {
           TEMPLATES[s].forEach(function (t) { pool.push(fill(t, scene, pick(moodBank))); });
         });
         candidates = candidates.concat(shuffle(pool));
-
-        // 去重、避开上一批，取 6 条
         var seen = {}, out = [];
         candidates.forEach(function (c) {
           if (!seen[c] && lastBatch.indexOf(c) === -1 && out.length < 6) { seen[c] = 1; out.push(c); }
@@ -1086,13 +1053,11 @@
           });
         }
         lastBatch = out.slice();
-
         if (state.withDate) {
           out = out.map(function (t) { return todayStr() + " · " + t; });
         }
         render(out, noScroll);
       }
-
       function render(list, noScroll) {
         currentBatch = list.slice();
         var grid = document.getElementById("grid");
@@ -1132,7 +1097,6 @@
         persist();
         if (!noScroll) grid.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
-
       var toastTimer = null;
       function showToast(msg) {
         var toast = document.getElementById("toast");
@@ -1162,14 +1126,9 @@
           document.body.removeChild(ta);
         }
       }
-
-      // ---------- 文案库 ----------
-      
       var SCENE_CAT_NAMES = ["咖啡茶饮", "海边", "登山徒步", "西餐", "日料", "美食", "运动", "读书", "自驾", "旅行", "日落晚霞", "雨天", "雪天", "赏花", "猫", "夜景", "看展", "同学聚会", "朋友聚会", "工作日常", "宅家周末", "清晨", "散步", "小酒馆", "音乐会", "演唱会", "圣诞节", "唱歌K歌", "拍照打卡", "听音乐", "稻田", "秋天"];
-      
-
       var libBuilt = false, libData = [], libCat = "全部";
-      var libOrder = null; // 刷新后的随机顺序（句子文本数组），null 表示默认顺序
+      var libOrder = null;
       function shuffleLib() {
         libOrder = shuffle(libData.map(function (e) { return e.text; }));
       }
@@ -1192,7 +1151,6 @@
         SCENE_BANKS.forEach(function (bank, i) {
           bank.lines.forEach(function (t) { add(t, "场景·" + (SCENE_CAT_NAMES[i] || bank.keys[0])); });
         });
-
         var cats = ["全部", "万能短句"]
           .concat(Object.keys(TEMPLATES))
           .concat(Object.keys(MOODS).map(function (m) { return "心情·" + m; }))
@@ -1214,7 +1172,6 @@
         });
         renderLib();
       }
-
       function renderLib() {
         var kw = document.getElementById("libSearch").value.trim();
         var list = libData.filter(function (e) {
@@ -1234,7 +1191,6 @@
         var grid = document.getElementById("libGrid");
         grid.innerHTML = "";
         var show = list.slice(0, 60);
-        // 60 张卡先在离线片段里拼好，再一次性挂上页面，避免逐张插入反复触发布局
         var frag = document.createDocumentFragment();
         show.forEach(function (e) {
           var card = document.createElement("div");
@@ -1264,12 +1220,9 @@
       document.getElementById("libSearch").addEventListener("input", function () {
         libOrder = null;
         if (!libBuilt) return;
-        // 输入时防抖：停笔一小会儿再重排列表，避免每个字都整表重建一次
         clearTimeout(libSearchTimer);
         libSearchTimer = setTimeout(function () { renderLib(); }, 140);
       });
-
-      // ---------- 小红书文案库（博主：懵逼星 · 淡淡的幸福感文案，按发表时间倒序，后台更新时往这个清单前面添） ----------
       var XHS_DATA = [
         { text: "不会让人咯噔一下的淡淡生命力", cat: "幸福感文案 · 自留款", note: "自存一些淡淡的幸福感文案2.0" },
         { text: "吃一颗苹果 然后赞美生活", cat: "幸福感文案 · 自留款", note: "自存一些淡淡的幸福感文案2.0" }
@@ -1344,8 +1297,6 @@
         btn.setAttribute("aria-expanded", open ? "true" : "false");
         if (open) showToast("选一个分类，只看这一类");
       });
-
-      // ---------- 页签切换 ----------
       var genView = document.getElementById("genView");
       var libView = document.getElementById("libView");
       var imgView = document.getElementById("imgView");
@@ -1355,8 +1306,6 @@
       var tabImg = document.getElementById("tabImg");
       var tabXhs = document.getElementById("tabXhs");
       var currentView = "gen";
-      // 首次打开某个库时，建库（生成几百条数据、建上百个卡片）是重活：
-      // 先让页签和空壳立刻切换出来，建库推迟到下一帧再做，点击就不会被堵住发卡
       var pendingBuild = "";
       function scheduleBuild(kind) {
         if (pendingBuild === kind) return;
@@ -1364,10 +1313,11 @@
         var run = function () {
           if (pendingBuild !== kind) return;
           pendingBuild = "";
-          if (kind === "lib" && currentView === "lib" && !libBuilt) buildLib();
+          if (kind === "lib" && currentView === "lib" && !libBuilt) {
+            if (document.getElementById("corpusData") || document.readyState === "complete") buildLib();
+            else { pendingBuild = kind; setTimeout(run, 150); }
+          }
           else if (kind === "img" && currentView === "img" && !imgBuilt) {
-            // 数据块在主脚本之后、可能还没下完：等它到了再建，别建成空库；
-            // 页面都加载完了还没来（文件损坏的极端情况）就不再空等，按空库收尾
             if (document.getElementById("imgLibData") || document.readyState === "complete") buildImgLib();
             else { pendingBuild = kind; setTimeout(run, 150); }
           }
@@ -1397,8 +1347,6 @@
       tabLib.addEventListener("click", function () { showView("lib"); });
       tabImg.addEventListener("click", function () { showView("img"); });
       tabXhs.addEventListener("click", function () { showView("xhs"); });
-      // 备用通道：电脑微信内核偶发某个按钮自己的监听没接上、点着没反应时，
-      // 页签栏这一层再兜一次底；showView 重复调用没有副作用，不会切错页
       var tabViewById = { tabGen: "gen", tabLib: "lib", tabImg: "img", tabXhs: "xhs" };
       var tabsNav = document.querySelector(".tabs");
       if (tabsNav) tabsNav.addEventListener("click", function (e) {
@@ -1406,11 +1354,8 @@
         while (t && t !== tabsNav && !(t.id && tabViewById[t.id])) t = t.parentNode;
         if (t && t.id && tabViewById[t.id]) showView(tabViewById[t.id]);
       });
-      // 主脚本已就绪：页签先行脚本从这里起退场；加载时用户已点过的页签，立刻正式切过去
       window.__mainReady = true;
       if (window.__earlyView && window.__earlyView !== currentView) showView(window.__earlyView);
-
-      // ---------- 照片意境（最多 9 张 · 九宫格） ----------
       var MAX_PHOTOS = 9;
       var photoInput = document.getElementById("photoInput");
       var drop = document.getElementById("drop");
@@ -1419,10 +1364,8 @@
       var photoGrid = document.getElementById("photoGrid");
       var dropAddHint = document.getElementById("dropAddHint");
       var photoCountBadge = document.getElementById("photoCountBadge");
-      var photos = []; // [{url, profile}]
-      var photoProfile = null; // 这组照片的综合意境
-
-      // 在本地看照片的颜色和明暗，判断它的意境
+      var photos = [];
+      var photoProfile = null;
       function analyzePhoto(img) {
         var S = 72;
         var c = document.createElement("canvas");
@@ -1466,11 +1409,9 @@
         if (pinkR > 0.09) return { label: "粉色心动", scene: "甜甜的小日子", mood: "浪漫" };
         return { label: "日常光影", scene: "", mood: "" };
       }
-
       function combineProfiles() {
         var valid = photos.map(function (p) { return p.profile; }).filter(Boolean);
         if (!valid.length) { photoProfile = null; return; }
-        // 同一场景不同角度，取出现最多的一种意境作为这组的主意境
         var counts = {}, best = valid[0], bestN = 0;
         valid.forEach(function (p) {
           counts[p.label] = (counts[p.label] || 0) + 1;
@@ -1478,7 +1419,6 @@
         });
         var withScene = valid.filter(function (p) { return p.scene; });
         var scenePick = withScene.length ? withScene[0] : best;
-        // 若多数照片有场景，用多数派的场景
         var sCounts = {}, sBest = scenePick, sBestN = 0;
         withScene.forEach(function (p) {
           sCounts[p.scene] = (sCounts[p.scene] || 0) + 1;
@@ -1486,7 +1426,6 @@
         });
         photoProfile = { label: best.label, scene: sBest.scene || "", mood: sBest.mood || best.mood || "" };
       }
-
       function applyProfile(force) {
         if (!photoProfile) return;
         if (photoProfile.scene && (force || (!sceneInput.value.trim() && !state.scenes.length))) {
@@ -1503,7 +1442,6 @@
             ? "已按这组照片的意境填好场景、选好心情，不合意可以改"
             : "这组意境偏日常，填个场景再生成吧";
       }
-
       function renderPhotos() {
         photoGrid.innerHTML = "";
         photoGrid.className = "photo-grid count-" + photos.length;
@@ -1543,7 +1481,6 @@
         combineProfiles();
         if (has && photoProfile) applyProfile(false);
       }
-
       function removePhotoAt(idx) {
         var p = photos[idx];
         if (p) URL.revokeObjectURL(p.url);
@@ -1557,7 +1494,6 @@
           showToast("已移除一张，还剩 " + photos.length + " 张");
         }
       }
-
       function clearPhoto() {
         photos.forEach(function (p) { URL.revokeObjectURL(p.url); });
         photos = []; photoProfile = null;
@@ -1566,15 +1502,7 @@
         var rtWrap = document.getElementById("resultThumbs");
         if (rtWrap) { rtWrap.innerHTML = ""; rtWrap.hidden = true; }
       }
-
-      // HEIC：浏览器能直接打开就用原图；打不开才解码成 JPEG。
-      // 主路：在页面里直接解码，优先用新版 WASM 解码库（assets/libheif-wasm.js，
-      // 解一张大图约 1 秒）；环境不支持 WASM 时自动退回老库（assets/libheif.js，
-      // 慢但稳）；两条都不行再退 heic2any 的后台线程方式。各路都有超时兜底，
-      // 解码库懒加载，平时不加载，页面打开速度不受影响。
       function isHeic(f) { return f.type === "image/heic" || f.type === "image/heif" || /\.(heic|heif)$/i.test(f.name || ""); }
-      // 按文件头认 HEIC：HEIF 文件第 5–8 字节是 ftyp，后面跟品牌字（heic、mif1 等）。
-      // 经微信转出来的照片偶尔扩展名丢失、类型被标错，名字和类型都认不出时靠它兜底。
       var HEIF_BRANDS = { heic: 1, heix: 1, hevc: 1, hevx: 1, heim: 1, heis: 1, hevm: 1, hevs: 1, mif1: 1, mif2: 1, msf1: 1 };
       function sniffHeif(f) {
         try {
@@ -1592,9 +1520,6 @@
       }
       function jpgName(file) { return (file.name || "photo").replace(/\.[^.]*$/, "") + ".jpg"; }
       var libheifReady = null;
-      // 提前热身：解码库有 1.3MB，等文件选好再加载解析要白等好几秒。
-      // 用户一点选图框、或把文件拖到框上时就先把库加载起来，和选图的时间
-      // 重叠，真正开始转换时库已经就绪。加载失败不吭声，转换时还会再试。
       function warmHeicDecoder() {
         try { getHeifImpl().catch(function () {}); } catch (e) {}
       }
@@ -1615,10 +1540,6 @@
         }
         return libheifReady;
       }
-      // 新版 WASM 解码库：整包一个文件（assets/libheif-wasm.js，WASM 已内嵌，
-      // 不用再拉别的文件），加载后 window.libheif 是个工厂函数，调一次拿到
-      // 解码模块。环境的安全策略若不许 WASM 编译，工厂会直接失败，外层
-      // getHeifImpl 会退回老库，不会卡住。
       var heifWasmReady = null;
       function loadHeifWasm() {
         if (window.__heifWasmModule && window.__heifWasmModule.HeifDecoder) return Promise.resolve(window.__heifWasmModule);
@@ -1644,8 +1565,6 @@
         }
         return heifWasmReady;
       }
-      // 统一入口：先试 WASM 新库，不行退老库；哪条通了记下来，后面每张都用它，
-      // 不再每张重新试一遍
       var heifImplPromise = null;
       function getHeifImpl() {
         if (!heifImplPromise) {
@@ -1658,17 +1577,12 @@
         }
         return heifImplPromise;
       }
-      // 把解码出的一张图画成 JPEG。display 的回调在个别内核里会无声无息地
-      // 不回来（图数据不完整时它内部直接断掉），给它 10 秒看门狗：不回来
-      // 就当这张失败，换下一张候选，别把整条转换链堵死到总超时。
       function displayToJpeg(image, w, h, file) {
         return new Promise(function (resolve, reject) {
           var probe = document.createElement("canvas");
           var pctx = probe.getContext("2d");
           var imageData;
           try { imageData = pctx.createImageData(w, h); } catch (e) { reject(e); return; }
-          // 先把整幅垫成不透明（解码回调漏写的像素不至于透黑）：1200 万像素
-          // 逐个字节循环要走上千万次，改成按 32 位整块填充，快两个数量级
           try { new Uint32Array(imageData.data.buffer).fill(0xff000000); }
           catch (e) { for (var p = 3; p < imageData.data.length; p += 4) imageData.data[p] = 255; }
           var settled = false;
@@ -1681,8 +1595,6 @@
               settled = true;
               clearTimeout(watchdog);
               try {
-                // 超大照片缩到长边 1600 以内：页面里最大就是整幅显示，
-                // 1600 已经足够清楚，画布搬运和 JPEG 编码都快一截、省内存
                 var scale = Math.min(1, 1600 / Math.max(w, h));
                 var tw = Math.max(1, Math.round(w * scale)), th = Math.max(1, Math.round(h * scale));
                 var full = document.createElement("canvas");
@@ -1715,10 +1627,6 @@
             var images;
             try { images = new implRef.HeifDecoder().decode(buf); } catch (e) { reject(e); return; }
             if (!images || !images.length) { reject(new Error("heic-empty")); return; }
-            // iPhone 的 HEIC 一个文件里常装着好几张图：主图之外还有缩略图、
-            // 景深图等辅助图，第一张不保证是主图，辅助图还可能根本画不出来。
-            // 电脑浏览器没有原生 HEIC 解码、全靠这里解，挑错一张整张照片就废：
-            // 主图优先、面积大的优先，逐张试（最多 3 张），哪张画出来用哪张。
             var cands = [];
             for (var i = 0; i < images.length; i++) {
               var im = images[i], w = 0, h = 0, prim = false;
@@ -1767,9 +1675,6 @@
           });
       }
       function toJpeg(file) {
-        // 先在页面里直接解码（新库约 1 秒、老库慢些但能解完）；这条路真失败
-        // 再试后台线程方式。主路超时放宽到 90 秒：老库解大图本来就可能超过
-        // 30 秒，原来 30 秒一到就把快解完的活作废、转后台从头再解，白等一倍
         return withTimeout(decodeHeicMain(file), 90000, "heic-main-timeout")
           .catch(function () { return toJpegViaWorker(file); });
       }
@@ -1783,17 +1688,11 @@
               toJpeg(file).then(function (jpg) { resolve(loadSlot(jpg, true)); }, function () { resolve(null); });
             };
             if (isHeic(file) || !file.type || file.type === "application/octet-stream") { go(); return; }
-            // 名字和类型都看不出是 HEIC 时，再按文件头认一次：
-            // 经微信转出来的照片偶尔类型被标错，内容仍是 HEIC，照样转
             sniffHeif(file).then(function (yes) { yes ? go() : resolve(null); }, function () { resolve(null); });
           }
           url = URL.createObjectURL(file);
           var img = new Image();
           var done = false;
-          // 试开原图的兜底时限：普通照片给 8 秒（原样）；认得出是 HEIC 的
-          // 只给 1.5 秒——能原生打开的（手机 Safari）一秒内就打开了，
-          // 打不开的内核（含电脑微信）试开失败有时不立刻报错，原来白等满
-          // 8 秒才开始转换，一张先亏好几秒，现在最多亏 1.5 秒就转去解码
           var fuse = isHeic(file) ? 1500 : 8000;
           var timer = setTimeout(function () { if (done) return; done = true; tryConvert(); }, fuse);
           img.onload = function () { if (done) return; done = true; clearTimeout(timer); var u = url; url = null; resolve({ url: u, profile: analyzePhoto(img) }); };
@@ -1801,16 +1700,12 @@
           img.src = url;
         });
       }
-
-      // 加图请求排队执行：一批（尤其带 HEIC 转换）还没处理完时又来一批，
-      // 两批各自算「还能加几张」会算错、进度提示也会互相打架，排成一队就稳了
       var addQueue = Promise.resolve();
       function handlePhotoFiles(fileList) {
         if (!fileList || !fileList.length) return;
         var batch = Array.prototype.slice.call(fileList);
         addQueue = addQueue.then(function () { return processPhotoFiles(batch); }, function () { return processPhotoFiles(batch); });
       }
-
       function processPhotoFiles(fileList) {
         if (!fileList || !fileList.length) return;
         var files = Array.prototype.slice.call(fileList);
@@ -1819,9 +1714,7 @@
         var skippedType = 0;
         var validFiles = files.filter(function (f) {
           if (f.type.indexOf("image/") === 0 || isHeic(f)) return true;
-          if (!f.type) return true; // 微信、QQ 拖入或系统不给类型和扩展名的照片，先收下再试着打开
-          // 电脑端拖入的 PNG、HEIC 常被标成通用类型（application/octet-stream），
-          // 类型看着不像照片、但扩展名是图片的，一样收下，别误判成「不是照片」
+          if (!f.type) return true;
           if (/\.(jpe?g|png|gif|webp|bmp|heic|heif|avif)$/i.test(f.name || "")) return true;
           skippedType++; return false;
         });
@@ -1831,10 +1724,8 @@
           validFiles = validFiles.slice(0, remain);
         }
         if (!validFiles.length) return;
-        // 逐张处理：HEIC 解码一张一张来，进度常驻显示，不会几张一起卡住看不出状态
         var status = document.getElementById("photoStatus");
         var total = validFiles.length;
-        // 状态带已用秒数：转换要等时，秒数在走，用户看得出没卡死
         var statusTimer = null, statusBase = "", statusStart = 0;
         function showStatus(text) {
           if (!status) return;
@@ -1850,8 +1741,6 @@
           if (statusTimer) { clearInterval(statusTimer); statusTimer = null; }
           if (status) { status.hidden = true; status.textContent = ""; }
         }
-        // 转好一张先放一张：以前要等整批全部转完才往格子里放，中间哪怕
-        // 第一张早转好了也看不见，几张大图排队时就像一张都没出来
         var added = 0, failed = 0;
         var chain = Promise.resolve();
         validFiles.forEach(function (file, i) {
@@ -1872,15 +1761,7 @@
           else if (added) showToast(photos.length >= MAX_PHOTOS ? "九宫格凑齐了，共 9 张" : "已放 " + photos.length + " 张，还能再加 " + (MAX_PHOTOS - photos.length) + " 张");
         });
       }
-
-      // ---------- 打开选图（电脑微信内置浏览器专项加固） ----------
-      // 那个内核里，隔着一层用程序去点文件框，偶尔会被吞掉（点了没反应）；
-      // 文件框在选图窗里被取消过一次后，还可能「粘住」再也打不开，只能
-      // 退出重进。两手对策：①空状态的大框本身就是文件框的 label（见页面
-      // 里 dropText），点它由浏览器顺着原生手势直接打开选图，最稳；
-      // ②文件框只要经历过一次选图（选好或取消），就换成全新的一个，
-      // 下次打开永远是干净状态，不会粘住。
-      var pickerSession = false; // 选图窗这一程开着时为 true
+      var pickerSession = false;
       function bindPhotoInput(el) {
         el.addEventListener("change", function () {
           pickerSession = false;
@@ -1900,7 +1781,6 @@
         bindPhotoInput(photoInput);
         return photoInput;
       }
-      // 选图窗关掉、焦点回到页面时，这一程若没选成（取消了）就换新文件框
       window.addEventListener("focus", function () {
         if (!pickerSession) return;
         pickerSession = false;
@@ -1908,23 +1788,19 @@
       });
       function openPhotoPicker() {
         if (photos.length >= MAX_PHOTOS) { showToast("最多放 9 张，已经满了"); return; }
-        warmHeicDecoder(); // 趁选图窗开着，先把 HEIC 解码库加载好
+        warmHeicDecoder();
         pickerSession = true;
         freshPhotoInput().click();
       }
-      // 空状态大框走 label 原生打开：这里只记一笔「选图开始了」；
-      // 满 9 张时拦下，别让选图窗弹出来
       dropText.addEventListener("click", function (e) {
         if (photos.length >= MAX_PHOTOS) { e.preventDefault(); showToast("最多放 9 张，已经满了"); return; }
-        warmHeicDecoder(); // label 原生打开选图窗的同时，先把解码库备好
+        warmHeicDecoder();
         pickerSession = true;
       });
       drop.addEventListener("click", function (e) {
-        if (dropText.contains(e.target)) return; // label 自己会打开选图，不再用程序点一次（防连弹两次）
+        if (dropText.contains(e.target)) return;
         openPhotoPicker();
       });
-
-      // ---------- 拖拽加图（同上，针对电脑微信加固） ----------
       function dragHasFiles(e) {
         var dt = e.dataTransfer;
         if (!dt) return false;
@@ -1936,7 +1812,7 @@
         if (!dt) return [];
         if (dt.files && dt.files.length) return Array.prototype.slice.call(dt.files);
         var out = [];
-        if (dt.items) { // 有的来源（如从聊天窗口拖出）只有 items、没有 files，从 items 里取
+        if (dt.items) {
           for (var i = 0; i < dt.items.length; i++) {
             var it = dt.items[i];
             if (it.kind === "file" && it.getAsFile) { var f = it.getAsFile(); if (f) out.push(f); }
@@ -1944,7 +1820,6 @@
         }
         return out;
       }
-      // dragenter 和 dragover 都要拦下，drop 才会被放行（少拦一个，有些内核就不给放）
       drop.addEventListener("dragenter", function (e) { e.preventDefault(); if (dragHasFiles(e)) { drop.classList.add("over"); warmHeicDecoder(); } });
       drop.addEventListener("dragover", function (e) { e.preventDefault(); if (e.dataTransfer) e.dataTransfer.dropEffect = "copy"; drop.classList.add("over"); });
       drop.addEventListener("dragleave", function () { drop.classList.remove("over"); });
@@ -1954,9 +1829,6 @@
         var fs = filesFromDataTransfer(e.dataTransfer);
         if (fs.length) handlePhotoFiles(fs);
       });
-      // 电脑微信里拖拽的落点有时对不准框：文件拖到页面任何位置都先拦下，
-      // 别让浏览器把图片直接打开、把页面顶掉（看起来就像拖了没反应）；
-      // 停在「生成文案」页时，落点不在框内也顺手把图收进照片区
       document.addEventListener("dragover", function (e) { if (dragHasFiles(e)) e.preventDefault(); });
       document.addEventListener("drop", function (e) {
         if (!dragHasFiles(e)) return;
@@ -1971,11 +1843,8 @@
         applyProfile(true);
         generate();
       });
-
       document.getElementById("genBtn").addEventListener("click", generate);
       document.getElementById("againBtn").addEventListener("click", generate);
-
-      // ---------- 恢复默认：照片、场景、风格、心情、生成的文案全部清空 ----------
       function markSeg(el, label) {
         if (!el) return;
         var all = el.querySelectorAll("button");
@@ -1983,22 +1852,16 @@
       }
       function resetAll() {
         try { localStorage.removeItem(STORE_KEY); } catch (e) {}
-        // 照片：全部移除，不用再手动一张张删
         clearPhoto();
-        // 场景：输入框清空，现成场景一个不留
         state.scenes = [];
         sceneInput.value = "";
         syncSceneChips();
-        // 心情：全部取消
         state.moods = [];
         syncMoodChips();
-        // 风格：全部取消，一个不留
         state.styles = [];
         syncStyleSeg();
-        // 日期：回到默认「不带日期」
         state.withDate = false;
         markSeg(document.getElementById("dateSeg"), "不带日期");
-        // 生成的文案：全部清掉，回到最初的空白提示
         lastBatch = [];
         currentBatch = [];
         document.getElementById("grid").innerHTML = "";
@@ -2006,7 +1869,6 @@
         var rtWrap2 = document.getElementById("resultThumbs");
         if (rtWrap2) { rtWrap2.innerHTML = ""; rtWrap2.hidden = true; }
         document.getElementById("empty").classList.remove("hide");
-        // 文案库：搜索词清空，分类回到「全部」，顺序回到默认
         libCat = "全部";
         libOrder = null;
         var libSearchEl = document.getElementById("libSearch");
@@ -2016,9 +1878,7 @@
           catChips[i].classList.toggle("on", catChips[i].textContent === "全部");
         }
         if (libBuilt) renderLib();
-        // 图片库：搜索词、分类、风格和已选的图都清掉
         if (typeof resetImgLib === "function") resetImgLib();
-        // 小红书文案库：搜索词清掉，分类回到「全部」并收起分类区
         var xhsSearchEl = document.getElementById("xhsSearch");
         if (xhsSearchEl) xhsSearchEl.value = "";
         xhsCat = "全部";
@@ -2031,12 +1891,9 @@
           xhsCatChips[xi].classList.toggle("on", xhsCatChips[xi].textContent === "全部");
         }
         if (xhsBuilt) renderXhs();
-        // 刷新只清内容，不换频道：当前在哪个频道，就停留在哪个频道
         showView(currentView);
         window.scrollTo(0, 0);
       }
-
-      // ---------- 顶部刷新（恢复默认 · 全新空白） ----------
       var refreshBtn = document.getElementById("refreshBtn");
       refreshBtn.addEventListener("click", function () {
         refreshBtn.classList.remove("spinning");
@@ -2046,12 +1903,8 @@
         resetAll();
         showToast("已清空，回到全新空白界面");
       });
-      // 加载时用户先点了「刷新」（先行脚本记下的）：主脚本一就绪就补上这次清空
       if (window.__pendingRefresh) { window.__pendingRefresh = false; resetAll(); }
       sceneInput.addEventListener("keydown", function (e) { if (e.key === "Enter") generate(); });
-      // 图片库的 125 条数据放在主脚本之后的 JSON 文本块里：主脚本不用等这 18KB
-      // 下完就能先跑、首屏先出来；第一次点开图片库时才解析这块数据。
-      // 数据块还没随页面下完时先返回空表、且不把空表存住——建库那边会等它到了再建。
       var IMG_LIB = null;
       function imgLib() {
         if (!IMG_LIB) {
@@ -2062,12 +1915,10 @@
         }
         return IMG_LIB;
       }
-      // ---------- 图片库（从日记的配图库搬过来的一份，两边各存一份、互不影响） ----------
       var IMG_TOPICS = ["四季", "天气", "心情", "节日", "城市", "街道", "自然", "风景", "食物咖啡", "咖啡", "建筑", "环境", "空间", "猫咪", "江南", "水彩类"];
       var IMG_STYLES = ["手绘水彩", "照片", "插画"];
-      var imgBuilt = false, imgCat = "全部", imgStyle = "全部", imgSeason = "全部", imgSel = []; // 已选图片的文件名，按点选顺序
+      var imgBuilt = false, imgCat = "全部", imgStyle = "全部", imgSeason = "全部", imgSel = [];
       var IMG_SEASONS = ["春", "夏", "秋", "冬"];
-      // 水彩人物的季节：先看名字开头的春/夏/秋/冬，再看文件名 fig-spring/summer/autumn/winter
       function imgSeasonOf(it) {
         var c = it.n.charAt(0);
         if (IMG_SEASONS.indexOf(c) !== -1) return c;
@@ -2077,7 +1928,6 @@
         if (it.f.indexOf("winter") !== -1) return "冬";
         return "";
       }
-      // 季节小分类只在选了「水彩类」时出现；离开水彩类时季节回到「全部」
       function syncImgSeasonRow() {
         var show = imgCat === "水彩类";
         document.getElementById("imgSeasonField").hidden = !show;
@@ -2090,10 +1940,6 @@
       function libFull(f) { return "assets/tuku/" + f; }
       function libThumb(f) { return "assets/tuku/th/" + f.replace(/\.jpg$/, ".webp"); }
       function libSm(f) { return "assets/tuku/sm/" + f.replace(/\.jpg$/, ".webp"); }
-      // 网格图统一在这里排队加载，分两档：
-      // 一档 288px 小图（平均不到 10KB）先行——只下快要滚到的，同时最多 8 张，出图跟手；
-      // 图解码完了才淡入，不闪半张图；停在眼前的再在后台换 512px 清晰版（见 queueHi）。
-      // 加载失败隔一会儿重试小图（不退回几百 KB 的原图），三次都不行才给占位，不留空白卡
       var thumbQueue = [], thumbActive = 0, thumbObserver = null;
       function pumpThumbs() {
         while (thumbActive < 8 && thumbQueue.length) {
@@ -2109,7 +1955,6 @@
         function ok() {
           im.removeEventListener("load", ok);
           im.removeEventListener("error", bad);
-          // 解码完了才淡入，避免滚动时闪半张没解码完的图
           if (im.decode) { im.decode().then(mark, mark); } else mark();
           function mark() { im.classList.add("ld"); }
           queueHi(im, job.it);
@@ -2148,7 +1993,6 @@
               if (en.isIntersecting) {
                 if (thumbQueue.indexOf(j) === -1) thumbQueue.push(j);
               } else {
-                // 还没轮到就滚走/切走页签了：先撤下队列，别在后台白抢带宽
                 var i = thumbQueue.indexOf(j);
                 if (i !== -1) thumbQueue.splice(i, 1);
               }
@@ -2158,9 +2002,6 @@
         }
         thumbObserver.observe(im);
       }
-      // 二档清晰版：小图先行后，停在眼前的图在后台静默换成 512px——并发最多 3 张，
-      // 预加载＋解码都完了才换源，不闪烁；滚走的撤下队列。
-      // 省流模式/慢网（3G 及以下）不换、屏幕本身不需要高清（低分屏且窄屏）时也不换，省流量。
       var hiQueue = [], hiActive = 0, hiObserver = null;
       var netInfo = navigator.connection || {};
       var wantHi = !netInfo.saveData && !/2g|3g/.test(netInfo.effectiveType || "") &&
@@ -2204,7 +2045,6 @@
           pre.src = libThumb(job.it.f);
         }
       }
-
       function buildImgLib() {
         imgBuilt = true;
         var catEl = document.getElementById("imgCats");
@@ -2255,9 +2095,7 @@
         buildImgCards();
         renderImgLib();
       }
-      // 126 张卡只建一次：之后筛选只切换显隐、选图只更新那一张的选中标记，
-      // 不再每次都把整表卡片拆掉重建、给每张缩略图重新赋值（那正是点分类、点图时卡顿的来源）
-      var imgCardEls = {}; // 文件名 -> {card, sel}
+      var imgCardEls = {};
       function imgItemByFile(f) {
         var L = imgLib(); for (var i = 0; i < L.length; i++) if (L[i].f === f) return L[i];
         return null;
@@ -2303,7 +2141,6 @@
           frag.appendChild(card);
         });
         grid.appendChild(frag);
-        // 整表共用一个点击/键盘处理器，不再给每张卡各挂三个监听
         grid.addEventListener("click", function (e) {
           var node = e.target, cardEl = null, isZoom = false;
           while (node && node !== grid) {
@@ -2352,8 +2189,6 @@
         imgView.classList.toggle("has-sel", imgSel.length > 0);
       }
       function toggleImgSel(it) {
-        // 选/取消只改这一张（及受序号影响的已选张）的标记，不整表重建，
-        // 也不再在点选时预下载几百 KB 的原图——点选因此不再卡
         var before = imgSel.slice();
         var idx = imgSel.indexOf(it.f);
         if (idx !== -1) { imgSel.splice(idx, 1); }
@@ -2416,14 +2251,12 @@
           else if (failed) showToast("图没取到，再试一次");
         }
       });
-
-      // ---------- 看大图 ----------
       var lightbox = document.getElementById("lightbox");
       function openLightbox(it) {
         var im = document.getElementById("lbImg");
         im.alt = it.n;
         im.dataset.f = it.f;
-        im.src = libThumb(it.f); // 先出小图，原图在后台加载完再换上
+        im.src = libThumb(it.f);
         var full = new Image();
         full.onload = function () { if (im.dataset.f === it.f) im.src = libFull(it.f); };
         full.onerror = function () { if (im.dataset.f === it.f) im.src = libFull(it.f); };
@@ -2438,8 +2271,8 @@
       document.getElementById("lbClose").addEventListener("click", closeLightbox);
       lightbox.addEventListener("click", function (e) { if (e.target === lightbox) closeLightbox(); });
       document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeLightbox(); });
-
     </script>
-    <script type="application/json" id="imgLibData">[{"f":"spring.jpg","n":"春日樱花","x":"","t":["四季"],"s":"手绘水彩","k":"春天 樱花 花开 粉色 春季"},{"f":"summer.jpg","n":"夏日荷塘","x":"","t":["四季"],"s":"手绘水彩","k":"夏天 荷花 荷塘 莲花 夏季"},{"f":"autumn.jpg","n":"秋天的公园","x":"","t":["四季","环境"],"s":"手绘水彩","k":"秋天 公园 银杏 落叶 金黄 秋季 林荫道 街道 散步"},{"f":"winter.jpg","n":"冬日雪景","x":"","t":["四季"],"s":"手绘水彩","k":"冬天 下雪 雪景 小屋 冬季"},{"f":"rain-coffee.jpg","n":"雨天的咖啡","x":"","t":["天气"],"s":"手绘水彩","k":"雨天 下雨 咖啡 窗边 咖啡馆 雨"},{"f":"sunny.jpg","n":"晴空草地","x":"","t":["天气","四季"],"s":"插画","k":"晴天 太阳 蓝天 好天气 阳光 夏天 草地 夏季"},{"f":"sunset.jpg","n":"晚霞","x":"","t":["天气","风景"],"s":"手绘水彩","k":"晚霞 夕阳 傍晚 日落 黄昏 湖 风景"},{"f":"reading.jpg","n":"窗边看书","x":"","t":["心情"],"s":"手绘水彩","k":"看书 阅读 安静 猫 午后 放松 窗边"},{"f":"picnic.jpg","n":"草地野餐","x":"","t":["心情"],"s":"插画","k":"野餐 开心 草地 出游 快乐 聚会"},{"f":"christmas.jpg","n":"圣诞树","x":"","t":["节日"],"s":"手绘水彩","k":"圣诞节 圣诞树 礼物 平安夜 圣诞"},{"f":"lantern.jpg","n":"春节灯笼","x":"","t":["节日"],"s":"手绘水彩","k":"春节 过年 灯笼 新年 老街 年味"},{"f":"city-lane.jpg","n":"老弄堂清晨","x":"","t":["城市","建筑"],"s":"手绘水彩","k":"弄堂 老上海 石库门 小巷 清晨 上海 老建筑 街巷"},{"f":"city-night.jpg","n":"城市夜景","x":"","t":["城市"],"s":"插画","k":"夜景 夜晚 城市 灯光 江边 月亮"},{"f":"mountain-lake.jpg","n":"山湖日出","x":"","t":["风景"],"s":"手绘水彩","k":"山 湖 日出 山水 云雾 湖泊"},{"f":"sea.jpg","n":"海边","x":"","t":["风景"],"s":"手绘水彩","k":"海 海边 沙滩 大海 海鸥 夏天"},{"f":"field.jpg","n":"田野黄昏","x":"","t":["风景"],"s":"手绘水彩","k":"田野 稻田 乡间 黄昏 田园 花田"},{"f":"forest.jpg","n":"林间小鹿","x":"","t":["自然","环境"],"s":"插画","k":"森林 树林 小鹿 绿意 大自然 散步 公园"},{"f":"park-path.jpg","n":"公园晨光","x":"","t":["环境"],"s":"手绘水彩","k":"公园 散步 晨光 小路 绿地 池塘"},{"f":"old-house.jpg","n":"老房子","x":"","t":["建筑"],"s":"手绘水彩","k":"老房子 旧屋 砖房 小院 怀旧 房子"},{"f":"bridge.jpg","n":"石桥流水","x":"","t":["建筑"],"s":"手绘水彩","k":"桥 石桥 水乡 河流 古镇 柳树"},{"f":"cafe-interior.jpg","n":"咖啡馆里","x":"","t":["空间","咖啡"],"s":"手绘水彩","k":"咖啡馆 室内 小店 蛋糕 温馨 咖啡 下午茶"},{"f":"cozy-room.jpg","n":"温馨小屋","x":"","t":["空间"],"s":"手绘水彩","k":"房间 客厅 室内 沙发 猫 温馨 家"},{"f":"dessert.jpg","n":"下午茶甜点","x":"","t":["食物咖啡"],"s":"手绘水彩","k":"甜点 蛋糕 下午茶 草莓 茶 点心"},{"f":"breakfast.jpg","n":"早餐时光","x":"","t":["食物咖啡"],"s":"插画","k":"早餐 咖啡 面包 可颂 早晨 食物"},{"f":"photo-autumn.jpg","n":"秋日红枫大道","x":"","t":["四季","环境"],"s":"照片","k":"秋天 红枫 公园 落叶 大道 秋季 街道 林荫道 散步 红叶"},{"f":"photo-coffee.jpg","n":"一杯拿铁","x":"","t":["食物咖啡","空间","咖啡"],"s":"照片","k":"咖啡 拿铁 咖啡馆 拉花 下午茶 吧台 室内 小店"},{"f":"photo-mountain.jpg","n":"山湖倒影","x":"","t":["风景","自然"],"s":"照片","k":"山 湖 倒影 山水 风景 湖泊 大自然"},{"f":"photo-sea.jpg","n":"海上日出","x":"","t":["风景","自然"],"s":"照片","k":"海 日出 沙滩 大海 海边 日落 海浪 大自然"},{"f":"photo-street.jpg","n":"老城小巷","x":"","t":["城市","建筑"],"s":"照片","k":"小巷 老城 街道 旅行 石板路 老街 老巷 老建筑 街巷 红瓦"},{"f":"wc-spring-river.jpg","n":"春溪樱花","x":"","t":["四季"],"s":"手绘水彩","k":"春天 樱花 溪流 花开 春季 小溪"},{"f":"wc-autumn-leaves.jpg","n":"秋日林荫","x":"","t":["四季","环境"],"s":"手绘水彩","k":"秋天 银杏 落叶 公园 秋季 金黄 小路 长椅 散步"},{"f":"wc-snow-night.jpg","n":"雪夜小镇","x":"","t":["四季"],"s":"手绘水彩","k":"冬天 下雪 雪夜 小镇 冬季 灯光"},{"f":"wc-foggy.jpg","n":"雾中山林","x":"","t":["自然"],"s":"手绘水彩","k":"雾 山林 松树 云雾 清晨 大自然"},{"f":"wc-cat-nap.jpg","n":"猫的午睡","x":"","t":["猫咪"],"s":"手绘水彩","k":"猫 睡觉 午睡 沙发 银渐层 猫咪"},{"f":"wc-cat-window.jpg","n":"看雪的猫","x":"","t":["猫咪"],"s":"手绘水彩","k":"猫 看窗外 雪 窗台 猫咪 冬天"},{"f":"wc-cat-eating.jpg","n":"猫吃饭","x":"","t":["猫咪"],"s":"手绘水彩","k":"猫 吃饭 猫碗 橘猫 猫咪"},{"f":"wc-cat-playing.jpg","n":"玩毛线球的猫","x":"","t":["猫咪"],"s":"手绘水彩","k":"猫 玩耍 毛线球 小猫 猫咪"},{"f":"wc-mid-autumn.jpg","n":"中秋月夜","x":"","t":["节日"],"s":"手绘水彩","k":"中秋 月亮 月饼 桂花 团圆 中秋节"},{"f":"wc-dragon-boat.jpg","n":"端午粽香","x":"","t":["节日"],"s":"手绘水彩","k":"端午 粽子 端午节 艾草"},{"f":"wc-old-street.jpg","n":"雨后老街","x":"","t":["街道"],"s":"手绘水彩","k":"老街 雨后 石板路 灯笼 老城 街道"},{"f":"wc-river-town.jpg","n":"江南水乡","x":"","t":["风景","建筑"],"s":"手绘水彩","k":"水乡 江南 小桥 古镇 运河 山水 老宅 白墙 建筑"},{"f":"wc-kitchen.jpg","n":"窗边的厨房","x":"","t":["空间"],"s":"手绘水彩","k":"厨房 窗边 做饭 家里 温馨 室内"},{"f":"wc-bookshop.jpg","n":"街角书店","x":"","t":["空间"],"s":"手绘水彩","k":"书店 街角 看书 小店 室内"},{"f":"wc-summer-rain.jpg","n":"夏日阵雨","x":"","t":["天气"],"s":"手绘水彩","k":"夏天 阵雨 下雨 雨 屋顶 雨天"},{"f":"wc-cloudy-sea.jpg","n":"阴天的海","x":"","t":["天气"],"s":"手绘水彩","k":"阴天 海边 多云 海 灰蓝"},{"f":"wc-tea-time.jpg","n":"一个人的茶","x":"","t":["心情"],"s":"手绘水彩","k":"喝茶 安静 茶壶 窗边 独处 治愈"},{"f":"wc-daydream.jpg","n":"云朵发呆","x":"","t":["心情"],"s":"手绘水彩","k":"发呆 做梦 云朵 草地 放空 山坡"},{"f":"wc-healing.jpg","n":"治愈的角落","x":"","t":["心情"],"s":"手绘水彩","k":"治愈 温暖 看书 毯子 猫 安静"},{"f":"wc-street-corner.jpg","n":"街角小店","x":"","t":["街道","环境"],"s":"手绘水彩","k":"街角 小店 清晨 街道 自行车 阳光"},{"f":"wc-street-night.jpg","n":"夜晚的街道","x":"","t":["街道"],"s":"手绘水彩","k":"夜晚 街道 路灯 夜 猫 夜景"},{"f":"wc-coffee-shop.jpg","n":"咖啡馆里","x":"","t":["咖啡"],"s":"手绘水彩","k":"咖啡馆 咖啡 吧台 小店 咖啡机"},{"f":"wc-new-year.jpg","n":"元旦晨光","x":"","t":["节日"],"s":"手绘水彩","k":"元旦 新年 日出 雪 元旦节"},{"f":"wc-womens-day.jpg","n":"春日花束","x":"","t":["节日"],"s":"手绘水彩","k":"妇女节 花束 郁金香 鲜花 国际妇女节"},{"f":"wc-earth-day.jpg","n":"地球日新芽","x":"","t":["节日"],"s":"手绘水彩","k":"地球日 新芽 环保 地球 绿色"},{"f":"wc-thanksgiving.jpg","n":"感恩节晚餐","x":"","t":["节日"],"s":"手绘水彩","k":"感恩节 晚餐 南瓜 丰收 聚餐"},{"f":"wc-christmas-eve.jpg","n":"平安夜","x":"","t":["节日"],"s":"手绘水彩","k":"平安夜 圣诞 雪夜 苹果 圣诞节"},{"f":"wc-national-day.jpg","n":"国庆花坛","x":"","t":["节日"],"s":"手绘水彩","k":"国庆节 灯笼 花坛 广场 国庆"},{"f":"il-cat-sunbathing.jpg","n":"晒太阳的猫","x":"","t":["猫咪"],"s":"插画","k":"猫 晒太阳 睡觉 猫咪 慵懒"},{"f":"il-cat-butterfly.jpg","n":"看蝴蝶的猫","x":"","t":["猫咪","心情"],"s":"插画","k":"猫 看窗外 蝴蝶 窗边 猫咪 好奇 发呆"},{"f":"il-spring-picnic.jpg","n":"春日野餐会","x":"","t":["四季","心情"],"s":"插画","k":"春天 野餐 樱花 出游 春季 开心 朋友 快乐"},{"f":"il-rainy-day.jpg","n":"雨天出门","x":"","t":["天气"],"s":"插画","k":"雨天 下雨 雨伞 彩虹 雨"},{"f":"il-snowman.jpg","n":"堆雪人","x":"","t":["天气","心情"],"s":"插画","k":"雪人 下雪 冬天 玩雪 雪 快乐 开心"},{"f":"il-happy-dog.jpg","n":"开心小狗","x":"","t":["心情"],"s":"插画","k":"开心 小狗 快乐 草地 泡泡"},{"f":"il-music.jpg","n":"吊床听歌","x":"","t":["心情"],"s":"插画","k":"听音乐 放松 吊床 音乐 治愈"},{"f":"il-fireworks.jpg","n":"跨年烟花","x":"","t":["节日","城市"],"s":"插画","k":"跨年 烟花 新年 夜晚 庆典 跨年夜 江边 夜景 城市 桥"},{"f":"il-halloween.jpg","n":"万圣节南瓜","x":"","t":["节日"],"s":"插画","k":"万圣节 南瓜 黑猫 万圣"},{"f":"il-city-bus.jpg","n":"城市公交","x":"","t":["城市","街道"],"s":"插画","k":"公交 街道 城市 出行 巴士 商店 马路"},{"f":"il-skyline.jpg","n":"黄昏天际线","x":"","t":["城市","建筑"],"s":"插画","k":"黄昏 天际线 城市 日落 高楼 楼群 建筑"},{"f":"il-butterfly.jpg","n":"蝴蝶花丛","x":"","t":["自然"],"s":"插画","k":"蝴蝶 花丛 草地 春天 大自然"},{"f":"il-owl.jpg","n":"林间猫头鹰","x":"","t":["自然"],"s":"插画","k":"猫头鹰 森林 夜晚 星星 大自然"},{"f":"il-breakfast-nook.jpg","n":"窗边早餐","x":"","t":["空间","食物咖啡"],"s":"插画","k":"早餐 窗边 家里 早晨 室内 吐司 果汁 食物"},{"f":"il-desk.jpg","n":"书桌一角","x":"","t":["空间"],"s":"插画","k":"书桌 写字 台灯 文具 房间"},{"f":"il-hotpot.jpg","n":"热闹火锅","x":"","t":["食物咖啡"],"s":"插画","k":"火锅 聚餐 吃饭 热闹 晚餐"},{"f":"il-birthday.jpg","n":"生日蛋糕","x":"","t":["节日","食物咖啡"],"s":"插画","k":"生日 蛋糕 蜡烛 气球 庆祝 甜点 点心"},{"f":"il-coffee-cup.jpg","n":"一杯拉花","x":"","t":["咖啡","食物咖啡"],"s":"插画","k":"咖啡 拉花 咖啡杯 可颂 咖啡豆 下午茶 食物"},{"f":"il-valentine.jpg","n":"情人节咖啡","x":"","t":["节日","咖啡"],"s":"插画","k":"情人节 咖啡 玫瑰 爱心 情人 浪漫"},{"f":"il-st-patricks.jpg","n":"三叶草","x":"","t":["节日"],"s":"插画","k":"圣帕特里克节 三叶草 绿色 彩虹 圣帕特里克"},{"f":"il-april-fools.jpg","n":"愚人节","x":"","t":["节日"],"s":"插画","k":"愚人节 小丑帽 开玩笑 搞怪 愚人"},{"f":"il-labor-day.jpg","n":"劳动节","x":"","t":["节日"],"s":"插画","k":"劳动节 麦穗 园艺 致敬 劳动"},{"f":"il-childrens-day.jpg","n":"儿童节","x":"","t":["节日"],"s":"插画","k":"儿童节 气球 风筝 快乐 儿童"},{"f":"il-human-rights.jpg","n":"和平鸽","x":"","t":["节日"],"s":"插画","k":"世界人权日 和平鸽 和平 希望 人权日"},{"f":"il-longing.jpg","n":"寄给远方的信","x":"","t":["心情"],"s":"插画","k":"想念 信 远方 月亮 思念"},{"f":"photo-cat-sleep.jpg","n":"窗台睡猫","x":"","t":["猫咪","心情"],"s":"照片","k":"猫 睡觉 窗台 阳光 猫咪 午觉 慵懒 治愈"},{"f":"photo-cat-window.jpg","n":"看窗外的猫","x":"","t":["猫咪"],"s":"照片","k":"猫 看窗外 窗边 猫咪"},{"f":"photo-cat-play.jpg","n":"玩线球的小猫","x":"","t":["猫咪"],"s":"照片","k":"猫 玩耍 毛线球 小猫 猫咪"},{"f":"photo-cat-eating.jpg","n":"吃饭的猫","x":"","t":["猫咪"],"s":"照片","k":"猫 吃饭 猫碗 猫咪"},{"f":"photo-rain-street.jpg","n":"雨夜街道","x":"","t":["街道","天气"],"s":"照片","k":"街道 雨夜 下雨 夜晚 霓虹 雨天"},{"f":"photo-cafe-corner.jpg","n":"街角咖啡座","x":"","t":["街道","咖啡"],"s":"照片","k":"街角 咖啡馆 街道 清晨 小店 咖啡 座位"},{"f":"photo-latte.jpg","n":"拉花拿铁","x":"","t":["咖啡","食物咖啡"],"s":"照片","k":"咖啡 拉花 拿铁 咖啡馆 咖啡杯 下午茶 饮品"},{"f":"photo-cherry.jpg","n":"樱花大道","x":"","t":["四季","环境"],"s":"照片","k":"春天 樱花 大道 花开 春季 小路 散步 公园"},{"f":"photo-fog-mountain.jpg","n":"云雾山峦","x":"","t":["天气","风景"],"s":"照片","k":"云雾 山 阴天 山峦 雾 云海 日出 山水 风景"},{"f":"photo-rainbow.jpg","n":"雨后彩虹","x":"","t":["天气","自然"],"s":"照片","k":"彩虹 雨后 田野 天晴 雨 草地 大自然"},{"f":"photo-christmas-market.jpg","n":"圣诞集市","x":"","t":["节日","城市"],"s":"照片","k":"圣诞节 集市 夜晚 灯光 圣诞 夜市 摩天轮 城市"},{"f":"photo-waterfall.jpg","n":"林间瀑布","x":"","t":["自然","风景"],"s":"照片","k":"瀑布 森林 溪流 大自然 山泉 山间 风景 绿意"},{"f":"photo-lavender.jpg","n":"薰衣草田","x":"","t":["自然","风景"],"s":"照片","k":"薰衣草 花田 紫色 夏天 花海 风景 田野"},{"f":"photo-park-bench.jpg","n":"秋日长椅","x":"","t":["环境"],"s":"照片","k":"公园 长椅 秋天 落叶 散步"},{"f":"photo-ramen.jpg","n":"拉面小馆","x":"","t":["食物咖啡"],"s":"照片","k":"拉面 面馆 吃饭 日料 食物"},{"f":"photo-fireworks.jpg","n":"江边烟花","x":"","t":["节日"],"s":"照片","k":"烟花 跨年 夜晚 江边 庆典"},{"f":"photo-lantern-festival.jpg","n":"灯会夜色","x":"","t":["节日","街道"],"s":"照片","k":"灯会 灯笼 元宵 夜晚 春节 老街 街道"},{"f":"wc-jiangnan-bridge.jpg","n":"小桥流水","x":"","t":["江南"],"s":"手绘水彩","k":"江南 水乡 小桥 流水 石拱桥 垂柳 白墙黑瓦"},{"f":"wc-jiangnan-boat.jpg","n":"乌篷船","x":"","t":["江南"],"s":"手绘水彩","k":"江南 水乡 乌篷船 小船 粉墙黛瓦 灯笼 倒影"},{"f":"wc-jiangnan-rain-alley.jpg","n":"江南雨巷","x":"","t":["江南"],"s":"手绘水彩","k":"江南 水乡 雨巷 下雨 石板路 油纸伞 红灯笼"},{"f":"wc-jiangnan-morning.jpg","n":"临水人家","x":"","t":["江南"],"s":"手绘水彩","k":"江南 水乡 临水人家 粉墙黛瓦 清晨 河埠头 垂柳"},{"f":"wc-jiangnan-night.jpg","n":"水乡夜色","x":"","t":["江南"],"s":"手绘水彩","k":"江南 水乡 夜色 夜晚 红灯笼 乌篷船 倒影"},{"f":"wc-jiangnan-street.jpg","n":"临河老街","x":"","t":["江南"],"s":"手绘水彩","k":"江南 水乡 老街 石板路 垂柳 茶馆 白墙黑瓦"},{"f":"fig-spring-01.jpg","n":"春·粉开衫花裙","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 春季 春天 春装 针织开衫 碎花裙 郁金香 花束"},{"f":"fig-spring-02.jpg","n":"春·风衣白裙背影","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 春季 春天 春装 风衣 白裙 樱花 背影"},{"f":"fig-spring-03.jpg","n":"春·薄荷毛衣白裙","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 春季 春天 春装 毛衣 白裙 侧影 野花 帆布包"},{"f":"fig-summer-01.jpg","n":"夏·辫子背影花束","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 背影 麻花辫 花束 阔腿裤 凉鞋"},{"f":"fig-summer-02.jpg","n":"夏·黄裙草帽","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 吊带裙 长裙 草帽 书 花束"},{"f":"fig-summer-03.jpg","n":"夏·黄丝带粉裙背影","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 背影 长裙 草帽 花束 丝带"},{"f":"fig-summer-04.jpg","n":"夏·墨镜草帽短裤","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 墨镜 草帽 短裤 衬衫 凉鞋"},{"f":"fig-summer-06.jpg","n":"夏·捧花背影","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 背影 花束 长裙"},{"f":"fig-summer-07.jpg","n":"夏·蓝帽侧影","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 侧影 帽子 长裙 花束 手提包"},{"f":"fig-summer-08.jpg","n":"夏·青裙草帽","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 长裙 吊带裙 草帽 花束"},{"f":"fig-summer-09.jpg","n":"夏·蓝裙背影","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 背影 长裙 草帽 花束"},{"f":"fig-summer-10.jpg","n":"夏·咖啡漫步","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 咖啡 墨镜 阔腿裤 散步 花束"},{"f":"fig-summer-11.jpg","n":"夏·渔夫帽的她","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 渔夫帽 眼镜 长裙 手提包"},{"f":"fig-summer-12.jpg","n":"夏·绿衣背影","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 背影 长裙 花束 手提包"},{"f":"fig-autumn-01.jpg","n":"秋·驼色大衣","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 秋季 秋天 秋装 大衣 围巾 枫叶 咖啡 短靴"},{"f":"fig-autumn-02.jpg","n":"秋·焦糖毛衣格纹裙","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 秋季 秋天 秋装 毛衣 格纹裙 背影 书 干花"},{"f":"fig-autumn-03.jpg","n":"秋·牛仔外套长裙","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 秋季 秋天 秋装 牛仔外套 长裙 银杏 侧影 帆布包"},{"f":"fig-winter-01.jpg","n":"冬·红大衣白围巾","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 冬季 冬天 冬装 大衣 围巾 手套 雪 松枝"},{"f":"fig-winter-02.jpg","n":"冬·羽绒服背影","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 冬季 冬天 冬装 羽绒服 针织帽 围巾 背影 热饮 雪"},{"f":"fig-winter-03.jpg","n":"冬·绿大衣格纹围巾","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 冬季 冬天 冬装 大衣 格纹围巾 长靴 侧影 冬青"}]</script>
+<script type="application/json" id="corpusData">{"MOODS":{"开心":["快乐有了回音","好心情正在营业","笑意藏都藏不住","快乐超标，申请加时","今天的运气和心情都在线","把开心明目张胆地写在脸上"],"治愈":["心被轻轻熨平了","烦恼暂时下线","慢下来，连风都是软的","被这一刻温柔以待","给心情放了个短假","世界放轻了脚步"],"疲惫":["电量告急，来此充电","累是真的，值得也是真的","给紧绷的神经松松绑","歇一歇，再出发","把疲惫留在这里，不带走","今天先对自己好一点"],"平静":["心里不起波澜，只有微风","不慌不忙，自有回响","安安静静，也是一种圆满","时光清浅，岁月安然","把日子过成了散文","心有定境，不负清欢"],"浪漫":["心动有了落点","晚风也懂我的心事","把心动藏进这一刻","遇见的都是温柔","心跳漏了一拍，又悄悄补了回来","连空气都变得甜丝丝"],"感慨":["时间走得真快，我们也是","有些日子，值得回头看看","人生的故事又翻了一页","来路虽远，步步生花","这一刻，想留给很多年以后","平凡日子里，也有闪闪发光的片段"],"兴奋":["心跳加速，快乐起飞","多巴胺正在全速分泌","这一刻值得大声喊出来","热血正在沸腾","激动的心情根本压不住","快乐直接拉满"],"想静静":["想把世界调成静音","一个人，也很自在","给心情留一点空白","热闹是他们的，我只要安静","独处不是孤独，是充电","把喧嚣关在了门外"],"日常":["把日子过成喜欢的样子","平凡也浪漫","小确幸正在发生","今天也很好","认真生活，快乐自来","日子明朗，万物可爱"]},"TEMPLATES":{"文艺小清新":["{S}，{M}。时光在这里放慢了脚步，连风都变得温柔起来，想把这一幕好好记下来，留给往后的日子慢慢回味。","风经过{S}，把这一刻轻轻写进了今天。街道、光影，还有此刻的心情，都刚刚好，不多不少，值得打卡留念。","今日打卡：{S}。日子不声不响，却处处藏着诗意，抬头是风景，低头是欢喜，平凡的一天也因此闪闪发光。","在{S}停下脚步，{M}，连时间都放慢了脚步。走走停停，看看风景，也看看自己，原来幸福一直都在身边。","{S}，是生活写给今天的一首小诗。字里行间没有喧闹，只有安安静静的美好，读着读着，心就软了下来。","把心安放在{S}，剩下的交给晚风。不去想太远的事，只好好感受眼前这一刻，温暖、踏实，又带着一点小欢喜。","偷得浮生半日闲——在{S}，{M}。茶也好，风也好，人也好，这半日的清闲，足够给往后的忙碌攒足力气。","{S}的风，吹散了眉间的褶皱，也吹开了心里的结。原来日子可以这样慢，这样轻，这样让人舍不得离开。","愿日子清净，所遇皆温柔。今日{S}，打卡留念。走过的每一步都算数，眼前的每一景，都值得被好好记住。","生活有望穿秋水的等待，也有意想不到的欢喜，比如{S}。不期而遇的美好最动人，今天这一份，我先收下了。","{S}打卡。山高路远，看世界，也找自己。这一路不只是看风景，更是把心情一点点整理好，再轻装出发。","人间有味是清欢，今日份的清欢在{S}。不浓不淡，不急不缓，品一口是甘甜，回味起来满是安然。"],"简约高级":["{S}，打卡。今天不赶路，只感受路，慢慢走，慢慢看，把喜欢的画面都留下来。","今日份的{M}，已签收。{S}这一趟来得很值，风景好，心情更好，特意记录一下。","{S}。简单，舒服，刚刚好。不需要太多修饰，这样的状态，就是最好的状态。","{M}。——记{S}。短短一行装不下满心的欢喜，就让照片替我多说几句吧。","{S}，留个纪念。若干年后再翻到今天，还是会记得这阵风、这片光，和此刻的好心情。","今日行程：{S}。已完成。清单上又多了一项，回忆里又多了一页，今天过得很充实。","{S}，{M}，足矣。日子不必处处热闹，有这样安安静静的一刻，就已经很圆满了。","{S} · 打卡成功。把今天的好天气、好风景、好心情一并存档，留着往后慢慢看。","平平无奇的一天，因为{S}有了光。原来让日子发亮的，从来都是这些小小的瞬间。","记录一下：{S}，{M}。生活需要仪式感，这一笔，我认真地为今天记下了。","{S}。不多不少，刚刚好。风景刚刚好，心情刚刚好，连时间都刚刚好。","今日关键词：{S}，{M}。用两个词概括今天刚刚好，剩下的美好，都在照片里了。"],"幽默有趣":["{S}打卡！快乐这不就来了吗，谁也别想把它带走。今天的任务很简单：好好吃、好好玩、好好拍照，一样都不能少。","本来想低调，可{S}不允许啊。风景这么好看，不拍几张、不发个圈，实在对不起今天的好天气。","来{S}主要是为了打卡，顺便{M}。主次必须分明，快乐必须到位，照片必须拍够，不虚此行。","生活给了我很多选择，我选择了{S}，果然没选错。一路走一路看，越看越欢喜，这眼光我给自己打满分。","别问，问就是在{S}，{M}。问就是心情很好，问就是不想回去，问就是还想再多待一会儿。","{S}打卡成功，本人已被快乐绑架，不接受赎回。赎金也不用交了，就让我一直这样开心下去吧。","今日宜：{S}。今日忌：想太多。出门之前把烦恼锁在家里，现在的我，只负责开心和拍照。","{M}的一天，从{S}正式开始营业。快乐不打烊，好运不缺席，今天的营业额是满满的好心情。","打卡{S}。不是我吹，这日子过得有滋有味。吃得香、看得美、拍得好，平平无奇的快乐最长久。","{S}已打卡，烦恼已读乱回，快乐秒回。区别对待非常明显，今天谁也别想把我的好心情带走。","出门前：随便逛逛。到了{S}：真香。脚步根本停不下来，相机根本放不下来，这地方有点东西。","{S}，{M}。钱包表示情绪稳定，心情表示非常不稳定——开心得快要飞起来了，今天值了。"],"温暖治愈":["{S}，{M}，日子再忙，也要留一点甜给自己。停下来歇一歇，看看风景，心里那点累就慢慢化开了。","在{S}，把坏心情调成了静音。世界一下子安静下来，只剩下风声、笑声，和慢慢变好的心情。","愿你眼里有光，心里有暖。今天的{S}，刚刚好，不晒不燥，不慌不忙，连日子都变得温柔起来。","{S}打卡。慢慢来，一切都来得及。不必追赶谁的脚步，按自己的节奏走，风景自然会在路上等你。","生活偶尔糟糕，但{S}这一刻，很温柔。它像一句轻轻的安慰，告诉我：没关系，一切都会慢慢好起来的。","给自己一个拥抱，再给生活一个{S}。抱一抱那个努力的自己，然后笑着继续往前走，前面还有好多美好等着。","{M}。今日的{S}，是疲惫生活里的解药。药效刚刚好，心里的褶皱被一点点抚平，又有力气啦。","阳光正好，微风不燥，{S}打卡。这样的天气最适合出门走走，把好心情晒一晒，把烦恼晾一晾。","愿所有的不安，都止步于{S}。从这里往后走的每一步，都带着今天的这份踏实和欢喜，稳稳当当。","{S}，把烦恼清仓，把快乐囤货。仓里囤得满满当当，够往后的日子慢慢享用，想想就觉得安心。","今天的快乐，是{S}给的。不贵重，却很珍贵，收进心里好好放着，往后哪天累了，拿出来回味一下。","心怀暖阳，何惧岁月寒凉。{S}，打卡。只要心里有光，日子再平常，也能过得热气腾腾、有滋有味。"],"复古风":["{S}，像一张微微泛黄的老照片。时光在这里慢了下来，连风都带着旧日子的味道，站在这里，仿佛和从前打了个照面。","今日{S}，复古氛围拉满。老式的招牌、斑驳的墙面，还有空气里慢悠悠的节奏，都让人想起小时候的夏天。","把今天过成老电影的样子：{S}，{M}。画面不用太鲜亮，带一点颗粒感，反而更有故事，值得慢慢回味。","{S}打卡。今天不追新潮，就爱这份旧时光的踏实，一砖一瓦都有年头，一草一木都藏着回忆。","时光是个小偷，偷走了匆匆，却留下了{S}这样的好地方。走一走，看一看，心里满是怀念和欢喜。","{S}，{M}，连影子都像从旧画报里走出来的。这样的日子不用滤镜，本身就自带复古的味道。","旧时光的味道，在{S}飘着。慢慢逛，慢慢拍，把这一份难得的怀旧，好好收进今天的相册里。","{S}，是城市留给怀旧者的一封信。拆开慢慢读，字里行间都是从前的温柔和如今的安稳。"],"法式浪漫":["{S}，把日子过成法式的慢调。不赶时间，不追行程，坐下来喝一杯、看会儿风景，浪漫就藏在这样的松弛里。","今日份法式浪漫：{S}。阳光、微风和一点点慵懒刚刚好，连空气都变得柔软起来，心也跟着轻轻荡漾。","{S}，{M}，像走进了巴黎街角的小咖啡馆。生活需要这样的仪式感，不隆重，却足够让人心动。","法式的浪漫从不喧哗，它在{S}的午后悄悄发生：一束光、一阵风、一个微笑，就足够记上一整天。","在{S}，把浪漫放在心里、挂在脸上。不必远行，眼前这一刻的优雅和自在，就是最好的法式风情。","{S}打卡。今天做一回法式女主角，步子放慢，眼神放柔，连拍出来的照片都带着淡淡的电影感。","浪漫是{S}这样的小事：花香飘过来，音乐响起来，喜欢的人在身边。平凡的日子，也能过得像诗一样。","{S}，{M}。愿往后的日子，都带着一点法式的松弛和浪漫：不慌不忙，自在欢喜，美得很自然。"],"美拉德":["{S}，是美拉德色调的一天。焦糖、棕褐、暖橘层层叠叠，像秋天亲手调的色，连拍出来的照片都自带暖暖的滤镜。","今日走美拉德风，{S}打卡。棕色系的温柔最衬人，不张扬，却高级得恰到好处，看着就让人心情大好。","{S}，{M}，满眼都是暖棕色的治愈。像一杯热可可，像一块烤得刚好的吐司，看着就让人心里暖暖的。","美拉德的魅力，在于越看越耐看。{S}这一趟，把秋冬的温柔都穿在了身上、留在了照片里，越品越有味道。","{S}打卡。大地色系的松弛感拉满，不用费力凹造型，站在暖暖的光里，随手一拍都是氛围感大片。","把{S}过成美拉德的样子：温暖、醇厚、不动声色地好看。日子也一样，平平淡淡里藏着的回甘，最长久。","{M}。今日份美拉德已上线——{S}。焦糖色的阳光洒下来，连影子都是暖的，心情也跟着变得绵软起来。","{S}，像走进了秋天的调色盘。深棕、浅咖、奶油白，怎么搭都好看，这份高级的温暖，值得专门记录一下。"]},"SCENE_BANKS":[{"keys":["咖啡","奶茶","下午茶","茶馆","喝茶"],"lines":["一杯咖啡的时间，把生活调回喜欢的频道。坐在窗边慢慢喝，看人来人往，心里的节奏也跟着慢了下来，真舒服。","咖啡是成年人的续命水，续命又续快乐。这一杯下肚，疲惫散了大半，剩下的时光都用来发呆和欢喜。","在咖啡香里，把日子过慢一点。香气一缕一缕飘着，一个人静静坐着，什么都不用想，这样不慌不忙的午后最难得。","今日宜：发呆，喝咖啡，看人来人往。什么都不用赶，什么都不用想，把这一下午完完整整地留给自己。"]},{"keys":["海","沙滩","海岛"],"lines":["大海和晚风，都在替我说话。想说的、没说出口的，海浪都懂，吹着海风站一会儿，心就敞亮了。","面朝大海，把烦恼都交给浪花带走。一波一波的潮声听着听着，心里的结就松开了，人也轻松了。","海风一吹，快乐就有了形状。是衣角飞扬的样子，是头发乱了也不在乎的样子，是忍不住笑出声的样子。","收集了一整片海的蓝色，存进今天。往后哪天心情灰了，就翻出来看看，海还在，风还是一样温柔。"]},{"keys":["爬山","登山","徒步","山顶","上山"],"lines":["山不就我，我来就山。登顶打卡！一路喘着气往上走，站到山顶那一刻才明白，所有的累都值得。","一步一个脚印，山顶的风不会辜负赶路人。回头看看走过的路，再看看眼前的风景，心里满是成就感。","爬山治百病，登顶治内耗。出了一身汗，吹了一阵风，脑子里那些乱七八糟的念头，全被留在了山脚下。","把心愿说给山听，风会替我保管。下山的时候脚步特别轻，像是把心事卸在了半山腰，轻装回程。"]},{"keys":["西餐","牛排","意面","披萨","西式"],"lines":["刀叉轻轻碰出声响，牛排的香气先一步报到。一口肉、一口红酒（饮料也行），把日子过出一点仪式感，慢悠悠吃完这一餐，心情都被熨得服服帖帖。","意面卷起最后一圈，芝士拉着长长的丝。西餐吃的就是这份不慌不忙，摆盘好看，味道也对得起等待，吃饱了连脚步都变得优雅起来。","今日份西餐打卡：从餐前面包吃到最后的甜点，一道都没落下。灯光柔柔的，盘子精致得很，这一顿吃得满足又体面，值得专门记录一下。","把西餐吃出小假期的感觉。窗边的位置、刚好的火候、慢慢聊着的天，食物是主角，这份松弛的心情才是今天真正的收获。"]},{"keys":["日料","寿司","刺身","拉面","居酒屋","日式"],"lines":["寿司一颗一颗排得整整齐齐，蘸一点酱油，鲜味在嘴里慢慢散开。日料吃的是一份新鲜和讲究，吃完这一餐，连心情都变得清清爽爽。","刺身切得透亮，入口是海的味道。再配一碗热乎乎的味噌汤，胃里暖了，心里也静了，这样简单又精致的一餐，最治愈。","在居酒屋坐下来，烤串滋滋作响，话也越聊越热。日料的快乐不在排场，在这一口鲜、这一串香，和身边一起吃饭的人。","拉面端上来先喝一口汤，浓郁又踏实。面条吸溜着吃完，额头微微冒汗，今日份日料打卡完成，满足感直接拉满。"]},{"keys":["火锅","烧烤","美食","吃饭","餐厅","甜品","蛋糕","小吃","夜市"],"lines":["人间烟火气，最抚凡人心。今日份美食已签收，热气腾腾端上桌的那一刻，一天的疲惫就先散了一半。","手机先吃，快乐随后就到。拍完照赶紧动筷子，好吃的东西要趁热吃，好心情也要趁热分享给大家。","没有什么是一顿好吃的解决不了的，如果有，就两顿。吃饱喝足之后再看世界，连烦恼都变小了。","吃饱了，才有力气热爱生活。这一餐吃得心满意足，胃里暖暖的，心里也暖暖的，今天圆满了。"]},{"keys":["跑步","夜跑","晨跑","健身","瑜伽","游泳","骑行","运动"],"lines":["汗水是最好的护肤品，打卡今日份运动。跑完洗个热水澡，整个人像重新充了电，清清爽爽。","跑起来，连风都是甜的。脚步一步一步踩着节奏，烦恼一步一步落在身后，越跑心里越敞亮。","自律给我自由，今天的运动量达标啦。说到做到这件事本身就很酷，给坚持下来的自己点个赞。","每一次出汗，都是在和更好的自己打招呼。不求多快，不求多远，今天的我比昨天的我又进步了一点点。"]},{"keys":["读书","看书","图书馆","书店","学习"],"lines":["在书页之间，偷一段安静的时光。外面世界再喧闹，翻开书的这一刻，心就慢慢沉了下来，安安稳稳。","今日份精神食粮，已补充完毕。读到喜欢的句子就划下来，像是和作者隔着时空点了点头，心领神会。","把日子过成散文，从翻开一本书开始。一页一页慢慢读，不赶时间，这样的午后最养人。","书里写尽了远方，我在这里读到了安宁。合上书的时候天都快黑了，心里却亮堂堂的，收获满满。"]},{"keys":["自驾","自驾游","开车出游","环岛自驾"],"lines":["自驾出游打卡！方向盘在自己手里，想停就停，想走就走，沿途的风景一站一站解锁，这样自由自在的旅程，最合心意。","油箱加满，歌单备好，自驾正式出发。窗外的风景一路变换，从高楼开到田野，心也跟着越开越敞亮，长途也不觉得累。","自驾的好处，是风景都在路上。路过好看的湖就停下来拍张照，遇见好吃的小店就拐进去尝尝，不赶行程的旅行最舒服。","今日自驾：把导航设为远方，把心情调成放假。一路哼着歌、吹着风，抵达目的地的时候，连晚霞都像在欢迎我们。"]},{"keys":["旅行","旅游","出游","古镇","机场","火车"],"lines":["出发，永远是最有意义的事情。不管去多远，迈出门的那一刻，心情就已经飞起来了，剩下的都是惊喜。","风来自很远的地方，我去去也无妨。一路走一路看，把没见过的风景、没尝过的味道，都装进这次行程里。","旅行的意义，是把向往变成脚印。以前只在照片里看过的地方，今天亲脚踩到了，这种感觉真好。","世界那么大，今日又解锁了一小块。地图上多了一个标记，回忆里多了一段故事，这一趟没有白来。"]},{"keys":["日落","黄昏","晚霞","夕阳"],"lines":["晚霞是太阳写给天空的情书，我刚好读到。站在原地看了好久，从金黄看到橘红，字字句句都温柔得不行。","追赶日落，是献给自己的一场浪漫。跑着去，笑着看，等天色一点点暗下来，心里的欢喜却越来越亮。","黄昏作证，今天也是被温柔以待的一天。再忙再累，看到这一片晚霞，就觉得这一天过得值了。","把晚霞装进口袋，把这一天好好收起来。带着满身的余晖慢慢往回走，连影子都镀上了一层金边。"]},{"keys":["下雨","雨天","雨中"],"lines":["雨声是天空的白噪音，适合放空。听着雨点敲窗，泡一杯热茶，什么都不想，就这样静静坐着也很好。","下雨天，适合想念，也适合打卡。空气洗得干干净净，心事也跟着清爽起来，撑着伞慢慢走，别有一番味道。","撑一把伞，把喧嚣挡在雨幕之外。伞下是自己的小世界，脚步不慌不忙，连踩水花的声音都好听。","雨会停，天会晴，就像此刻的心情。乌云总会散的，淋过这一场雨，往后的路只会越来越明朗。"]},{"keys":["下雪","雪天","雪中","玩雪"],"lines":["雪落人间，日子也变得轻盈起来。伸手接一片雪花，看它在掌心慢慢融化，冬天的小确幸就是这么简单。","把冬天的心事，说给雪听。雪落无声，心事也有了着落，走在咯吱咯吱的雪地上，心里特别踏实。","今日份浪漫，是雪给的。整个世界都白了、静了、软了，随便站在哪里拍一张，都是好看的画面。","踩着雪走过的路，每一步都算数。回头望望那串脚印，歪歪扭扭，却一步一步走得很认真。"]},{"keys":["花","樱花","桂花","赏花","花海"],"lines":["花开有时，快乐无价。趁花期正好，赶紧来看、赶紧来拍，错过了这一季，就要再等上一年啦。","在花香里，把心情调成明媚模式。走一步香一步，看一朵笑一朵，连拍出来的照片都带着香气。","花会沿路盛开，以后的路也是。看着这一片热热闹闹的花，就觉得往后的日子也一定会越来越好。","今日宜：赏花，拍照，把美好存档。花开得这样用力，我们看花的人，也要开开心心地不辜负它。"]},{"keys":["猫","撸猫","猫咪"],"lines":["今日份营业：可爱已送达，请签收。它往那儿一趴，眼睛一眯，我的心就化了，什么烦恼都没了。","有猫的日子，快乐自动翻倍。它蹭一蹭、叫一声、打个滚儿，每一下都精准地戳中我的开心开关。","撸猫一时爽，一直撸猫一直爽。手感这么好，脾气这么乖，难怪一下午的时间一眨眼就过去了。","它负责可爱，我负责记录。镜头举了一下午，存了满满一相册，翻来翻去，每一张都舍不得删。"]},{"keys":["夜晚","夜里","星空","月亮","夜景"],"lines":["夜色温柔，适合把心事说给星星听。白天没说出口的话，夜里慢慢说，星星不催不问，只是安安静静地陪着。","城市睡了，我的故事才刚刚开始。灯火一盏一盏亮着，夜色里的每一步，都走得比白天更自在。","今晚的月亮很亮，适合打卡留念。月光洒了一地，抬头看一眼，心里那点小情绪就被照得透透亮亮。","把一天的疲惫，交给夜色保管。洗个热水澡，早点休息，明天醒来，又是元气满满的新一天。"]},{"keys":["看展","展览","博物馆","美术馆","画展"],"lines":["在展品面前，时间慢了下来。一件一件慢慢看，脚步放轻，声音放低，心也跟着静了下来，特别治愈。","看展，是给眼睛和心灵一起放假。看不懂也没关系，觉得好看、觉得心动，就已经不虚此行了。","艺术不会说话，却治好了我的精神内耗。站在一幅画前发会儿呆，出来的时候，整个人都松弛了许多。","今日份审美充值，已到账。看过的每一件好东西，都会悄悄变成眼界和底气，攒着攒着，人就不一样了。"]},{"keys":["同学聚会","同学会","老同学"],"lines":["同学聚会打卡！毕业这么多年再坐到一张桌上，名字一喊还是当年的感觉，聊起上课传纸条、考试借橡皮的糗事，笑得眼泪都出来了。","老同学见面，分外亲切。头发白了些，笑容没变样，一杯茶、一顿饭，把这些年没赶上的陪伴，慢慢补了回来。","今日同学聚会：合影拍了一张又一张，生怕漏了谁。时光带走了青春，带不走同窗的情谊，愿我们下次相聚，不用等太久。","和老同学聚在一起，话题永远绕不开当年。说着说着就笑了，笑着笑着又有点感慨，这样纯粹的情谊，是岁月给的礼物。"]},{"keys":["朋友","聚会","闺蜜","老友","同学聚"],"lines":["和有趣的人在一起，连时间都变得可爱。聊起从前笑个不停，说到现在满是感慨，一转眼就到了要散场的时候。","老友如酒，越陈越香。今日小聚，打卡。隔了这么久再见，一开口还是当年的感觉，一点都不生分。","快乐的秘诀：和喜欢的人，做喜欢的事。不用刻意找话题，不用小心翼翼，怎么舒服怎么来，这就是老朋友。","聚会结束，快乐续航中。回家的路上还在回味刚才的笑声，这份热闹，够我开心好一阵子了。"]},{"keys":["上班","加班","下班","工作","出差"],"lines":["下班打卡！今天的班，就上到这里。关掉电脑，伸个懒腰，属于自己的时间正式开始，谁也别想占用。","努力搬砖的人，连晚霞都格外好看。忙了一整天，抬头看到这一片天，忽然觉得辛苦也有了回报。","工作再忙，也要记得抬头看看天。喝口水，站起来活动活动，日子是自己的，身体更是自己的，要照顾好。","今日份打工完成，快乐正式开始。回家的路慢慢走，晚饭好好吃，今晚的时间，一分钟都不浪费。"]},{"keys":["宅家","在家","周末","躺平","休息日"],"lines":["宅家的一天，舒服得不像话。睡到自然醒，吃点好吃的，窝在沙发里追剧发呆，这才是休息该有的样子。","周末的意义，就是把闹钟调成静音。没有安排，没有催促，时间大把大把的，全由自己说了算。","在家躺平，是对周末最基本的尊重。忙了一周了，今天谁也别想让我动弹，快乐就是这么朴素。","慢悠悠的一天，幸福感拉满。不赶时间，不想事情，把日子过得松松垮垮、舒舒服服，真好。"]},{"keys":["早起","清晨","日出","晨光","早安"],"lines":["新的一天，从打卡开始。早起的空气特别清新，深吸一口，整个人都清醒了，今天也要好好加油。","晨光熹微，心情也跟着亮了起来。天一点点变亮，心里的计划也一点点清晰，新的一天，充满希望。","一日之计在于晨，今日份元气已加载。早餐吃得饱饱的，出门的时候脚步都是轻快的，好运正在路上。","迎着朝阳出发，好运正在路上。早起的人不会被辜负，今天的每一份努力，都会有回响。"]},{"keys":["散步","逛街","公园","江边","湖边","河边"],"lines":["慢慢走，沿途的风景都在打招呼。不用赶路，也不用目的地，走到哪儿算哪儿，心情却出奇地好。","散步是和城市谈一场慢恋爱。走了这么多年的路，换个心情再走一遍，居然处处都是新发现。","把烦恼留给风，把脚步留给路。一圈走下来，出了一身微汗，心里那些堵着的东西，也跟着散了。","走着走着，心情就晴了。原来治愈自己不用花大钱，出门走走，吹吹风，看看人间烟火，就足够了。"]},{"keys":["小酒馆","酒吧","清吧","微醺","鸡尾酒","精酿"],"lines":["小酒馆的灯光是暖黄色的，酒杯轻轻一碰，叮的一声，把白天的疲惫都碰碎了。坐在吧台边慢慢喝，不赶时间，这一杯敬自己，也敬今天的好心情。","找一家安静的小酒馆，点一杯招牌特调，看调酒师摇酒、倒酒，动作行云流水。酒还没喝，光是看着就已经心满意足，今晚注定是个好夜晚。","微醺是结束一天最好的方式。在小酒馆里听着轻柔的音乐，和朋友聊些有的没的，笑声和酒香混在一起，这样松弛的夜晚，值得打卡纪念。","小酒馆打卡：一杯下肚，话就多了，心也热了。不用多，一杯刚刚好，带着一点点飘飘然往家走，连路灯看起来都格外温柔。"]},{"keys":["音乐会","交响乐","演奏会","古典音乐","钢琴独奏"],"lines":["音乐会开场，灯光暗下来，第一个音符响起的时候，心一下子就静了。坐在台下什么都不用想，只跟着旋律慢慢走，这一晚，耳朵和心都被温柔以待了。","听一场音乐会，是给忙碌生活的一次暂停。琴声、弦乐声层层叠叠漫过来，安安静静坐着听完，走出音乐厅的时候，夜色都变得格外动人。","今日份音乐会打卡。听不懂的地方就闭上眼睛感受，好听的旋律从不挑人，谢幕时掌声响了好久，心里还留着回声，这就是余音绕梁吧。","把今晚交给音乐。从第一个音符到最后一曲，两个小时过得又慢又快，这样专注又美好的时光，是生活给耳朵发的一份奖金，收好了。"]},{"keys":["演唱会","音乐节","演唱","安可"],"lines":["演唱会现场，荧光棒汇成一片星海，歌声一响，全场一起大合唱。喊到嗓子微哑，跳到满头是汗，这样的夜晚，快乐是会传染的，我已经被传染了。","等了好久的演唱会，今天终于坐在了现场。灯光亮起、音乐响起来的那一刻，心里又激动又感动——耳机里听了无数遍的歌，今天亲耳听到了，太值了。","今日份快乐超标：演唱会打卡！从第一首跟唱到最后一首安可，手机拍满了，嗓子喊哑了，心也被填满了，回家的路上还在小声哼着刚才的旋律。","演唱会的魅力，就是几千人一起为同一首歌心动。散场时耳朵还有点嗡嗡的，心里却热热的，这份热闹和感动，够我回味好长一段时间了。"]},{"keys":["圣诞","平安夜"],"lines":["圣诞树上的小灯一闪一闪，街边的橱窗都换上了节日的颜色。捧一杯热饮慢慢逛，把这份热热闹闹的圣诞气氛装进口袋，今晚连空气都是甜甜的。","圣诞节打卡：给自己挑了一份小礼物，不贵，却足够开心。过节嘛，就是要找个理由对自己好一点，愿这个冬天，温暖和好运都如期而至。","平安夜的灯光格外温柔，和喜欢的人一起吃顿饭、拆个礼物、互道一声圣诞快乐。仪式感不用多隆重，心意到了，这个节日就过得圆圆满满。","圣诞的歌声飘满了大街小巷，站在挂满彩灯的圣诞树下拍张照。把这一年的辛苦都留在身后，带着满心的欢喜，开开心心迎接新的一年。"]},{"keys":["唱歌","K歌","KTV","ktv","卡拉OK","练歌房"],"lines":["话筒一拿，灯光一打，今天我就是全场最佳。老歌新歌轮番上，唱到高音处全场鼓掌，K歌的快乐就是这么直接，嗓子唱哑了也开心。","去KTV唱歌打卡！包厢里点满了拿手曲目，从情歌对唱到摇滚嘶吼，压力随着歌声一起释放出去，唱完一身轻松，快乐充满电。","唱歌是给心情开的一扇窗。在KTV里把喜欢的歌唱了一遍又一遍，跑调也没关系，开心最重要，今天的我们都是麦霸本霸。","约上三五好友一起K歌，果盘饮料摆满桌，歌单从傍晚唱到夜里。那些平日说不出口的欢喜和疲惫，都在一首首歌里找到了出口。"]},{"keys":["拍照","摄影","自拍","拍写真","写真"],"lines":["拍照打卡！今天的任务就是把好看的画面都收进相机，角度试了七八种，光线等了小半天，翻看成果的时候，每一张都舍不得删。","出门拍照的一天，快乐是快门给的。咔嚓咔嚓一通拍，好看的风景、好看的心情，全都定格成了照片，往后翻起来都是甜的。","拍照的意义，是把瞬间变成永恒。今天这一通拍，构图讲究、笑容自然，出片率高得惊人，朋友圈的九宫格有着落了。","带上相机去拍照打卡。走走停停，看到好看的就举起镜头，拍的不只是风景，还有此刻闪闪发光的好心情。"]},{"keys":["听音乐","听歌","戴耳机","单曲循环"],"lines":["戴上耳机，整个世界都安静了，只剩下喜欢的旋律。听音乐的时光最自在，跟着节拍轻轻哼，心情被一个个音符熨得平平整整。","今日份快乐是耳机给的。歌单从头播到尾，老歌听出回忆，新歌听出惊喜，一首接一首，舍不得按下暂停键。","听音乐打卡：把音量调到刚好，把烦恼调成静音。旋律流淌的这一会儿，什么都不用想，只管让耳朵去旅行。","单曲循环了一下午，同一首歌听了十几遍还是喜欢。音乐就是有这样的魔力，能把平平无奇的午后，变得闪闪发亮。"]},{"keys":["稻田","金色稻田","稻田边","稻穗"],"lines":["站在稻田边，风一吹，稻浪一层一层涌向远方，金灿灿的，连空气里都是谷物成熟的香气。这样的秋天，看一眼就醉了。","稻田打卡！稻穗沉甸甸地低着头，像在向辛苦的人们鞠躬。走在田埂上慢慢拍，怎么拍都是一幅丰收的画。","把心情放进金色的稻田里晒一晒。蓝天、白云、稻浪，随手一拍都是好看的画面，乡野的治愈，从来不用刻意找。","今日在稻田边待了好久，听风吹稻浪的沙沙声，看白鹭慢慢飞过。这样安安静静的田野时光，把心里的浮躁都吹散了。"]},{"keys":["秋天","秋日","秋风","落叶","枫叶","银杏"],"lines":["秋天来了，风里有了凉意，也有了桂花的甜香。踩着落叶慢慢走，咯吱咯吱的声响里，藏着这个季节独有的温柔。","秋日打卡：天高云淡，阳光不燥，微风正好。枫叶红了，银杏黄了，随便走走都是风景，这样的日子最适合出门拍照。","把秋天装进口袋：一片落叶、一缕桂花香、一个暖洋洋的午后。不冷不热的天气里，连心情都变得软软的、慢慢的。","秋天的快乐很简单，是一杯热茶、一条围巾、一次说走就走的散步。走在铺满落叶的路上，感觉整个人都被季节温柔以待。"]}],"UNIVERSAL":["把平凡的日子，过出一点仪式感。不用等什么大事，认真吃一顿饭、好好走一段路，都是生活的小庆典。","今天也很好，值得记一笔。把开心的瞬间写下来、拍下来，往后的日子翻一翻，心里还是暖的。","生活明朗，万物可爱。天晴也好，下雨也罢，换个心情看世界，处处都是值得欢喜的小风景。","认真生活的人，自带光芒。不慌不忙地过好每一天，光芒不用找，它会自己从日子里透出来。","日子不慌不忙，我们来日方长。该来的都在路上，慢慢走，慢慢等，好事多磨，快乐也一样。","小确幸，是生活里的小星星。一闪一闪不耀眼，却足够照亮普通日子里的每一个小角落。","把开心存档，把烦恼删除。存档的要常常翻出来看看，删除的就别再想了，心要腾地方装快乐。","人间值得，今天又多了一个证据。也许是一阵风、一顿饭、一个笑，证据虽小，分量却一点都不轻。","慢一点没关系，风景都在路上。走得慢，才能看得清；看得清，才不会错过沿途的好风光。","愿往后的日子，多的是不需要理由的快乐。想笑就笑，想走就走，日子简单一点，幸福就多一点。"],"STYLE_SAMPLES":[["海边看日落","心动有了落点"],["和老朋友喝咖啡","笑意藏都藏不住"],["在公园里散步","心被轻轻熨平了"],["爬山登顶","热血正在沸腾"],["在江边看晚霞","晚风也懂我的心事"],["宅家过周末","一个人，也很自在"]]}</script>
+        <script type="application/json" id="imgLibData">[{"f":"spring.jpg","n":"春日樱花","x":"","t":["四季"],"s":"手绘水彩","k":"春天 樱花 花开 粉色 春季"},{"f":"summer.jpg","n":"夏日荷塘","x":"","t":["四季"],"s":"手绘水彩","k":"夏天 荷花 荷塘 莲花 夏季"},{"f":"autumn.jpg","n":"秋天的公园","x":"","t":["四季","环境"],"s":"手绘水彩","k":"秋天 公园 银杏 落叶 金黄 秋季 林荫道 街道 散步"},{"f":"winter.jpg","n":"冬日雪景","x":"","t":["四季"],"s":"手绘水彩","k":"冬天 下雪 雪景 小屋 冬季"},{"f":"rain-coffee.jpg","n":"雨天的咖啡","x":"","t":["天气"],"s":"手绘水彩","k":"雨天 下雨 咖啡 窗边 咖啡馆 雨"},{"f":"sunny.jpg","n":"晴空草地","x":"","t":["天气","四季"],"s":"插画","k":"晴天 太阳 蓝天 好天气 阳光 夏天 草地 夏季"},{"f":"sunset.jpg","n":"晚霞","x":"","t":["天气","风景"],"s":"手绘水彩","k":"晚霞 夕阳 傍晚 日落 黄昏 湖 风景"},{"f":"reading.jpg","n":"窗边看书","x":"","t":["心情"],"s":"手绘水彩","k":"看书 阅读 安静 猫 午后 放松 窗边"},{"f":"picnic.jpg","n":"草地野餐","x":"","t":["心情"],"s":"插画","k":"野餐 开心 草地 出游 快乐 聚会"},{"f":"christmas.jpg","n":"圣诞树","x":"","t":["节日"],"s":"手绘水彩","k":"圣诞节 圣诞树 礼物 平安夜 圣诞"},{"f":"lantern.jpg","n":"春节灯笼","x":"","t":["节日"],"s":"手绘水彩","k":"春节 过年 灯笼 新年 老街 年味"},{"f":"city-lane.jpg","n":"老弄堂清晨","x":"","t":["城市","建筑"],"s":"手绘水彩","k":"弄堂 老上海 石库门 小巷 清晨 上海 老建筑 街巷"},{"f":"city-night.jpg","n":"城市夜景","x":"","t":["城市"],"s":"插画","k":"夜景 夜晚 城市 灯光 江边 月亮"},{"f":"mountain-lake.jpg","n":"山湖日出","x":"","t":["风景"],"s":"手绘水彩","k":"山 湖 日出 山水 云雾 湖泊"},{"f":"sea.jpg","n":"海边","x":"","t":["风景"],"s":"手绘水彩","k":"海 海边 沙滩 大海 海鸥 夏天"},{"f":"field.jpg","n":"田野黄昏","x":"","t":["风景"],"s":"手绘水彩","k":"田野 稻田 乡间 黄昏 田园 花田"},{"f":"forest.jpg","n":"林间小鹿","x":"","t":["自然","环境"],"s":"插画","k":"森林 树林 小鹿 绿意 大自然 散步 公园"},{"f":"park-path.jpg","n":"公园晨光","x":"","t":["环境"],"s":"手绘水彩","k":"公园 散步 晨光 小路 绿地 池塘"},{"f":"old-house.jpg","n":"老房子","x":"","t":["建筑"],"s":"手绘水彩","k":"老房子 旧屋 砖房 小院 怀旧 房子"},{"f":"bridge.jpg","n":"石桥流水","x":"","t":["建筑"],"s":"手绘水彩","k":"桥 石桥 水乡 河流 古镇 柳树"},{"f":"cafe-interior.jpg","n":"咖啡馆里","x":"","t":["空间","咖啡"],"s":"手绘水彩","k":"咖啡馆 室内 小店 蛋糕 温馨 咖啡 下午茶"},{"f":"cozy-room.jpg","n":"温馨小屋","x":"","t":["空间"],"s":"手绘水彩","k":"房间 客厅 室内 沙发 猫 温馨 家"},{"f":"dessert.jpg","n":"下午茶甜点","x":"","t":["食物咖啡"],"s":"手绘水彩","k":"甜点 蛋糕 下午茶 草莓 茶 点心"},{"f":"breakfast.jpg","n":"早餐时光","x":"","t":["食物咖啡"],"s":"插画","k":"早餐 咖啡 面包 可颂 早晨 食物"},{"f":"photo-autumn.jpg","n":"秋日红枫大道","x":"","t":["四季","环境"],"s":"照片","k":"秋天 红枫 公园 落叶 大道 秋季 街道 林荫道 散步 红叶"},{"f":"photo-coffee.jpg","n":"一杯拿铁","x":"","t":["食物咖啡","空间","咖啡"],"s":"照片","k":"咖啡 拿铁 咖啡馆 拉花 下午茶 吧台 室内 小店"},{"f":"photo-mountain.jpg","n":"山湖倒影","x":"","t":["风景","自然"],"s":"照片","k":"山 湖 倒影 山水 风景 湖泊 大自然"},{"f":"photo-sea.jpg","n":"海上日出","x":"","t":["风景","自然"],"s":"照片","k":"海 日出 沙滩 大海 海边 日落 海浪 大自然"},{"f":"photo-street.jpg","n":"老城小巷","x":"","t":["城市","建筑"],"s":"照片","k":"小巷 老城 街道 旅行 石板路 老街 老巷 老建筑 街巷 红瓦"},{"f":"wc-spring-river.jpg","n":"春溪樱花","x":"","t":["四季"],"s":"手绘水彩","k":"春天 樱花 溪流 花开 春季 小溪"},{"f":"wc-autumn-leaves.jpg","n":"秋日林荫","x":"","t":["四季","环境"],"s":"手绘水彩","k":"秋天 银杏 落叶 公园 秋季 金黄 小路 长椅 散步"},{"f":"wc-snow-night.jpg","n":"雪夜小镇","x":"","t":["四季"],"s":"手绘水彩","k":"冬天 下雪 雪夜 小镇 冬季 灯光"},{"f":"wc-foggy.jpg","n":"雾中山林","x":"","t":["自然"],"s":"手绘水彩","k":"雾 山林 松树 云雾 清晨 大自然"},{"f":"wc-cat-nap.jpg","n":"猫的午睡","x":"","t":["猫咪"],"s":"手绘水彩","k":"猫 睡觉 午睡 沙发 银渐层 猫咪"},{"f":"wc-cat-window.jpg","n":"看雪的猫","x":"","t":["猫咪"],"s":"手绘水彩","k":"猫 看窗外 雪 窗台 猫咪 冬天"},{"f":"wc-cat-eating.jpg","n":"猫吃饭","x":"","t":["猫咪"],"s":"手绘水彩","k":"猫 吃饭 猫碗 橘猫 猫咪"},{"f":"wc-cat-playing.jpg","n":"玩毛线球的猫","x":"","t":["猫咪"],"s":"手绘水彩","k":"猫 玩耍 毛线球 小猫 猫咪"},{"f":"wc-mid-autumn.jpg","n":"中秋月夜","x":"","t":["节日"],"s":"手绘水彩","k":"中秋 月亮 月饼 桂花 团圆 中秋节"},{"f":"wc-dragon-boat.jpg","n":"端午粽香","x":"","t":["节日"],"s":"手绘水彩","k":"端午 粽子 端午节 艾草"},{"f":"wc-old-street.jpg","n":"雨后老街","x":"","t":["街道"],"s":"手绘水彩","k":"老街 雨后 石板路 灯笼 老城 街道"},{"f":"wc-river-town.jpg","n":"江南水乡","x":"","t":["风景","建筑"],"s":"手绘水彩","k":"水乡 江南 小桥 古镇 运河 山水 老宅 白墙 建筑"},{"f":"wc-kitchen.jpg","n":"窗边的厨房","x":"","t":["空间"],"s":"手绘水彩","k":"厨房 窗边 做饭 家里 温馨 室内"},{"f":"wc-bookshop.jpg","n":"街角书店","x":"","t":["空间"],"s":"手绘水彩","k":"书店 街角 看书 小店 室内"},{"f":"wc-summer-rain.jpg","n":"夏日阵雨","x":"","t":["天气"],"s":"手绘水彩","k":"夏天 阵雨 下雨 雨 屋顶 雨天"},{"f":"wc-cloudy-sea.jpg","n":"阴天的海","x":"","t":["天气"],"s":"手绘水彩","k":"阴天 海边 多云 海 灰蓝"},{"f":"wc-tea-time.jpg","n":"一个人的茶","x":"","t":["心情"],"s":"手绘水彩","k":"喝茶 安静 茶壶 窗边 独处 治愈"},{"f":"wc-daydream.jpg","n":"云朵发呆","x":"","t":["心情"],"s":"手绘水彩","k":"发呆 做梦 云朵 草地 放空 山坡"},{"f":"wc-healing.jpg","n":"治愈的角落","x":"","t":["心情"],"s":"手绘水彩","k":"治愈 温暖 看书 毯子 猫 安静"},{"f":"wc-street-corner.jpg","n":"街角小店","x":"","t":["街道","环境"],"s":"手绘水彩","k":"街角 小店 清晨 街道 自行车 阳光"},{"f":"wc-street-night.jpg","n":"夜晚的街道","x":"","t":["街道"],"s":"手绘水彩","k":"夜晚 街道 路灯 夜 猫 夜景"},{"f":"wc-coffee-shop.jpg","n":"咖啡馆里","x":"","t":["咖啡"],"s":"手绘水彩","k":"咖啡馆 咖啡 吧台 小店 咖啡机"},{"f":"wc-new-year.jpg","n":"元旦晨光","x":"","t":["节日"],"s":"手绘水彩","k":"元旦 新年 日出 雪 元旦节"},{"f":"wc-womens-day.jpg","n":"春日花束","x":"","t":["节日"],"s":"手绘水彩","k":"妇女节 花束 郁金香 鲜花 国际妇女节"},{"f":"wc-earth-day.jpg","n":"地球日新芽","x":"","t":["节日"],"s":"手绘水彩","k":"地球日 新芽 环保 地球 绿色"},{"f":"wc-thanksgiving.jpg","n":"感恩节晚餐","x":"","t":["节日"],"s":"手绘水彩","k":"感恩节 晚餐 南瓜 丰收 聚餐"},{"f":"wc-christmas-eve.jpg","n":"平安夜","x":"","t":["节日"],"s":"手绘水彩","k":"平安夜 圣诞 雪夜 苹果 圣诞节"},{"f":"wc-national-day.jpg","n":"国庆花坛","x":"","t":["节日"],"s":"手绘水彩","k":"国庆节 灯笼 花坛 广场 国庆"},{"f":"il-cat-sunbathing.jpg","n":"晒太阳的猫","x":"","t":["猫咪"],"s":"插画","k":"猫 晒太阳 睡觉 猫咪 慵懒"},{"f":"il-cat-butterfly.jpg","n":"看蝴蝶的猫","x":"","t":["猫咪","心情"],"s":"插画","k":"猫 看窗外 蝴蝶 窗边 猫咪 好奇 发呆"},{"f":"il-spring-picnic.jpg","n":"春日野餐会","x":"","t":["四季","心情"],"s":"插画","k":"春天 野餐 樱花 出游 春季 开心 朋友 快乐"},{"f":"il-rainy-day.jpg","n":"雨天出门","x":"","t":["天气"],"s":"插画","k":"雨天 下雨 雨伞 彩虹 雨"},{"f":"il-snowman.jpg","n":"堆雪人","x":"","t":["天气","心情"],"s":"插画","k":"雪人 下雪 冬天 玩雪 雪 快乐 开心"},{"f":"il-happy-dog.jpg","n":"开心小狗","x":"","t":["心情"],"s":"插画","k":"开心 小狗 快乐 草地 泡泡"},{"f":"il-music.jpg","n":"吊床听歌","x":"","t":["心情"],"s":"插画","k":"听音乐 放松 吊床 音乐 治愈"},{"f":"il-fireworks.jpg","n":"跨年烟花","x":"","t":["节日","城市"],"s":"插画","k":"跨年 烟花 新年 夜晚 庆典 跨年夜 江边 夜景 城市 桥"},{"f":"il-halloween.jpg","n":"万圣节南瓜","x":"","t":["节日"],"s":"插画","k":"万圣节 南瓜 黑猫 万圣"},{"f":"il-city-bus.jpg","n":"城市公交","x":"","t":["城市","街道"],"s":"插画","k":"公交 街道 城市 出行 巴士 商店 马路"},{"f":"il-skyline.jpg","n":"黄昏天际线","x":"","t":["城市","建筑"],"s":"插画","k":"黄昏 天际线 城市 日落 高楼 楼群 建筑"},{"f":"il-butterfly.jpg","n":"蝴蝶花丛","x":"","t":["自然"],"s":"插画","k":"蝴蝶 花丛 草地 春天 大自然"},{"f":"il-owl.jpg","n":"林间猫头鹰","x":"","t":["自然"],"s":"插画","k":"猫头鹰 森林 夜晚 星星 大自然"},{"f":"il-breakfast-nook.jpg","n":"窗边早餐","x":"","t":["空间","食物咖啡"],"s":"插画","k":"早餐 窗边 家里 早晨 室内 吐司 果汁 食物"},{"f":"il-desk.jpg","n":"书桌一角","x":"","t":["空间"],"s":"插画","k":"书桌 写字 台灯 文具 房间"},{"f":"il-hotpot.jpg","n":"热闹火锅","x":"","t":["食物咖啡"],"s":"插画","k":"火锅 聚餐 吃饭 热闹 晚餐"},{"f":"il-birthday.jpg","n":"生日蛋糕","x":"","t":["节日","食物咖啡"],"s":"插画","k":"生日 蛋糕 蜡烛 气球 庆祝 甜点 点心"},{"f":"il-coffee-cup.jpg","n":"一杯拉花","x":"","t":["咖啡","食物咖啡"],"s":"插画","k":"咖啡 拉花 咖啡杯 可颂 咖啡豆 下午茶 食物"},{"f":"il-valentine.jpg","n":"情人节咖啡","x":"","t":["节日","咖啡"],"s":"插画","k":"情人节 咖啡 玫瑰 爱心 情人 浪漫"},{"f":"il-st-patricks.jpg","n":"三叶草","x":"","t":["节日"],"s":"插画","k":"圣帕特里克节 三叶草 绿色 彩虹 圣帕特里克"},{"f":"il-april-fools.jpg","n":"愚人节","x":"","t":["节日"],"s":"插画","k":"愚人节 小丑帽 开玩笑 搞怪 愚人"},{"f":"il-labor-day.jpg","n":"劳动节","x":"","t":["节日"],"s":"插画","k":"劳动节 麦穗 园艺 致敬 劳动"},{"f":"il-childrens-day.jpg","n":"儿童节","x":"","t":["节日"],"s":"插画","k":"儿童节 气球 风筝 快乐 儿童"},{"f":"il-human-rights.jpg","n":"和平鸽","x":"","t":["节日"],"s":"插画","k":"世界人权日 和平鸽 和平 希望 人权日"},{"f":"il-longing.jpg","n":"寄给远方的信","x":"","t":["心情"],"s":"插画","k":"想念 信 远方 月亮 思念"},{"f":"photo-cat-sleep.jpg","n":"窗台睡猫","x":"","t":["猫咪","心情"],"s":"照片","k":"猫 睡觉 窗台 阳光 猫咪 午觉 慵懒 治愈"},{"f":"photo-cat-window.jpg","n":"看窗外的猫","x":"","t":["猫咪"],"s":"照片","k":"猫 看窗外 窗边 猫咪"},{"f":"photo-cat-play.jpg","n":"玩线球的小猫","x":"","t":["猫咪"],"s":"照片","k":"猫 玩耍 毛线球 小猫 猫咪"},{"f":"photo-cat-eating.jpg","n":"吃饭的猫","x":"","t":["猫咪"],"s":"照片","k":"猫 吃饭 猫碗 猫咪"},{"f":"photo-rain-street.jpg","n":"雨夜街道","x":"","t":["街道","天气"],"s":"照片","k":"街道 雨夜 下雨 夜晚 霓虹 雨天"},{"f":"photo-cafe-corner.jpg","n":"街角咖啡座","x":"","t":["街道","咖啡"],"s":"照片","k":"街角 咖啡馆 街道 清晨 小店 咖啡 座位"},{"f":"photo-latte.jpg","n":"拉花拿铁","x":"","t":["咖啡","食物咖啡"],"s":"照片","k":"咖啡 拉花 拿铁 咖啡馆 咖啡杯 下午茶 饮品"},{"f":"photo-cherry.jpg","n":"樱花大道","x":"","t":["四季","环境"],"s":"照片","k":"春天 樱花 大道 花开 春季 小路 散步 公园"},{"f":"photo-fog-mountain.jpg","n":"云雾山峦","x":"","t":["天气","风景"],"s":"照片","k":"云雾 山 阴天 山峦 雾 云海 日出 山水 风景"},{"f":"photo-rainbow.jpg","n":"雨后彩虹","x":"","t":["天气","自然"],"s":"照片","k":"彩虹 雨后 田野 天晴 雨 草地 大自然"},{"f":"photo-christmas-market.jpg","n":"圣诞集市","x":"","t":["节日","城市"],"s":"照片","k":"圣诞节 集市 夜晚 灯光 圣诞 夜市 摩天轮 城市"},{"f":"photo-waterfall.jpg","n":"林间瀑布","x":"","t":["自然","风景"],"s":"照片","k":"瀑布 森林 溪流 大自然 山泉 山间 风景 绿意"},{"f":"photo-lavender.jpg","n":"薰衣草田","x":"","t":["自然","风景"],"s":"照片","k":"薰衣草 花田 紫色 夏天 花海 风景 田野"},{"f":"photo-park-bench.jpg","n":"秋日长椅","x":"","t":["环境"],"s":"照片","k":"公园 长椅 秋天 落叶 散步"},{"f":"photo-ramen.jpg","n":"拉面小馆","x":"","t":["食物咖啡"],"s":"照片","k":"拉面 面馆 吃饭 日料 食物"},{"f":"photo-fireworks.jpg","n":"江边烟花","x":"","t":["节日"],"s":"照片","k":"烟花 跨年 夜晚 江边 庆典"},{"f":"photo-lantern-festival.jpg","n":"灯会夜色","x":"","t":["节日","街道"],"s":"照片","k":"灯会 灯笼 元宵 夜晚 春节 老街 街道"},{"f":"wc-jiangnan-bridge.jpg","n":"小桥流水","x":"","t":["江南"],"s":"手绘水彩","k":"江南 水乡 小桥 流水 石拱桥 垂柳 白墙黑瓦"},{"f":"wc-jiangnan-boat.jpg","n":"乌篷船","x":"","t":["江南"],"s":"手绘水彩","k":"江南 水乡 乌篷船 小船 粉墙黛瓦 灯笼 倒影"},{"f":"wc-jiangnan-rain-alley.jpg","n":"江南雨巷","x":"","t":["江南"],"s":"手绘水彩","k":"江南 水乡 雨巷 下雨 石板路 油纸伞 红灯笼"},{"f":"wc-jiangnan-morning.jpg","n":"临水人家","x":"","t":["江南"],"s":"手绘水彩","k":"江南 水乡 临水人家 粉墙黛瓦 清晨 河埠头 垂柳"},{"f":"wc-jiangnan-night.jpg","n":"水乡夜色","x":"","t":["江南"],"s":"手绘水彩","k":"江南 水乡 夜色 夜晚 红灯笼 乌篷船 倒影"},{"f":"wc-jiangnan-street.jpg","n":"临河老街","x":"","t":["江南"],"s":"手绘水彩","k":"江南 水乡 老街 石板路 垂柳 茶馆 白墙黑瓦"},{"f":"fig-spring-01.jpg","n":"春·粉开衫花裙","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 春季 春天 春装 针织开衫 碎花裙 郁金香 花束"},{"f":"fig-spring-02.jpg","n":"春·风衣白裙背影","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 春季 春天 春装 风衣 白裙 樱花 背影"},{"f":"fig-spring-03.jpg","n":"春·薄荷毛衣白裙","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 春季 春天 春装 毛衣 白裙 侧影 野花 帆布包"},{"f":"fig-summer-01.jpg","n":"夏·辫子背影花束","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 背影 麻花辫 花束 阔腿裤 凉鞋"},{"f":"fig-summer-02.jpg","n":"夏·黄裙草帽","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 吊带裙 长裙 草帽 书 花束"},{"f":"fig-summer-03.jpg","n":"夏·黄丝带粉裙背影","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 背影 长裙 草帽 花束 丝带"},{"f":"fig-summer-04.jpg","n":"夏·墨镜草帽短裤","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 墨镜 草帽 短裤 衬衫 凉鞋"},{"f":"fig-summer-06.jpg","n":"夏·捧花背影","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 背影 花束 长裙"},{"f":"fig-summer-07.jpg","n":"夏·蓝帽侧影","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 侧影 帽子 长裙 花束 手提包"},{"f":"fig-summer-08.jpg","n":"夏·青裙草帽","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 长裙 吊带裙 草帽 花束"},{"f":"fig-summer-09.jpg","n":"夏·蓝裙背影","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 背影 长裙 草帽 花束"},{"f":"fig-summer-10.jpg","n":"夏·咖啡漫步","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 咖啡 墨镜 阔腿裤 散步 花束"},{"f":"fig-summer-11.jpg","n":"夏·渔夫帽的她","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 渔夫帽 眼镜 长裙 手提包"},{"f":"fig-summer-12.jpg","n":"夏·绿衣背影","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 夏季 夏天 夏装 背影 长裙 花束 手提包"},{"f":"fig-autumn-01.jpg","n":"秋·驼色大衣","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 秋季 秋天 秋装 大衣 围巾 枫叶 咖啡 短靴"},{"f":"fig-autumn-02.jpg","n":"秋·焦糖毛衣格纹裙","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 秋季 秋天 秋装 毛衣 格纹裙 背影 书 干花"},{"f":"fig-autumn-03.jpg","n":"秋·牛仔外套长裙","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 秋季 秋天 秋装 牛仔外套 长裙 银杏 侧影 帆布包"},{"f":"fig-winter-01.jpg","n":"冬·红大衣白围巾","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 冬季 冬天 冬装 大衣 围巾 手套 雪 松枝"},{"f":"fig-winter-02.jpg","n":"冬·羽绒服背影","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 冬季 冬天 冬装 羽绒服 针织帽 围巾 背影 热饮 雪"},{"f":"fig-winter-03.jpg","n":"冬·绿大衣格纹围巾","x":"","t":["水彩类"],"s":"手绘水彩","k":"水彩人物 人物 女子 冬季 冬天 冬装 大衣 格纹围巾 长靴 侧影 冬青"}]</script>
   </body>
 </html>
