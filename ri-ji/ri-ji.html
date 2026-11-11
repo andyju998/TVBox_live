@@ -1824,8 +1824,8 @@ function shareEntry(e) {
       ctx.fillText(ln, 60, y);
       y += 76;
     });
-    /* 照片：最多两行，每行三张 */
-    var photos = (e.photos || []).slice(0, 6);
+    /* 照片：最多三行，每行三张；全部照片进图（最多 9 张），格子按剩余空间自动缩小，整张放入不裁切 */
+    var photos = (e.photos || []).slice(0, 9);
     var drawPhotos = function () {
       /* 落款 */
       var sig = e.sig || "";
@@ -1853,9 +1853,18 @@ function shareEntry(e) {
       }, "image/jpeg", 0.9);
     };
     if (photos.length === 0) { drawPhotos(); return; }
-    var cell = 224, gap = 8, startX = 60;
-    var rows = (y + cell <= 940) ? 2 : ((y + cell <= 940 + cell + gap) ? 1 : 0);
-    if (rows === 0) { drawPhotos(); return; }
+    var cellW = 224, gap = 8, startX = 60, minCellH = 110, bottom = 940;
+    var needRows = Math.ceil(photos.length / 3);
+    var rows = Math.min(needRows, 3);
+    var avail = bottom - y;
+    var cellH = Math.floor((avail - (rows - 1) * gap) / rows);
+    if (cellH > cellW) cellH = cellW;
+    if (cellH < minCellH) {
+      rows = Math.floor((avail + gap) / (minCellH + gap));
+      if (rows <= 0) { drawPhotos(); return; }
+      rows = Math.min(rows, needRows, 3);
+      cellH = Math.floor((avail - (rows - 1) * gap) / rows);
+    }
     var list = photos.slice(0, rows * 3);
     var loaded = 0, imgs = [];
     list.forEach(function (ph, i) {
@@ -1865,17 +1874,12 @@ function shareEntry(e) {
           list.forEach(function (ph, j) {
             var img = imgs[j];
             if (!img) return;
-            var cx = startX + (j % 3) * (cell + gap);
-            var cy = y + Math.floor(j / 3) * (cell + gap);
+            var cx = startX + (j % 3) * (cellW + gap);
+            var cy = y + Math.floor(j / 3) * (cellH + gap);
             var iw = img.naturalWidth, ih = img.naturalHeight;
-            var s = Math.max(cell / iw, cell / ih);
+            var s = Math.min(cellW / iw, cellH / ih);
             var dw = iw * s, dh = ih * s;
-            ctx.save();
-            ctx.beginPath();
-            ctx.rect(cx, cy, cell, cell);
-            ctx.clip();
-            ctx.drawImage(img, cx + (cell - dw) / 2, cy + (cell - dh) / 2, dw, dh);
-            ctx.restore();
+            ctx.drawImage(img, cx + (cellW - dw) / 2, cy + (cellH - dh) / 2, dw, dh);
           });
           drawPhotos();
         }
