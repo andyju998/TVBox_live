@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- 打卡文案 · v44（2026-11-11）：只修 HEIC 这一环——电脑微信内置浏览器里点选、拖入 HEIC 都转不出图，其它格式正常。iPhone 的 HEIC 一个文件装着主图＋缩略图＋景深等好几张图，旧解码只认第一张，且解码回调不回来时只能干等整条链超时：改为按主图优先、面积大优先逐张试解（最多 3 张，每张带 15 秒看门狗，画不出就换下一张）；再加文件头识别兜底（名字/类型被微信转手标错或丢失时，凭文件头 ftyp 品牌字认出 HEIC 照样转）。点选、拖拽、文案、版面、内容与其余格式一字未动 -->
+<!-- 打卡文案 · v45（2026-11-11）：只修 HEIC 转换太慢——慢在四处叠加：①明知是 HEIC 还先拿原图试浏览器能不能打开，打不开的内核要白等到 8 秒兜底才开始转；②1.3MB 解码库等文件选好才开始下载解析，又白等几秒；③解码后给整张大图逐像素补透明通道、再整幅搬进全尺寸画布，1200 万像素全走主线程慢循环；④主路总超时 45 秒＋单张看门狗 15 秒，真卡住时要等一分多钟。改法：HEIC 的试开兜底从 8 秒收紧到 1.5 秒（能原生打开的照样秒开，打不开的最多亏 1.5 秒就开始转）；点开选图框／拖到框上时就提前把解码库加载好，和选图的时间重叠；透明通道改整块填充、成品长边从 2560 收到 1600（页面里最大也就整幅显示，足够清楚）；超时收紧（主路 30 秒、单张 10 秒）；转换状态带已用秒数，不再只有一句「请稍等」。解码仍按 v44 的主图优先逐张试、文件头兜底，点选、拖拽、文案、版面与其余格式一字未动 -->
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
@@ -1887,6 +1887,12 @@
       }
       function jpgName(file) { return (file.name || "photo").replace(/\.[^.]*$/, "") + ".jpg"; }
       var libheifReady = null;
+      // 提前热身：解码库有 1.3MB，等文件选好再加载解析要白等好几秒。
+      // 用户一点选图框、或把文件拖到框上时就先把库加载起来，和选图的时间
+      // 重叠，真正开始转换时库已经就绪。加载失败不吭声，转换时还会再试。
+      function warmHeicDecoder() {
+        try { loadLibheif().catch(function () {}); } catch (e) {}
+      }
       function loadLibheif() {
         if (window.libheif && window.libheif.HeifDecoder) return Promise.resolve();
         if (!libheifReady) {
@@ -1905,7 +1911,7 @@
         return libheifReady;
       }
       // 把解码出的一张图画成 JPEG。display 的回调在个别内核里会无声无息地
-      // 不回来（图数据不完整时它内部直接断掉），给它 15 秒看门狗：不回来
+      // 不回来（图数据不完整时它内部直接断掉），给它 10 秒看门狗：不回来
       // 就当这张失败，换下一张候选，别把整条转换链堵死到总超时。
       function displayToJpeg(image, w, h, file) {
         return new Promise(function (resolve, reject) {
@@ -1913,9 +1919,12 @@
           var pctx = probe.getContext("2d");
           var imageData;
           try { imageData = pctx.createImageData(w, h); } catch (e) { reject(e); return; }
-          for (var p = 3; p < imageData.data.length; p += 4) imageData.data[p] = 255;
+          // 先把整幅垫成不透明（解码回调漏写的像素不至于透黑）：1200 万像素
+          // 逐个字节循环要走上千万次，改成按 32 位整块填充，快两个数量级
+          try { new Uint32Array(imageData.data.buffer).fill(0xff000000); }
+          catch (e) { for (var p = 3; p < imageData.data.length; p += 4) imageData.data[p] = 255; }
           var settled = false;
-          var watchdog = setTimeout(function () { fail(new Error("heic-display-timeout")); }, 15000);
+          var watchdog = setTimeout(function () { fail(new Error("heic-display-timeout")); }, 10000);
           function fail(err) { if (!settled) { settled = true; clearTimeout(watchdog); reject(err); } }
           try {
             image.display(imageData, function (out) {
@@ -1924,8 +1933,9 @@
               settled = true;
               clearTimeout(watchdog);
               try {
-                // 超大照片缩到长边 2560 以内，省内存、出图也快
-                var scale = Math.min(1, 2560 / Math.max(w, h));
+                // 超大照片缩到长边 1600 以内：页面里最大就是整幅显示，
+                // 1600 已经足够清楚，画布搬运和 JPEG 编码都快一截、省内存
+                var scale = Math.min(1, 1600 / Math.max(w, h));
                 var tw = Math.max(1, Math.round(w * scale)), th = Math.max(1, Math.round(h * scale));
                 var full = document.createElement("canvas");
                 full.width = w; full.height = h;
@@ -2008,19 +2018,17 @@
           });
       }
       function toJpeg(file) {
-        // 先在页面里直接解码；这条路不通（或超时）再试后台线程方式
-        return withTimeout(decodeHeicMain(file), 45000, "heic-main-timeout")
+        // 先在页面里直接解码；这条路不通（或超时）再试后台线程方式。
+        // 主路总超时从 45 秒收到 30 秒：正常解码远用不到这么久，
+        // 真卡住时早点转备用路，用户少干等一截
+        return withTimeout(decodeHeicMain(file), 30000, "heic-main-timeout")
           .catch(function () { return toJpegViaWorker(file); });
       }
       function loadSlot(file, retried) {
         return new Promise(function (resolve) {
-          var url = URL.createObjectURL(file);
-          var img = new Image();
-          var done = false;
-          // 浏览器对某些照片既不报加载成功也不报失败时，8 秒后转去解码，不干等
-          var timer = setTimeout(function () { if (done) return; done = true; tryConvert(); }, 8000);
+          var url = null;
           function tryConvert() {
-            URL.revokeObjectURL(url);
+            if (url) { URL.revokeObjectURL(url); url = null; }
             if (retried) { resolve(null); return; }
             var go = function () {
               toJpeg(file).then(function (jpg) { resolve(loadSlot(jpg, true)); }, function () { resolve(null); });
@@ -2030,7 +2038,16 @@
             // 经微信转出来的照片偶尔类型被标错，内容仍是 HEIC，照样转
             sniffHeif(file).then(function (yes) { yes ? go() : resolve(null); }, function () { resolve(null); });
           }
-          img.onload = function () { if (done) return; done = true; clearTimeout(timer); resolve({ url: url, profile: analyzePhoto(img) }); };
+          url = URL.createObjectURL(file);
+          var img = new Image();
+          var done = false;
+          // 试开原图的兜底时限：普通照片给 8 秒（原样）；认得出是 HEIC 的
+          // 只给 1.5 秒——能原生打开的（手机 Safari）一秒内就打开了，
+          // 打不开的内核（含电脑微信）试开失败有时不立刻报错，原来白等满
+          // 8 秒才开始转换，一张先亏好几秒，现在最多亏 1.5 秒就转去解码
+          var fuse = isHeic(file) ? 1500 : 8000;
+          var timer = setTimeout(function () { if (done) return; done = true; tryConvert(); }, fuse);
+          img.onload = function () { if (done) return; done = true; clearTimeout(timer); var u = url; url = null; resolve({ url: u, profile: analyzePhoto(img) }); };
           img.onerror = function () { if (done) return; done = true; clearTimeout(timer); tryConvert(); };
           img.src = url;
         });
@@ -2069,20 +2086,33 @@
         var status = document.getElementById("photoStatus");
         var total = validFiles.length;
         var slots = validFiles.map(function () { return null; });
+        // 状态带已用秒数：转换要等时，秒数在走，用户看得出没卡死
+        var statusTimer = null, statusBase = "", statusStart = 0;
+        function showStatus(text) {
+          if (!status) return;
+          statusBase = text; statusStart = Date.now();
+          status.hidden = false; status.textContent = text;
+          if (statusTimer) clearInterval(statusTimer);
+          statusTimer = setInterval(function () {
+            var s = Math.floor((Date.now() - statusStart) / 1000);
+            if (s >= 2 && !status.hidden) status.textContent = statusBase + "（已 " + s + " 秒）";
+          }, 1000);
+        }
+        function hideStatus() {
+          if (statusTimer) { clearInterval(statusTimer); statusTimer = null; }
+          if (status) { status.hidden = true; status.textContent = ""; }
+        }
         var chain = Promise.resolve();
         validFiles.forEach(function (file, i) {
           chain = chain.then(function () {
-            if (status) {
-              status.hidden = false;
-              status.textContent = isHeic(file)
-                ? "正在转换 HEIC 照片（第 " + (i + 1) + " / " + total + " 张），请稍等…"
-                : "正在处理照片（第 " + (i + 1) + " / " + total + " 张）…";
-            }
+            showStatus(isHeic(file)
+              ? "正在转换 HEIC 照片（第 " + (i + 1) + " / " + total + " 张），请稍等…"
+              : "正在处理照片（第 " + (i + 1) + " / " + total + " 张）…");
             return loadSlot(file, false).then(function (slot) { slots[i] = slot || false; });
           });
         });
         return chain.then(function () {
-          if (status) { status.hidden = true; status.textContent = ""; }
+          hideStatus();
           finishAdd(slots);
         });
         function finishAdd(list) {
@@ -2132,6 +2162,7 @@
       });
       function openPhotoPicker() {
         if (photos.length >= MAX_PHOTOS) { showToast("最多放 9 张，已经满了"); return; }
+        warmHeicDecoder(); // 趁选图窗开着，先把 HEIC 解码库加载好
         pickerSession = true;
         freshPhotoInput().click();
       }
@@ -2139,6 +2170,7 @@
       // 满 9 张时拦下，别让选图窗弹出来
       dropText.addEventListener("click", function (e) {
         if (photos.length >= MAX_PHOTOS) { e.preventDefault(); showToast("最多放 9 张，已经满了"); return; }
+        warmHeicDecoder(); // label 原生打开选图窗的同时，先把解码库备好
         pickerSession = true;
       });
       drop.addEventListener("click", function (e) {
@@ -2167,7 +2199,7 @@
         return out;
       }
       // dragenter 和 dragover 都要拦下，drop 才会被放行（少拦一个，有些内核就不给放）
-      drop.addEventListener("dragenter", function (e) { e.preventDefault(); if (dragHasFiles(e)) drop.classList.add("over"); });
+      drop.addEventListener("dragenter", function (e) { e.preventDefault(); if (dragHasFiles(e)) { drop.classList.add("over"); warmHeicDecoder(); } });
       drop.addEventListener("dragover", function (e) { e.preventDefault(); if (e.dataTransfer) e.dataTransfer.dropEffect = "copy"; drop.classList.add("over"); });
       drop.addEventListener("dragleave", function () { drop.classList.remove("over"); });
       drop.addEventListener("drop", function (e) {
