@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- 打卡文案 · v38（2026-11-10）：修微信打开界面过大＋首屏提速——微信字体调大时 WebView 会把全页文字放大、页签行撑出屏幕导致打开即放大要手捏缩小：text-size-adjust 改 !important 顶住、页签行与照片按钮行恢复可换行、html/body 加 overflow-x: clip 兜底，打开直接贴合屏幕宽。提速：图片库 18KB 数据块移到主脚本之后（主脚本不等它下完先跑，建库有等数据兜底）、标题图钉图 256→128（17KB→2.2KB）。其余与 v37 一致（四页签、刷新、图片库、选图、HEIC、文案库、小红书文案、版面、内容全不变） -->
+<!-- 打卡文案 · v44（2026-11-11）：只修 HEIC 这一环——电脑微信内置浏览器里点选、拖入 HEIC 都转不出图，其它格式正常。iPhone 的 HEIC 一个文件装着主图＋缩略图＋景深等好几张图，旧解码只认第一张，且解码回调不回来时只能干等整条链超时：改为按主图优先、面积大优先逐张试解（最多 3 张，每张带 15 秒看门狗，画不出就换下一张）；再加文件头识别兜底（名字/类型被微信转手标错或丢失时，凭文件头 ftyp 品牌字认出 HEIC 照样转）。点选、拖拽、文案、版面、内容与其余格式一字未动 -->
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
@@ -1868,6 +1868,20 @@
       // 平时不加载，页面打开速度不受影响。主路不行再退回 heic2any 的后台线程
       // 方式；两条路都有超时兜底，不会再无声无息地卡住。
       function isHeic(f) { return f.type === "image/heic" || f.type === "image/heif" || /\.(heic|heif)$/i.test(f.name || ""); }
+      // 按文件头认 HEIC：HEIF 文件第 5–8 字节是 ftyp，后面跟品牌字（heic、mif1 等）。
+      // 经微信转出来的照片偶尔扩展名丢失、类型被标错，名字和类型都认不出时靠它兜底。
+      var HEIF_BRANDS = { heic: 1, heix: 1, hevc: 1, hevx: 1, heim: 1, heis: 1, hevm: 1, hevs: 1, mif1: 1, mif2: 1, msf1: 1 };
+      function sniffHeif(f) {
+        try {
+          return f.slice(0, 16).arrayBuffer().then(function (buf) {
+            var b = new Uint8Array(buf);
+            if (b.length < 12) return false;
+            var box = String.fromCharCode(b[4], b[5], b[6], b[7]);
+            var brand = String.fromCharCode(b[8], b[9], b[10], b[11]);
+            return box === "ftyp" && !!HEIF_BRANDS[brand];
+          });
+        } catch (e) { return Promise.resolve(false); }
+      }
       function withTimeout(promise, ms, tag) {
         return Promise.race([promise, new Promise(function (unused, rej) { setTimeout(function () { rej(new Error(tag || "timeout")); }, ms); })]);
       }
@@ -1890,53 +1904,78 @@
         }
         return libheifReady;
       }
+      // 把解码出的一张图画成 JPEG。display 的回调在个别内核里会无声无息地
+      // 不回来（图数据不完整时它内部直接断掉），给它 15 秒看门狗：不回来
+      // 就当这张失败，换下一张候选，别把整条转换链堵死到总超时。
+      function displayToJpeg(image, w, h, file) {
+        return new Promise(function (resolve, reject) {
+          var probe = document.createElement("canvas");
+          var pctx = probe.getContext("2d");
+          var imageData;
+          try { imageData = pctx.createImageData(w, h); } catch (e) { reject(e); return; }
+          for (var p = 3; p < imageData.data.length; p += 4) imageData.data[p] = 255;
+          var settled = false;
+          var watchdog = setTimeout(function () { fail(new Error("heic-display-timeout")); }, 15000);
+          function fail(err) { if (!settled) { settled = true; clearTimeout(watchdog); reject(err); } }
+          try {
+            image.display(imageData, function (out) {
+              if (settled) return;
+              if (!out) { fail(new Error("heic-display")); return; }
+              settled = true;
+              clearTimeout(watchdog);
+              try {
+                // 超大照片缩到长边 2560 以内，省内存、出图也快
+                var scale = Math.min(1, 2560 / Math.max(w, h));
+                var tw = Math.max(1, Math.round(w * scale)), th = Math.max(1, Math.round(h * scale));
+                var full = document.createElement("canvas");
+                full.width = w; full.height = h;
+                full.getContext("2d").putImageData(out, 0, 0);
+                var canvas = document.createElement("canvas");
+                canvas.width = tw; canvas.height = th;
+                canvas.getContext("2d").drawImage(full, 0, 0, tw, th);
+                if (canvas.toBlob) {
+                  canvas.toBlob(function (blob) {
+                    if (blob) resolve(new File([blob], jpgName(file), { type: "image/jpeg" }));
+                    else reject(new Error("heic-encode"));
+                  }, "image/jpeg", 0.85);
+                } else {
+                  var durl = canvas.toDataURL("image/jpeg", 0.85);
+                  var bin = atob(durl.split(",")[1]);
+                  var arr = new Uint8Array(bin.length);
+                  for (var q = 0; q < bin.length; q++) arr[q] = bin.charCodeAt(q);
+                  resolve(new File([new Blob([arr], { type: "image/jpeg" })], jpgName(file), { type: "image/jpeg" }));
+                }
+              } catch (e2) { reject(e2); }
+            });
+          } catch (e) { fail(e); }
+        });
+      }
       function decodeHeicMain(file) {
         return loadLibheif().then(function () { return file.arrayBuffer(); }).then(function (buf) {
           return new Promise(function (resolve, reject) {
             var images;
             try { images = new window.libheif.HeifDecoder().decode(buf); } catch (e) { reject(e); return; }
             if (!images || !images.length) { reject(new Error("heic-empty")); return; }
-            var image = images[0];
-            var w = 0, h = 0;
-            try { w = image.get_width(); h = image.get_height(); } catch (e) { reject(e); return; }
-            if (!w || !h) { reject(new Error("heic-size")); return; }
-            var probe = document.createElement("canvas");
-            var pctx = probe.getContext("2d");
-            var imageData;
-            try { imageData = pctx.createImageData(w, h); } catch (e) { reject(e); return; }
-            for (var p = 3; p < imageData.data.length; p += 4) imageData.data[p] = 255;
-            var settled = false;
-            function fail(err) { if (!settled) { settled = true; reject(err); } }
-            try {
-              image.display(imageData, function (out) {
-                if (settled) return;
-                if (!out) { fail(new Error("heic-display")); return; }
-                settled = true;
-                try {
-                  // 超大照片缩到长边 2560 以内，省内存、出图也快
-                  var scale = Math.min(1, 2560 / Math.max(w, h));
-                  var tw = Math.max(1, Math.round(w * scale)), th = Math.max(1, Math.round(h * scale));
-                  var full = document.createElement("canvas");
-                  full.width = w; full.height = h;
-                  full.getContext("2d").putImageData(out, 0, 0);
-                  var canvas = document.createElement("canvas");
-                  canvas.width = tw; canvas.height = th;
-                  canvas.getContext("2d").drawImage(full, 0, 0, tw, th);
-                  if (canvas.toBlob) {
-                    canvas.toBlob(function (blob) {
-                      if (blob) resolve(new File([blob], jpgName(file), { type: "image/jpeg" }));
-                      else reject(new Error("heic-encode"));
-                    }, "image/jpeg", 0.85);
-                  } else {
-                    var durl = canvas.toDataURL("image/jpeg", 0.85);
-                    var bin = atob(durl.split(",")[1]);
-                    var arr = new Uint8Array(bin.length);
-                    for (var q = 0; q < bin.length; q++) arr[q] = bin.charCodeAt(q);
-                    resolve(new File([new Blob([arr], { type: "image/jpeg" })], jpgName(file), { type: "image/jpeg" }));
-                  }
-                } catch (e2) { reject(e2); }
-              });
-            } catch (e) { fail(e); }
+            // iPhone 的 HEIC 一个文件里常装着好几张图：主图之外还有缩略图、
+            // 景深图等辅助图，第一张不保证是主图，辅助图还可能根本画不出来。
+            // 电脑浏览器没有原生 HEIC 解码、全靠这里解，挑错一张整张照片就废：
+            // 主图优先、面积大的优先，逐张试（最多 3 张），哪张画出来用哪张。
+            var cands = [];
+            for (var i = 0; i < images.length; i++) {
+              var im = images[i], w = 0, h = 0, prim = false;
+              try { w = im.get_width(); h = im.get_height(); } catch (e) {}
+              try { prim = !!im.is_primary(); } catch (e) {}
+              if (w > 0 && h > 0) cands.push({ im: im, w: w, h: h, prim: prim, area: w * h });
+            }
+            if (!cands.length) { reject(new Error("heic-size")); return; }
+            cands.sort(function (a, b) { return ((b.prim ? 1 : 0) - (a.prim ? 1 : 0)) || (b.area - a.area); });
+            cands = cands.slice(0, 3);
+            var tried = 0;
+            (function attempt() {
+              if (tried >= cands.length) { reject(new Error("heic-display")); return; }
+              var c = cands[tried++];
+              displayToJpeg(c.im, c.w, c.h, file).then(resolve, function () { attempt(); });
+            })();
           });
         });
       }
@@ -1982,8 +2021,14 @@
           var timer = setTimeout(function () { if (done) return; done = true; tryConvert(); }, 8000);
           function tryConvert() {
             URL.revokeObjectURL(url);
-            if (!retried && (isHeic(file) || !file.type || file.type === "application/octet-stream")) toJpeg(file).then(function (jpg) { resolve(loadSlot(jpg, true)); }, function () { resolve(null); });
-            else resolve(null);
+            if (retried) { resolve(null); return; }
+            var go = function () {
+              toJpeg(file).then(function (jpg) { resolve(loadSlot(jpg, true)); }, function () { resolve(null); });
+            };
+            if (isHeic(file) || !file.type || file.type === "application/octet-stream") { go(); return; }
+            // 名字和类型都看不出是 HEIC 时，再按文件头认一次：
+            // 经微信转出来的照片偶尔类型被标错，内容仍是 HEIC，照样转
+            sniffHeif(file).then(function (yes) { yes ? go() : resolve(null); }, function () { resolve(null); });
           }
           img.onload = function () { if (done) return; done = true; clearTimeout(timer); resolve({ url: url, profile: analyzePhoto(img) }); };
           img.onerror = function () { if (done) return; done = true; clearTimeout(timer); tryConvert(); };
