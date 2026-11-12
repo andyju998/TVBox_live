@@ -71,5 +71,6 @@ lbEl.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;});
 lbEl.addEventListener('touchend',function(e){if(tx===null)return;var dx=e.changedTouches[0].clientX-tx;tx=null;if(dx<-50)navLb(1);if(dx>50)navLb(-1);});
 document.getElementById('lb-img').addEventListener('click',closeLb);
 </script>
+
 </body>
 </html>
