@@ -49,7 +49,7 @@ h1{text-align:center;font-size:24px;font-weight:400;margin:6px 0 0}
 <h1>✨ MUSE 空间日记  把生活过成一本有图、有故事的日记 。</h1>
 
 <p class="txt">可以给每篇日记配上照片，再写几句当下的心情和故事，把生活中的小美好一点点记录下来。</p>
-<div class="grid" style="grid-template-columns:repeat(3,1fr)"><div class="cell"><img src="t12.jpg" data-full="p12.jpg" alt="" loading="lazy" decoding="async" onerror="gridImgErr(this)" onclick="openLb(0)"></div><div class="cell"><img src="t13.jpg" data-full="p13.jpg" alt="" loading="lazy" decoding="async" onerror="gridImgErr(this)" onclick="openLb(1)"></div><div class="cell"><img src="t14.jpg" data-full="p14.jpg" alt="" loading="lazy" decoding="async" onerror="gridImgErr(this)" onclick="openLb(2)"></div><div class="cell"><img src="t15.jpg" data-full="p15.jpg" alt="" loading="lazy" decoding="async" onerror="gridImgErr(this)" onclick="openLb(3)"></div><div class="cell"><img src="t16.jpg" data-full="p16.jpg" alt="" loading="lazy" decoding="async" onerror="gridImgErr(this)" onclick="openLb(4)"></div><div class="cell"><img src="t17.jpg" data-full="p17.jpg" alt="" loading="lazy" decoding="async" onerror="gridImgErr(this)" onclick="openLb(5)"></div><div class="cell"><img src="t18.jpg" data-full="p18.jpg" alt="" loading="lazy" decoding="async" onerror="gridImgErr(this)" onclick="openLb(6)"></div><div class="cell"><img src="t19.jpg" data-full="p19.jpg" alt="" loading="lazy" decoding="async" onerror="gridImgErr(this)" onclick="openLb(7)"></div><div class="cell"><img src="t20.jpg" data-full="p20.jpg" alt="" loading="lazy" decoding="async" onerror="gridImgErr(this)" onclick="openLb(8)"></div></div>
+<div class="grid" style="grid-template-columns:repeat(1,1fr)"><div class="cell"><img src="t12.jpg" data-full="p12.jpg" alt="" loading="lazy" decoding="async" onerror="gridImgErr(this)" onclick="openLb(0)"></div></div>
 </main>
 <div id="lb" hidden>
 <div class="lb-top"><span id="lb-n"></span><button type="button" onclick="closeLb()" aria-label="关闭">×</button></div>
@@ -58,7 +58,7 @@ h1{text-align:center;font-size:24px;font-weight:400;margin:6px 0 0}
 <button type="button" class="lb-next" onclick="navLb(1)" aria-label="下一张">›</button>
 </div>
 <script>
-var PHOTOS = ["p12.jpg","p13.jpg","p14.jpg","p15.jpg","p16.jpg","p17.jpg","p18.jpg","p19.jpg","p20.jpg"];
+var PHOTOS = ["p12.jpg"];
 var cur = 0;
 function gridImgErr(im){if(im.dataset.fb)return;im.dataset.fb='1';var f=im.getAttribute('data-full');if(f)im.src=f;}
 function showLb(){document.getElementById('lb-img').src=PHOTOS[cur];document.getElementById('lb-n').textContent=(cur+1)+' / '+PHOTOS.length;for(var k=-1;k<=1;k+=2){var n=cur+k;if(n>=0&&n<PHOTOS.length){var pre=new Image();pre.src=PHOTOS[n];}}}
