@@ -27,7 +27,6 @@ h1{text-align:center;font-size:24px;font-weight:400;margin:6px 0 0}
 .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;pointer-events:none}
 .dur{position:absolute;right:4px;top:4px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:2px 6px;border-radius:4px}
 .nolabel{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);color:#fff;font-size:11px;text-align:center;padding:3px 0}
-.sign{text-align:right;color:#7a8a7f;font-size:16px;margin:16px 0 0}
 #lb{position:fixed;inset:0;background:#000;z-index:9;display:flex;flex-direction:column}
 #lb[hidden]{display:none}
 .lb-top{display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,.85);padding:14px 16px;font-size:14px;font-family:sans-serif}
@@ -45,7 +44,6 @@ h1{text-align:center;font-size:24px;font-weight:400;margin:6px 0 0}
 
 <p class="txt">可以给每篇日记配上照片，再写几句当下的心情和故事，把生活中的小美好一点点记录下来。</p>
 <div class="grid" style="grid-template-columns:repeat(3,1fr)"><div class="cell"><img src="p12.jpg" alt="" onclick="openLb(0)"></div><div class="cell"><img src="p13.jpg" alt="" onclick="openLb(1)"></div><div class="cell"><img src="p14.jpg" alt="" onclick="openLb(2)"></div><div class="cell"><img src="p15.jpg" alt="" onclick="openLb(3)"></div><div class="cell"><img src="p16.jpg" alt="" onclick="openLb(4)"></div><div class="cell"><img src="p17.jpg" alt="" onclick="openLb(5)"></div><div class="cell"><img src="p18.jpg" alt="" onclick="openLb(6)"></div><div class="cell"><img src="p19.jpg" alt="" onclick="openLb(7)"></div><div class="cell"><img src="p20.jpg" alt="" onclick="openLb(8)"></div></div>
-<p class="sign">—— 左岸咖啡 · muse 日记</p>
 </main>
 <div id="lb" hidden>
 <div class="lb-top"><span id="lb-n"></span><button type="button" onclick="closeLb()" aria-label="关闭">×</button></div>
