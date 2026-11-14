@@ -376,17 +376,15 @@
     text-align: center; color: rgba(255,255,255,.8); font-size: 14px;
   }
 
-/* ---- 公开页图片库 ---- */
-.publib { margin-top: 28px; }
-.publib h2 { font-size: 20px; margin: 0 0 4px; }
-.publib .lib-cell .play {
+/* ---- 编辑器配图库：视频角标 ---- */
+.sheet .lib-cell .play {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
   width: 44px; height: 44px; border-radius: 50%;
   background: rgba(0,0,0,.45); color: #fff;
   display: flex; align-items: center; justify-content: center;
   font-size: 18px; pointer-events: none;
 }
-.publib .lib-cell .dur {
+.sheet .lib-cell .dur {
   position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,.55); color: #fff;
   font-size: 11px; line-height: 16px; padding: 1px 6px; border-radius: 999px; pointer-events: none;
 }
@@ -420,14 +418,7 @@
 
   <div id="entries"></div>
 
-  <section class="publib" id="pubLib" aria-label="图片库">
-    <h2>图片库</h2>
-    <p class="note" id="pubLibCount"></p>
-    <div class="lib-seasons" id="pubLibCats"></div>
-    <div class="lib-grid" id="pubLibGrid" style="margin-top:8px;"></div>
-  </section>
-
-  <p class="foot">公开版含示例日记与图片库；你写的日记只保存在本机浏览器，仅本设备可见。</p>
+  <p class="foot">公开版含示例日记；你写的日记只保存在本机浏览器，仅本设备可见。</p>
 </div>
 
 <!-- 编辑器 -->
@@ -495,8 +486,6 @@
   <div class="panel">
     <h3>配图库</h3>
     <div class="cats" id="libCats"></div>
-    <p class="note" style="margin-top:2px;">按季节（看服装）</p>
-    <div class="lib-seasons" id="libSeasons"></div>
     <p class="note" id="libCount"></p>
     <div class="lib-grid" id="libGrid" style="margin-top:8px;"></div>
     <button type="button" class="lib-done" id="libDoneBtn">完成</button>
@@ -596,7 +585,6 @@ var EXAMPLE_DATE = todayStr();
 
 /* ---- 示例九宫格：1 号位 10 秒示范视频＋八张照片 ---- */
 var MEDIA = [
-  { kind: "video", src: "lib/example/demo-video.mp4", poster: "lib/example/demo-poster.jpg", cap: "示范短视频 · 10秒" },
   { kind: "photo", src: "lib/example/afternoon-tea.jpg", cap: "下午茶" },
   { kind: "photo", src: "lib/example/evening-kitchen.jpg", cap: "晚间厨房" },
   { kind: "photo", src: "lib/example/tea-alone.jpg", cap: "一个人的茶" },
@@ -637,27 +625,27 @@ var LIB_FIG = [
 /* ---- 公开页图片库：全量 354 条（333 张照片＋21 个场景视频，与日记空间一致，按空间顺序） ----
    图在 lib/ig/ 里（照片原图、视频封面与视频本体），点开走同一个灯箱（照片看大图，视频格内播）。 */
 var PUB_LIB = [
-  { "id": "fig-autumn-01", "name": "秋·驼色大衣", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "秋季", "秋天", "秋装", "大衣", "围巾", "枫叶", "咖啡", "短靴"], "kind": "photo", "thumb": "lib/ig/fig-autumn-01.jpg", "full": "lib/ig/fig-autumn-01.jpg" },
-  { "id": "fig-autumn-02", "name": "秋·焦糖毛衣格纹裙", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "秋季", "秋天", "秋装", "毛衣", "格纹裙", "背影", "书", "干花"], "kind": "photo", "thumb": "lib/ig/fig-autumn-02.jpg", "full": "lib/ig/fig-autumn-02.jpg" },
-  { "id": "fig-autumn-03", "name": "秋·牛仔外套长裙", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "秋季", "秋天", "秋装", "牛仔外套", "长裙", "银杏", "侧影", "帆布包"], "kind": "photo", "thumb": "lib/ig/fig-autumn-03.jpg", "full": "lib/ig/fig-autumn-03.jpg" },
-  { "id": "fig-spring-01", "name": "春·粉开衫花裙", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "春季", "春天", "春装", "针织开衫", "碎花裙", "郁金香", "花束"], "kind": "photo", "thumb": "lib/ig/fig-spring-01.jpg", "full": "lib/ig/fig-spring-01.jpg" },
-  { "id": "fig-spring-02", "name": "春·风衣白裙背影", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "春季", "春天", "春装", "风衣", "白裙", "樱花", "背影"], "kind": "photo", "thumb": "lib/ig/fig-spring-02.jpg", "full": "lib/ig/fig-spring-02.jpg" },
-  { "id": "fig-spring-03", "name": "春·薄荷毛衣白裙", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "春季", "春天", "春装", "毛衣", "白裙", "侧影", "野花", "帆布包"], "kind": "photo", "thumb": "lib/ig/fig-spring-03.jpg", "full": "lib/ig/fig-spring-03.jpg" },
-  { "id": "fig-summer-01", "name": "夏·辫子背影花束", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "背影", "麻花辫", "花束", "阔腿裤", "凉鞋"], "kind": "photo", "thumb": "lib/ig/fig-summer-01.jpg", "full": "lib/ig/fig-summer-01.jpg" },
-  { "id": "fig-summer-02", "name": "夏·黄裙草帽", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "吊带裙", "长裙", "草帽", "书", "花束"], "kind": "photo", "thumb": "lib/ig/fig-summer-02.jpg", "full": "lib/ig/fig-summer-02.jpg" },
-  { "id": "fig-summer-03", "name": "夏·黄丝带粉裙背影", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "背影", "长裙", "草帽", "花束", "丝带"], "kind": "photo", "thumb": "lib/ig/fig-summer-03.jpg", "full": "lib/ig/fig-summer-03.jpg" },
-  { "id": "fig-summer-04", "name": "夏·墨镜草帽短裤", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "墨镜", "草帽", "短裤", "衬衫", "凉鞋"], "kind": "photo", "thumb": "lib/ig/fig-summer-04.jpg", "full": "lib/ig/fig-summer-04.jpg" },
-  { "id": "fig-summer-05", "name": "夏·花篮蓝裙", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "花篮", "花束", "长裙", "草帽"], "kind": "photo", "thumb": "lib/ig/fig-summer-05.jpg", "full": "lib/ig/fig-summer-05.jpg" },
-  { "id": "fig-summer-06", "name": "夏·捧花背影", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "背影", "花束", "长裙"], "kind": "photo", "thumb": "lib/ig/fig-summer-06.jpg", "full": "lib/ig/fig-summer-06.jpg" },
-  { "id": "fig-summer-07", "name": "夏·蓝帽侧影", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "侧影", "帽子", "长裙", "花束", "手提包"], "kind": "photo", "thumb": "lib/ig/fig-summer-07.jpg", "full": "lib/ig/fig-summer-07.jpg" },
-  { "id": "fig-summer-08", "name": "夏·青裙草帽", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "长裙", "吊带裙", "草帽", "花束"], "kind": "photo", "thumb": "lib/ig/fig-summer-08.jpg", "full": "lib/ig/fig-summer-08.jpg" },
-  { "id": "fig-summer-09", "name": "夏·蓝裙背影", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "背影", "长裙", "草帽", "花束"], "kind": "photo", "thumb": "lib/ig/fig-summer-09.jpg", "full": "lib/ig/fig-summer-09.jpg" },
-  { "id": "fig-summer-10", "name": "夏·咖啡漫步", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "咖啡", "墨镜", "阔腿裤", "散步", "花束"], "kind": "photo", "thumb": "lib/ig/fig-summer-10.jpg", "full": "lib/ig/fig-summer-10.jpg" },
-  { "id": "fig-summer-11", "name": "夏·渔夫帽的她", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "渔夫帽", "眼镜", "长裙", "手提包"], "kind": "photo", "thumb": "lib/ig/fig-summer-11.jpg", "full": "lib/ig/fig-summer-11.jpg" },
-  { "id": "fig-summer-12", "name": "夏·绿衣背影", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "背影", "长裙", "花束", "手提包"], "kind": "photo", "thumb": "lib/ig/fig-summer-12.jpg", "full": "lib/ig/fig-summer-12.jpg" },
-  { "id": "fig-winter-01", "name": "冬·红大衣白围巾", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "冬季", "冬天", "冬装", "大衣", "围巾", "手套", "雪", "松枝"], "kind": "photo", "thumb": "lib/ig/fig-winter-01.jpg", "full": "lib/ig/fig-winter-01.jpg" },
-  { "id": "fig-winter-02", "name": "冬·羽绒服背影", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "冬季", "冬天", "冬装", "羽绒服", "针织帽", "围巾", "背影", "热饮", "雪"], "kind": "photo", "thumb": "lib/ig/fig-winter-02.jpg", "full": "lib/ig/fig-winter-02.jpg" },
-  { "id": "fig-winter-03", "name": "冬·绿大衣格纹围巾", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "冬季", "冬天", "冬装", "大衣", "格纹围巾", "长靴", "侧影", "冬青"], "kind": "photo", "thumb": "lib/ig/fig-winter-03.jpg", "full": "lib/ig/fig-winter-03.jpg" },
+  { "id": "fig-autumn-01", "name": "秋·驼色大衣", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "秋季", "秋天", "秋装", "大衣", "围巾", "枫叶", "咖啡", "短靴"], "kind": "photo", "thumb": "lib/th/fig-autumn-01.jpg", "full": "lib/ig/fig-autumn-01.jpg" },
+  { "id": "fig-autumn-02", "name": "秋·焦糖毛衣格纹裙", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "秋季", "秋天", "秋装", "毛衣", "格纹裙", "背影", "书", "干花"], "kind": "photo", "thumb": "lib/th/fig-autumn-02.jpg", "full": "lib/ig/fig-autumn-02.jpg" },
+  { "id": "fig-autumn-03", "name": "秋·牛仔外套长裙", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "秋季", "秋天", "秋装", "牛仔外套", "长裙", "银杏", "侧影", "帆布包"], "kind": "photo", "thumb": "lib/th/fig-autumn-03.jpg", "full": "lib/ig/fig-autumn-03.jpg" },
+  { "id": "fig-spring-01", "name": "春·粉开衫花裙", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "春季", "春天", "春装", "针织开衫", "碎花裙", "郁金香", "花束"], "kind": "photo", "thumb": "lib/th/fig-spring-01.jpg", "full": "lib/ig/fig-spring-01.jpg" },
+  { "id": "fig-spring-02", "name": "春·风衣白裙背影", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "春季", "春天", "春装", "风衣", "白裙", "樱花", "背影"], "kind": "photo", "thumb": "lib/th/fig-spring-02.jpg", "full": "lib/ig/fig-spring-02.jpg" },
+  { "id": "fig-spring-03", "name": "春·薄荷毛衣白裙", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "春季", "春天", "春装", "毛衣", "白裙", "侧影", "野花", "帆布包"], "kind": "photo", "thumb": "lib/th/fig-spring-03.jpg", "full": "lib/ig/fig-spring-03.jpg" },
+  { "id": "fig-summer-01", "name": "夏·辫子背影花束", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "背影", "麻花辫", "花束", "阔腿裤", "凉鞋"], "kind": "photo", "thumb": "lib/th/fig-summer-01.jpg", "full": "lib/ig/fig-summer-01.jpg" },
+  { "id": "fig-summer-02", "name": "夏·黄裙草帽", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "吊带裙", "长裙", "草帽", "书", "花束"], "kind": "photo", "thumb": "lib/th/fig-summer-02.jpg", "full": "lib/ig/fig-summer-02.jpg" },
+  { "id": "fig-summer-03", "name": "夏·黄丝带粉裙背影", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "背影", "长裙", "草帽", "花束", "丝带"], "kind": "photo", "thumb": "lib/th/fig-summer-03.jpg", "full": "lib/ig/fig-summer-03.jpg" },
+  { "id": "fig-summer-04", "name": "夏·墨镜草帽短裤", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "墨镜", "草帽", "短裤", "衬衫", "凉鞋"], "kind": "photo", "thumb": "lib/th/fig-summer-04.jpg", "full": "lib/ig/fig-summer-04.jpg" },
+  { "id": "fig-summer-05", "name": "夏·花篮蓝裙", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "花篮", "花束", "长裙", "草帽"], "kind": "photo", "thumb": "lib/th/fig-summer-05.jpg", "full": "lib/ig/fig-summer-05.jpg" },
+  { "id": "fig-summer-06", "name": "夏·捧花背影", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "背影", "花束", "长裙"], "kind": "photo", "thumb": "lib/th/fig-summer-06.jpg", "full": "lib/ig/fig-summer-06.jpg" },
+  { "id": "fig-summer-07", "name": "夏·蓝帽侧影", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "侧影", "帽子", "长裙", "花束", "手提包"], "kind": "photo", "thumb": "lib/th/fig-summer-07.jpg", "full": "lib/ig/fig-summer-07.jpg" },
+  { "id": "fig-summer-08", "name": "夏·青裙草帽", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "长裙", "吊带裙", "草帽", "花束"], "kind": "photo", "thumb": "lib/th/fig-summer-08.jpg", "full": "lib/ig/fig-summer-08.jpg" },
+  { "id": "fig-summer-09", "name": "夏·蓝裙背影", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "背影", "长裙", "草帽", "花束"], "kind": "photo", "thumb": "lib/th/fig-summer-09.jpg", "full": "lib/ig/fig-summer-09.jpg" },
+  { "id": "fig-summer-10", "name": "夏·咖啡漫步", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "咖啡", "墨镜", "阔腿裤", "散步", "花束"], "kind": "photo", "thumb": "lib/th/fig-summer-10.jpg", "full": "lib/ig/fig-summer-10.jpg" },
+  { "id": "fig-summer-11", "name": "夏·渔夫帽的她", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "渔夫帽", "眼镜", "长裙", "手提包"], "kind": "photo", "thumb": "lib/th/fig-summer-11.jpg", "full": "lib/ig/fig-summer-11.jpg" },
+  { "id": "fig-summer-12", "name": "夏·绿衣背影", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "夏季", "夏天", "夏装", "背影", "长裙", "花束", "手提包"], "kind": "photo", "thumb": "lib/th/fig-summer-12.jpg", "full": "lib/ig/fig-summer-12.jpg" },
+  { "id": "fig-winter-01", "name": "冬·红大衣白围巾", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "冬季", "冬天", "冬装", "大衣", "围巾", "手套", "雪", "松枝"], "kind": "photo", "thumb": "lib/th/fig-winter-01.jpg", "full": "lib/ig/fig-winter-01.jpg" },
+  { "id": "fig-winter-02", "name": "冬·羽绒服背影", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "冬季", "冬天", "冬装", "羽绒服", "针织帽", "围巾", "背影", "热饮", "雪"], "kind": "photo", "thumb": "lib/th/fig-winter-02.jpg", "full": "lib/ig/fig-winter-02.jpg" },
+  { "id": "fig-winter-03", "name": "冬·绿大衣格纹围巾", "topic": "水彩类", "style": "手绘水彩", "kw": ["水彩人物", "人物", "女子", "冬季", "冬天", "冬装", "大衣", "格纹围巾", "长靴", "侧影", "冬青"], "kind": "photo", "thumb": "lib/th/fig-winter-03.jpg", "full": "lib/ig/fig-winter-03.jpg" },
   { "id": "wc-autumn-leaves", "name": "秋叶小径", "topic": "四季", "style": "手绘水彩", "kw": ["秋天", "秋季", "红叶", "长椅", "小路"], "kind": "photo", "thumb": "lib/ig/wc-autumn-leaves.jpg", "full": "lib/ig/wc-autumn-leaves.jpg" },
   { "id": "wc-bookshop", "name": "街角书店", "topic": "街道", "style": "手绘水彩", "kw": ["书店", "街角", "自行车", "花"], "kind": "photo", "thumb": "lib/ig/wc-bookshop.jpg", "full": "lib/ig/wc-bookshop.jpg" },
   { "id": "wc-cat-eating", "name": "吃饭的橘猫", "topic": "猫咪", "style": "手绘水彩", "kw": ["猫", "橘猫", "吃饭"], "kind": "photo", "thumb": "lib/ig/wc-cat-eating.jpg", "full": "lib/ig/wc-cat-eating.jpg" },
@@ -993,63 +981,6 @@ var PUB_LIB = [
   { "id": "ig-markizon-18457562959193893", "name": "壁炉秋窗咖啡", "topic": "场景视频", "style": "视频", "kw": ["雨天", "咖啡", "治愈", "氛围"], "kind": "video", "thumb": "lib/ig/ig-markizon-18457562959193893-poster.jpg", "full": "lib/ig/ig-markizon-18457562959193893.mp4", "poster": "lib/ig/ig-markizon-18457562959193893-poster.jpg", "dur": 9.6 }
 ];
 var PUB_TOPICS = ["四季", "天气", "心情", "节日", "城市", "街道", "自然", "风景", "食物咖啡", "建筑", "环境", "空间", "猫咪", "水彩类", "咖啡书籍", "文具", "家居", "街景", "书角桌面", "人物手绘", "水彩手绘", "场景视频"];
-
-var pubLibTopic = null; /* null=全部，否则为分类名 */
-function pubLibList() { return pubLibTopic === null ? PUB_LIB : PUB_LIB.filter(function (it) { return it.topic === pubLibTopic; }); }
-function renderPubLib() {
-  var cats = document.getElementById("pubLibCats");
-  cats.innerHTML = "";
-  var counts = {};
-  PUB_LIB.forEach(function (it) { counts[it.topic] = (counts[it.topic] || 0) + 1; });
-  var opts = [{ t: null, n: "全部" }].concat(PUB_TOPICS.map(function (t) { return { t: t, n: t }; }));
-  opts.forEach(function (o) {
-    var b = document.createElement("button");
-    b.type = "button";
-    b.className = (pubLibTopic === o.t) ? "on" : "";
-    b.textContent = o.n + " " + (o.t === null ? PUB_LIB.length : counts[o.t]);
-    b.addEventListener("click", function () { pubLibTopic = o.t; renderPubLib(); });
-    cats.appendChild(b);
-  });
-  var grid = document.getElementById("pubLibGrid");
-  grid.innerHTML = "";
-  var list = pubLibList();
-  var photos = list.filter(function (it) { return it.kind !== "video"; }).length;
-  var videos = list.length - photos;
-  document.getElementById("pubLibCount").textContent = "共 " + list.length + " 条" + (pubLibTopic ? " · " + pubLibTopic : "：333 张照片、21 个场景视频") + (pubLibTopic ? ("（" + photos + " 张照片、" + videos + " 个视频）") : "");
-  list.forEach(function (it, idx) {
-    var b = document.createElement("button");
-    b.type = "button";
-    b.className = "lib-cell";
-    var im = document.createElement("img");
-    im.src = it.thumb;
-    im.alt = it.name;
-    im.loading = "lazy";
-    im.decoding = "async";
-    b.appendChild(im);
-    if (it.kind === "video") {
-      var pl = document.createElement("span");
-      pl.className = "play";
-      pl.textContent = "▶";
-      b.appendChild(pl);
-      if (it.dur) {
-        var du = document.createElement("span");
-        du.className = "dur";
-        du.textContent = Math.round(it.dur) + "″";
-        b.appendChild(du);
-      }
-    }
-    var nm = document.createElement("span");
-    nm.className = "nm";
-    nm.textContent = it.name;
-    b.appendChild(nm);
-    b.addEventListener("click", function () {
-      var lb = list.map(function (x) { return { kind: x.kind, full: x.full, poster: x.poster, cap: x.name }; });
-      openLightbox(lb, idx);
-    });
-    grid.appendChild(b);
-  });
-}
-renderPubLib();
 
 /* ---- 日历渲染 ---- */
 var viewY, viewM, selected;
@@ -1493,12 +1424,12 @@ function renderEmojiSheet() {
 document.getElementById("emojiMask").addEventListener("click", closeEmojiSheet);
 /* 配图库面板（与表情面板同一套浮层）：一张一张点着选，可多选，
    选中顺序就是插入顺序；点「完成」把选中的一起插进照片组。
-   只有水彩类一个主题，里面按服装分春夏秋冬（与空间日记一致）。 */
-var libSeason = null; /* null=全部，春/夏/秋/冬 */
+   全量 354 条，按分类（与打卡文案一样）筛选。 */
+var libTopic = null; /* null=全部，否则为分类名 */
 var libPicked = []; /* 按点选先后排的 id */
 function openLibSheet() {
   libPicked = [];
-  libSeason = null;
+  libTopic = null;
   renderLibSheet();
   document.getElementById("libSheet").classList.add("open");
 }
@@ -1508,27 +1439,23 @@ function closeLibSheet() {
 function renderLibSheet() {
   var cats = document.getElementById("libCats");
   cats.innerHTML = "";
-  var b = document.createElement("button");
-  b.type = "button";
-  b.className = "on";
-  b.textContent = "水彩类";
-  cats.appendChild(b);
-  var seasons = document.getElementById("libSeasons");
-  seasons.innerHTML = "";
-  var opts = [null, "春", "夏", "秋", "冬"];
-  var labels = { "null": "全部", "春": "春", "夏": "夏", "秋": "秋", "冬": "冬" };
-  opts.forEach(function (s) {
-    var sb = document.createElement("button");
-    sb.type = "button";
-    sb.className = (libSeason === s) ? "on" : "";
-    sb.textContent = labels[String(s)];
-    sb.addEventListener("click", function () { libSeason = s; renderLibSheet(); });
-    seasons.appendChild(sb);
+  var counts = {};
+  PUB_LIB.forEach(function (it) { counts[it.topic] = (counts[it.topic] || 0) + 1; });
+  var opts = [{ t: null, n: "全部" }].concat(PUB_TOPICS.map(function (t) { return { t: t, n: t }; }));
+  opts.forEach(function (o) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = (libTopic === o.t) ? "on" : "";
+    b.textContent = o.n + " " + (o.t === null ? PUB_LIB.length : counts[o.t]);
+    b.addEventListener("click", function () { libTopic = o.t; renderLibSheet(); });
+    cats.appendChild(b);
   });
   var grid = document.getElementById("libGrid");
   grid.innerHTML = "";
-  var list = LIB_FIG.filter(function (it) { return libSeason === null || it.season === libSeason; });
-  document.getElementById("libCount").textContent = "共 " + list.length + " 张图";
+  var list = libTopic === null ? PUB_LIB : PUB_LIB.filter(function (it) { return it.topic === libTopic; });
+  var photos = list.filter(function (it) { return it.kind !== "video"; }).length;
+  var videos = list.length - photos;
+  document.getElementById("libCount").textContent = "共 " + list.length + " 条（" + photos + " 张照片、" + videos + " 个视频）";
   list.forEach(function (it) {
     var cell = document.createElement("button");
     cell.type = "button";
@@ -1539,6 +1466,18 @@ function renderLibSheet() {
     img.loading = "lazy";
     img.draggable = false;
     cell.appendChild(img);
+    if (it.kind === "video") {
+      var pl = document.createElement("span");
+      pl.className = "play";
+      pl.textContent = "▶";
+      cell.appendChild(pl);
+      if (it.dur) {
+        var du = document.createElement("span");
+        du.className = "dur";
+        du.textContent = Math.round(it.dur) + "″";
+        cell.appendChild(du);
+      }
+    }
     var nm = document.createElement("span");
     nm.className = "nm";
     nm.textContent = it.name;
@@ -1558,15 +1497,15 @@ function renderLibSheet() {
     cell.addEventListener("pointerdown", function (ev) { startLibDrag(ev, it); });
     grid.appendChild(cell);
   });
-}
-document.getElementById("edLibBtn").addEventListener("click", openLibSheet);
+}document.getElementById("edLibBtn").addEventListener("click", openLibSheet);
 document.getElementById("libMask").addEventListener("click", closeLibSheet);
 document.getElementById("libDoneBtn").addEventListener("click", function () {
   var picked = libPicked.map(function (id) {
-    return LIB_FIG.filter(function (x) { return x.id === id; })[0];
+    return PUB_LIB.filter(function (x) { return x.id === id; })[0];
   }).filter(function (x) { return !!x; });
   picked.forEach(function (it) {
-    edState.photos.push({ kind: "photo", src: it.full, cap: it.name });
+    if (it.kind === "video") edState.photos.push({ kind: "video", src: it.full, poster: it.poster || "", duration: it.dur || null, cap: it.name });
+    else edState.photos.push({ kind: "photo", src: it.full, cap: it.name });
   });
   if (picked.length > 0) renderPhotoThumbs();
   closeLibSheet();
@@ -1661,7 +1600,8 @@ function startLibDrag(e, item) {
     if (!wasActive) return; /* 没拖起来，就是一次普通点选 */
     swallowNextClick();
     if (zone) {
-      edState.photos.push({ kind: "photo", src: st.item.full, cap: st.item.name });
+      if (st.item.kind === "video") edState.photos.push({ kind: "video", src: st.item.full, poster: st.item.poster || "", duration: st.item.dur || null, cap: st.item.name });
+      else edState.photos.push({ kind: "photo", src: st.item.full, cap: st.item.name });
       renderPhotoThumbs();
     } else {
       /* 落到别处：取消，图库重新打开，恢复原样。 */
