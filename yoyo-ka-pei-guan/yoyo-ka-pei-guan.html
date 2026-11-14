@@ -216,7 +216,7 @@
         .cafe .time-switch { margin-top: 14px; margin-bottom: 6px; }
       }
 
-      /* ---- 九个场景 ---- */
+      /* ---- 十一个场景 ---- */
       .cafe .scenes-title {
         font-weight: 900;
         font-size: clamp(22px, 4.5vw, 30px);
@@ -366,7 +366,7 @@
         </div>
 
         <div class="scenes-block">
-          <h2 class="scenes-title">九个场景</h2>
+          <h2 class="scenes-title">十一个场景</h2>
           <div class="scenes" id="scenes" aria-label="店里的场景，点一张换到上方大图，长按拖动可以换位置"></div>
         </div>
 
@@ -387,7 +387,9 @@
         { id: "windowseat", name: "窗边",     alt: "窗边 — YOYO 坐在窗边捧着拿铁", wide: false, thumbW: 800, thumbH: 533, fullH: 853 },
         { id: "entrance",   name: "入口转角", alt: "入口转角 — YOYO 在拱门入口里挥手迎客", wide: false, thumbW: 800, thumbH: 533, fullH: 853 },
         { id: "streetside", name: "街边外摆", alt: "街边外摆 — 远景：咖啡馆在左侧，街道向右远方延伸，YOYO 端着咖啡站在沿街一长排外摆桌椅之间", wide: true, thumbW: 1200, thumbH: 800, fullH: 853 },
-        { id: "terrace",    name: "长街远景", alt: "长街远景 — 反方向远景：咖啡馆在右侧，石板长街向左远方延伸，YOYO 在桌边倒咖啡", wide: true, thumbW: 1200, thumbH: 514, fullH: 549 }
+        { id: "terrace",    name: "长街远景", alt: "长街远景 — 反方向远景：咖啡馆在右侧，石板长街向左远方延伸，YOYO 在桌边倒咖啡", wide: true, thumbW: 1200, thumbH: 514, fullH: 549 },
+        { id: "snow-day",   name: "平时下雪", alt: "平时下雪 — YOYO 站在绿色大窗边捧热咖啡看雪，窗户玻璃上有雪花和结冰霜花", wide: false, thumbW: 800, thumbH: 533, fullH: 853 },
+        { id: "snow-christmas", name: "圣诞下雪", alt: "圣诞下雪 — 店外夜景，YOYO 在门口端热可可，圣诞老人背礼物袋招手，雪人、圣诞树和礼物盒", wide: false, thumbW: 800, thumbH: 533, fullH: 853 }
       ];
       var byId = {};
       SCENES.forEach(function (s) { byId[s.id] = s; });
