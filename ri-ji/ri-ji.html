@@ -1437,6 +1437,23 @@ function openLibSheet() {
 function closeLibSheet() {
   document.getElementById("libSheet").classList.remove("open");
 }
+var libImgObserver = null;
+/* 配图库图片预加载：滚动容器（.panel）内提前 1200px 开始加载，
+   替代原生 loading=lazy（手机上触发太晚、快滑时图跟不上）。 */
+function ensureLibImgObserver() {
+  if (libImgObserver) return libImgObserver;
+  var panel = document.querySelector("#libSheet .panel");
+  if (!("IntersectionObserver" in window) || !panel) return null;
+  libImgObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      var im = en.target;
+      if (im.dataset.src) { im.src = im.dataset.src; delete im.dataset.src; }
+      libImgObserver.unobserve(im);
+    });
+  }, { root: panel, rootMargin: "1200px 0px 1200px 0px", threshold: 0 });
+  return libImgObserver;
+}
 function renderLibSheet() {
   var cats = document.getElementById("libCats");
   cats.innerHTML = "";
@@ -1453,19 +1470,25 @@ function renderLibSheet() {
   });
   var grid = document.getElementById("libGrid");
   grid.innerHTML = "";
+  if (libImgObserver) libImgObserver.disconnect();
   var list = libTopic === null ? PUB_LIB : PUB_LIB.filter(function (it) { return it.topic === libTopic; });
   var photos = list.filter(function (it) { return it.kind !== "video"; }).length;
   var videos = list.length - photos;
   document.getElementById("libCount").textContent = "共 " + list.length + " 条（" + photos + " 张照片、" + videos + " 个视频）";
-  list.forEach(function (it) {
+  list.forEach(function (it, idx) {
     var cell = document.createElement("button");
     cell.type = "button";
     cell.className = "lib-cell" + (libPicked.indexOf(it.id) >= 0 ? " picked" : "");
     var img = document.createElement("img");
-    img.src = it.thumb;
     img.alt = it.name;
-    img.loading = "lazy";
+    img.decoding = "async";
     img.draggable = false;
+    if (idx < 9) { img.src = it.thumb; }
+    else {
+      img.dataset.src = it.thumb;
+      var ob = ensureLibImgObserver();
+      if (ob) ob.observe(img); else img.src = it.thumb;
+    }
     cell.appendChild(img);
     if (it.kind === "video") {
       var pl = document.createElement("span");
