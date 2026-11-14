@@ -1,0 +1,1451 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" type="image/jpeg" href="assets/coffee.jpg" />
+    <link rel="preload" as="image" href="assets/coffee.jpg" fetchpriority="high" />
+    <title>YOYO小屋</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@600;900&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        --bg:#f6efe3;
+        --surface:#fffaf0;
+        --surface-2:#fdf3df;
+        --ink:#2e2118;
+        --ink-soft:#6f5b49;
+        --line:#e3d3b8;
+        --coral:#d94f30;
+        --coral-deep:#b93c20;
+        --blue:#2456a6;
+        --green:#24503c;
+        --green-deep:#173628;
+        --green-ink:#eaf3e4;
+        --gold:#e9a13b;
+        --shadow:0 10px 30px rgba(84,52,20,.14);
+        --radius:18px;
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --bg:#1c1510;
+          --surface:#2a2019;
+          --surface-2:#332619;
+          --ink:#f3e8d8;
+          --ink-soft:#c9b299;
+          --line:#4a3826;
+          --coral:#f0714d;
+          --coral-deep:#f0714d;
+          --blue:#7ea6e8;
+          --green:#2c5c46;
+          --green-deep:#12241b;
+          --shadow:0 10px 30px rgba(0,0,0,.45);
+        }
+      }
+      *{box-sizing:border-box}
+      html{scroll-behavior:smooth}
+      body{
+        margin:0;background:var(--bg);color:var(--ink);
+        font-family:"Noto Sans SC",system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+        line-height:1.65;
+      }
+      button{font:inherit;min-height:44px;cursor:pointer}
+      img{display:block;max-width:100%}
+      .wrap{max-width:1060px;margin:0 auto;padding:0 16px 148px}
+
+      /* ---------- 头部（已下移到全景图下方） ---------- */
+      header{padding:32px 0 6px}
+      .title-line{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:12px}
+      /* 绿色时间徽标与 YOYO 小字描述同一行，徽标靠右 */
+      .tagline-row{display:flex;flex-wrap:nowrap;align-items:center;gap:8px 18px;margin-top:6px}
+      .tagline-row .tagline{margin:0;flex:1 1 auto;min-width:0}
+      .tagline-row .clock-chip{flex:none}
+      h1{
+        font-family:"Noto Serif SC",serif;font-weight:900;
+        font-size:clamp(30px,6vw,44px);line-height:1.15;margin:0;letter-spacing:.02em;
+      }
+      h1 .accent{color:var(--coral)}
+      .tagline{margin:6px 0 0;color:var(--ink-soft);font-size:16px}
+      .clock-chip{
+        margin-left:auto;display:inline-flex;align-items:center;gap:6px;
+        background:var(--green);color:var(--green-ink);
+        border-radius:999px;padding:5px 12px;font-size:12px;font-weight:700;
+      }
+      .clock-chip .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex:none}
+
+      /* ---------- 房间舞台：左右与下方内容边框对齐，不满屏 ---------- */
+      .stage{
+        margin:24px auto 0;border-radius:var(--radius);overflow:hidden;position:relative;
+        box-shadow:var(--shadow);border:1px solid var(--line);background:#3a2a1a;
+        width:min(1028px,calc(100% - 32px));
+      }
+      .stage img.stage-main{width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:center;display:block;transition:opacity .35s ease,filter .8s ease}
+      /* 电脑端（只认带鼠标的电脑：宽屏 + hover + 精细指针）：首图放大一档并上移一点，
+         宽度不加宽——仍是 1028px，与下方 .wrap 内容区（1060 - 左右各 16px 内边距）
+         同宽、同为居中，左右两边正好与「十二个休闲角落」两张图的边框对齐；
+         放大靠改高：比例由 12/5 改为约 1.86/1，1028px 宽时高约 552px；
+         顶部上边距保持 61px 不动，只加高图片、下边往下移约 1 厘米，
+         下面的标题、YOYO 小字、绿色时间徽标随文档流一起下移约 1 厘米。
+         平板横屏是触摸设备（coarse 指针、无 hover）、宽度也会过 1024，
+         所以不能只按宽度分——这条规则平板横屏和平板竖屏、手机都不会命中，定版不动 */
+      @media (min-width:1024px) and (hover:hover) and (pointer:fine){
+        .stage{margin-top:61px}
+        /* 文字块（标题、YOYO 小字、绿色时间徽标）再往下移 1 厘米：只加大首图与标题之间的间距，
+           首图顶部和下边都不动——header 上内边距由 32px 加到 70px（+38px） */
+        header{padding-top:70px}
+        .stage img.stage-main{aspect-ratio:1.86/1}
+        .corners-title{margin-top:137px}
+        .tagline-row .tagline{flex:0 1 auto}
+        /* 绿色时间徽标先从与 YOYO 小字居中同一行往下挪 8px（底边贴 17:11 截图红线），
+           17:20 截图她说落得太低了，从这个位置再往上挪 7mm（约 26px）；
+           17:26 截图她说又太高了，从上移后的位置再往下挪 3mm：
+           transform 用 calc(8px - 7mm + 3mm)，合计相对居中位置往上约 7px。
+           用 transform 只挪徽标本身：
+           小字位置、徽标右边距 132px、大小、颜色、圆角都不变，下面的版面也不受影响。
+           只在这条电脑端规则里，平板横屏那条 coarse 规则和手机、平板竖屏都不命中 */
+        .tagline-row .clock-chip{margin-right:132px;transform:translateY(calc(8px - 7mm + 3mm))}
+      }
+      /* 平板横屏（触摸设备、横向）：绿色时间徽标在右边缘与首图右边缘齐平的基础上
+         再往左移 3 毫米（约 11px，右边距 0 → 11px），
+         并与 YOYO 小字第一行在同一条水平线上——
+         按 05:33 平板横屏截图（1586×1035）实测：首图右边缘 x≈1561、徽标右边缘 x≈1422，
+         还差约 139 图像素；首图宽约 1038 图像素，139 ÷ 1038 × 首图 CSS 宽（约 761px）
+         ≈ 102 CSS 像素，正好是原来的右边距 102px。几何上也对得上：首图宽
+         min(1028px, 100%−32px) 居中、.wrap 内容区同宽居中，两者右边缘本就重合，
+         所以右边距收到 0，徽标右边缘就与首图右边缘完全齐平。
+         垂直方向：原来 .tagline-row 是 align-items:center，徽标居中在两行小字中间
+         （截图里徽标中心比第一行中心低约 17 图像素）；改成顶部对齐后徽标上移约
+         11.5 CSS 像素（半行高），中心正好落到第一行中心线上。
+         YOYO 小字保持原宽（flex:0 1 auto），位置不动。
+         17:40 她看平板横屏截图后定：绿色徽标再从这个位置往上挪 2.5 毫米——
+         用 transform:translateY(-2.5mm) 只挪徽标本身，右边距仍是 11px，
+         YOYO 小字不动，徽标大小、颜色、圆角都不变，下面的版面也不受影响。
+         只命中平板横屏：电脑端是 hover + 精细指针且有自己 132px 的定版规则，
+         手机和平板竖屏是竖向（portrait），都不会命中；首图、房间标题不动 */
+      @media (min-width:720px) and (max-width:1400px) and (orientation:landscape) and (pointer:coarse){
+        .tagline-row{align-items:flex-start}
+        .tagline-row .tagline{flex:0 1 auto}
+        .tagline-row .clock-chip{margin-right:11px;transform:translateY(-2.5mm)}
+      }
+      .stage img.stage-main.fading{opacity:.25}
+      .stage[data-period="morning"] img.stage-main{filter:brightness(1.06) saturate(1.04)}
+      .stage[data-period="afternoon"] img.stage-main{filter:brightness(1.02)}
+      .stage[data-period="dusk"] img.stage-main{filter:brightness(.94) sepia(.20)}
+      .stage[data-period="night"] img.stage-main{filter:brightness(.76) saturate(.92)}
+      .stage .tint{position:absolute;inset:0;pointer-events:none;transition:background .8s ease}
+      .stage[data-period="morning"] .tint{background:linear-gradient(180deg,rgba(255,196,110,.10),rgba(255,170,80,.05))}
+      .stage[data-period="afternoon"] .tint{background:linear-gradient(180deg,rgba(255,220,150,.06),rgba(0,0,0,0))}
+      .stage[data-period="dusk"] .tint{background:radial-gradient(ellipse 55% 40% at 16% 6%,rgba(255,170,80,.20),rgba(255,170,80,0) 62%),linear-gradient(180deg,rgba(255,120,60,.16),rgba(90,40,90,.12))}
+      .stage[data-period="night"] .tint{background:radial-gradient(ellipse 55% 42% at 16% 4%,rgba(255,178,92,.30),rgba(255,178,92,0) 62%),linear-gradient(180deg,rgba(20,26,66,.34),rgba(10,10,40,.22))}
+      .stage-top{
+        position:absolute;top:12px;left:12px;right:12px;
+        display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:flex-start;
+      }
+      /* 首图上的时段/天气标签：与咖啡馆首图天气小条同一套——
+         只留蒙层：白色半透明底 rgba(255,255,255,0.18)，无 backdrop-filter 模糊；边框线透明；
+         字体继承正文 Noto Sans SC、13px、淡米黄 #ffeec2，配同样的深色柔和文字阴影 */
+      .period-badge{
+        background:rgba(255,255,255,.18);color:#ffeec2;border:1px solid transparent;border-radius:999px;
+        padding:8px 14px;font-size:13px;
+        text-shadow:0 1px 3px rgba(0,0,0,.45),0 0 10px rgba(0,0,0,.18);
+      }
+
+      .light-bar{
+        display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px;
+      }
+      .light-bar .label{font-size:14px;color:var(--ink-soft);font-weight:700;margin-right:2px}
+      .light-btn{
+        border:1.5px solid var(--line);background:var(--surface);color:var(--ink);
+        border-radius:999px;padding:8px 18px;font-weight:700;font-size:15px;
+      }
+      .light-btn[aria-pressed="true"]{background:var(--coral);border-color:var(--coral);color:#fff}
+      .auto-status{font-size:14px;color:var(--ink-soft)}
+
+      /* ---------- 十二个角落 ---------- */
+      h2{
+        font-family:"Noto Serif SC",serif;font-weight:900;
+        font-size:clamp(22px,4.5vw,30px);margin:28px 0 4px;
+      }
+      .section-note{color:var(--ink-soft);margin:0 0 16px;font-size:15px}
+      /* 只收紧「十二个休闲角落」标题到首行卡片的间距：标题不动，卡片上移贴近标题 */
+      .corners-note{margin-bottom:4px}
+      /* 手机端（≤560px）：「十二个休闲角落」整块上移到红圈下沿——标题上边距由 66px 收到 50px（−16px），
+         按她 05:12 截图实测：红圈下沿到标题顶原差约 18px，收后标题紧贴红圈下沿、这段空白收掉；
+         说明小字和所有角落图片随文档流一起上移；平板竖屏/横屏宽度都大于 560px 不命中，
+         电脑端 137px 的定版规则在 min-width:1024px 里、也不受影响；首图、房间标题、YOYO 小字、时间徽标不动 */
+      @media (max-width:560px){
+        .corners-title{margin-top:50px}
+      }
+      .corners{display:grid;grid-template-columns:1fr;gap:16px}
+      /* 咖啡角 + 阅读角固定左右并排一行，窄屏也不上下叠 */
+      .corner-pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;grid-column:1/-1}
+      @media (max-width:560px){
+        .corner-pair{gap:10px}
+        .corner-pair .corner-body{padding:12px 12px 14px}
+        .corner-pair .corner .corner-name{left:8px;bottom:8px}
+      }
+      @media (min-width:720px){
+        .corners{grid-template-columns:1fr 1fr}
+        .corner-wide{grid-column:1/-1;flex-direction:row}
+        .corner-wide figure{flex:1.15}
+        .corner-wide figure img{height:100%;aspect-ratio:auto}
+        .corner-wide .corner-body{flex:1;justify-content:center}
+      }
+      .corner{
+        background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+        overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;
+      }
+      .corner.active{outline:3px solid var(--coral);outline-offset:-1px}
+      .corner figure{margin:0;position:relative}
+      .corner figure img{width:100%;aspect-ratio:1/1;object-fit:cover}
+      /* 休息角用整张横图，沙发完整露出、不切底部 */
+      #corner-sleep figure img{aspect-ratio:3/2;object-fit:cover}
+      /* 咖啡角、阅读角两张图改用稍矮的 4/3，并排成一行时整行更矮，
+         标题下方一屏内能同时看全两张，不用再滚动 */
+      #corner-coffee figure img,#corner-reading figure img{aspect-ratio:4/3}
+      /* 角落名标签（十二个角落全用这一条）：与咖啡馆场景名标签、首图天气小条同一套——
+         只留蒙层：白色半透明底 rgba(255,255,255,0.18)，无 backdrop-filter 模糊；边框线透明；
+         字体继承正文 Noto Sans SC（不再用衬线）、细字（常规 400，不加粗）、13px、淡米黄 #ffeec2，
+         配同样的深色柔和文字阴影；框收紧：内边距 1px 6px、圆角 999px，与咖啡馆一致 */
+      .corner .corner-name{
+        position:absolute;left:12px;bottom:12px;background:rgba(255,255,255,.18);color:#ffeec2;
+        border:1px solid transparent;border-radius:999px;
+        font-weight:400;font-size:13px;padding:1px 6px;
+        text-shadow:0 1px 3px rgba(0,0,0,.45),0 0 10px rgba(0,0,0,.18);
+      }
+      .corner-body{padding:14px 16px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+      .corner-body p{margin:0;font-size:15px}
+      .corner-body .line{color:var(--ink-soft);font-size:14px}
+      .go-btn{
+        align-self:flex-start;border:none;border-radius:999px;
+        background:var(--green);color:#fff;font-weight:800;padding:9px 20px;font-size:15px;
+      }
+      .corner.active .go-btn{background:var(--coral)}
+      .play-area{border-top:1px dashed var(--line);padding-top:12px;display:flex;flex-direction:column;gap:10px}
+      .play-title{font-size:13px;font-weight:900;color:var(--ink-soft);letter-spacing:.06em}
+      .chips{display:flex;flex-wrap:wrap;gap:8px}
+      .chip{
+        border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink);
+        border-radius:999px;padding:7px 16px;font-weight:700;font-size:14px;
+      }
+      .chip[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+      .action-btn{
+        align-self:flex-start;border:none;border-radius:999px;background:var(--gold);
+        color:#3a2405;font-weight:900;padding:9px 22px;font-size:15px;
+      }
+      .action-btn.playing{background:var(--coral);color:#fff}
+      .result{
+        background:var(--surface-2);border-radius:12px;padding:10px 14px;font-size:14.5px;min-height:48px;
+      }
+      .result b{color:var(--coral-deep)}
+      @media (prefers-color-scheme: dark){ .result b{color:#f0855f} }
+      .book-title{font-family:"Noto Serif SC",serif;font-weight:900;font-size:17px}
+      .droplets{display:inline-flex;gap:5px;margin-left:8px;vertical-align:middle}
+      .droplets i{
+        width:8px;height:12px;border-radius:50% 50% 60% 60%;
+        background:#5ea9dd;display:inline-block;opacity:0;
+      }
+      .watering .droplets i{animation:drop .7s ease forwards}
+      .droplets i:nth-child(2){animation-delay:.12s}
+      .droplets i:nth-child(3){animation-delay:.24s}
+      @keyframes drop{0%{opacity:0;transform:translateY(-8px)}60%{opacity:1}100%{opacity:.9;transform:translateY(3px)}}
+      @media (prefers-reduced-motion: reduce){
+        .watering .droplets i{animation:none;opacity:.9}
+        html{scroll-behavior:auto}
+        .stage img.stage-main{transition:none}
+      }
+
+      /* ---------- 清单区 ---------- */
+      .inventory{
+        margin-top:44px;background:var(--green-deep);color:var(--green-ink);
+        border-radius:24px;padding:24px 20px 26px;
+      }
+      .inventory h2{margin-top:0;color:#ffe9c4}
+      .inventory .section-note{color:#bcd2bd}
+      .inv-grid{display:grid;grid-template-columns:1fr;gap:20px}
+      @media (min-width:720px){ .inv-grid{grid-template-columns:1fr 1fr} }
+      .inv-grid h3{margin:0 0 10px;font-size:17px;color:#ffd98f}
+      ul.have{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+      ul.have li{
+        background:rgba(255,255,255,.07);border-radius:10px;padding:8px 14px;font-size:15px;
+        display:flex;gap:10px;align-items:baseline;
+      }
+      ul.have li::before{content:"✓";color:var(--gold);font-weight:900;flex:none}
+      .wish-chips{display:flex;flex-wrap:wrap;gap:8px}
+      .wish{
+        border:1.5px solid rgba(255,233,196,.45);background:transparent;color:var(--green-ink);
+        border-radius:999px;padding:8px 16px;font-weight:700;font-size:14.5px;
+      }
+      .wish[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#3a2405}
+      .wish-summary{margin:14px 0 0;font-size:15px;color:#ffe9c4;min-height:26px}
+
+      /* ---------- 窗外天气：跟着真实天气变 ---------- */
+      .stage-top{z-index:5}
+      .stage-chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+      .fest-badge{background:#b3231a;color:#ffe9c4}
+      .wx-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+      .wx-wash{position:absolute;inset:0;transition:background .8s ease}
+      .stage[data-wx="rain"] .wx-wash{background:linear-gradient(180deg,rgba(70,95,130,.20),rgba(50,70,100,.10))}
+      .stage[data-wx="storm"] .wx-wash{background:linear-gradient(180deg,rgba(45,55,95,.30),rgba(30,40,70,.16))}
+      .stage[data-wx="snow"] .wx-wash{background:linear-gradient(180deg,rgba(230,240,250,.16),rgba(210,225,245,.06))}
+      .stage[data-wx="overcast"] .wx-wash{background:linear-gradient(180deg,rgba(120,125,135,.16),rgba(100,105,115,.07))}
+      .stage[data-wx="fog"] .wx-wash{background:linear-gradient(180deg,rgba(225,228,230,.22),rgba(215,218,220,.12))}
+      .stage[data-wx="clear"] .wx-wash{background:radial-gradient(ellipse 60% 45% at 82% 0%,rgba(255,205,110,.20),rgba(255,205,110,0) 65%)}
+      /* 天气特效只落在舞台上半部（窗外那片），下半部室内只留淡淡的光影 */
+      .wx-fx{
+        position:absolute;left:0;right:0;top:0;height:54%;overflow:hidden;
+        -webkit-mask-image:linear-gradient(180deg,#000 70%,transparent 100%);
+        mask-image:linear-gradient(180deg,#000 70%,transparent 100%);
+      }
+      .wx-drop{
+        position:absolute;top:-90px;width:2px;height:56px;border-radius:2px;
+        background:linear-gradient(180deg,rgba(190,220,250,0),rgba(190,220,250,.85));
+        transform:rotate(11deg);animation:wxFall linear infinite;
+      }
+      @keyframes wxFall{to{transform:rotate(11deg) translateY(360px)}}
+      .wx-flake{
+        position:absolute;top:-14px;border-radius:50%;background:rgba(255,255,255,.92);
+        box-shadow:0 0 6px rgba(255,255,255,.6);animation:wxSnow linear infinite;
+      }
+      @keyframes wxSnow{0%{transform:translate(0,-14px)}50%{transform:translate(14px,180px)}100%{transform:translate(-8px,360px)}}
+      .wx-sun{
+        position:absolute;top:-46px;right:-46px;width:190px;height:190px;border-radius:50%;
+        background:radial-gradient(circle,rgba(255,214,120,.85) 0%,rgba(255,190,90,.35) 42%,rgba(255,190,90,0) 70%);
+        animation:wxSunPulse 5s ease-in-out infinite alternate;
+      }
+      @keyframes wxSunPulse{from{opacity:.75}to{opacity:1}}
+      .wx-star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:.7;animation:wxTwinkle 2.6s ease-in-out infinite alternate}
+      @keyframes wxTwinkle{from{opacity:.25}to{opacity:.95}}
+      .wx-cloud{
+        position:absolute;height:44px;border-radius:999px;background:rgba(240,242,246,.5);
+        filter:blur(10px);animation:wxDrift linear infinite;
+      }
+      .stage[data-wx="overcast"] .wx-cloud{background:rgba(160,165,175,.55)}
+      @keyframes wxDrift{from{transform:translateX(-26%)}to{transform:translateX(55%)}}
+      .wx-fogband{
+        position:absolute;left:-10%;width:120%;height:52px;border-radius:50%;
+        background:rgba(235,238,240,.35);filter:blur(14px);animation:wxFog 9s ease-in-out infinite alternate;
+      }
+      @keyframes wxFog{from{transform:translateX(-2%)}to{transform:translateX(2%)}}
+      .wx-flash{position:absolute;inset:0;background:rgba(240,244,255,.85);opacity:0;animation:wxFlash 8s linear infinite}
+      @keyframes wxFlash{0%,91%,94.5%,100%{opacity:0}92.5%{opacity:.55}93.5%{opacity:.1}}
+
+      /* ---------- 节日装饰：圣诞彩灯、春节窗花 ---------- */
+      .fest-layer{position:absolute;inset:0;pointer-events:none;z-index:2;display:none}
+      .stage[data-fest="xmas"] .fest-xmas{display:block}
+      .stage[data-fest="spring"] .fest-spring{display:block}
+      .fest-xmas svg.wire{position:absolute;top:0;left:0;width:100%;height:72px}
+      .bulb{
+        position:absolute;width:11px;height:11px;border-radius:50%;transform:translate(-50%,0);
+        animation:bulbTwinkle 1.5s ease-in-out infinite alternate;
+      }
+      .bulb::before{
+        content:"";position:absolute;left:50%;top:-6px;width:2px;height:6px;
+        background:rgba(30,40,25,.65);transform:translateX(-50%);
+      }
+      @keyframes bulbTwinkle{from{opacity:.55;filter:brightness(.75)}to{opacity:1;filter:brightness(1.15)}}
+      .paper-cut{position:absolute;top:46px;width:86px;height:86px;opacity:.96;filter:drop-shadow(0 3px 6px rgba(60,10,5,.35))}
+      .paper-cut.left{left:14px}
+      .paper-cut.right{right:14px}
+      .fu{
+        position:absolute;top:48px;left:50%;width:76px;height:76px;margin-left:-38px;
+        background:#c8231c;border:2.5px solid #f0c569;border-radius:10px;
+        transform:rotate(45deg);display:flex;align-items:center;justify-content:center;
+        box-shadow:0 4px 12px rgba(60,10,5,.35);
+      }
+      .fu span{transform:rotate(-45deg);font-family:"Noto Serif SC",serif;font-weight:900;font-size:42px;color:#ffe9a8;line-height:1}
+      @media (max-width:560px){
+        .paper-cut{width:58px;height:58px;top:52px}
+        .fu{width:58px;height:58px;margin-left:-29px;top:54px}
+        .fu span{font-size:32px}
+      }
+
+      @media (prefers-reduced-motion: reduce){
+        .wx-drop,.wx-flake,.wx-sun,.wx-star,.wx-cloud,.wx-fogband,.wx-flash,.bulb{animation:none}
+      }
+
+      footer{margin-top:34px;text-align:center;color:var(--ink-soft);font-size:14px}
+      footer .heart{color:var(--coral)}
+      /* 窗外天气行固定在页面内容最下面，留足底部间距，不被导航条盖住 */
+      .wx-bottom{
+        margin-top:28px;background:var(--surface);border:1px solid var(--line);
+        border-radius:14px;padding:12px 16px;box-shadow:var(--shadow);
+      }
+    </style>
+  </head>
+  <body>
+      <!-- 房间舞台：首图左右与下方内容边框对齐，不铺满全屏 -->
+      <section class="stage" id="stage" data-period="afternoon" data-wx="rain" data-fest="none" aria-label="房间全景">
+        <img class="stage-main" id="stageImg" src="assets/coffee.jpg" fetchpriority="high" decoding="async" alt="咖啡角：YOYO 坐在白色绒沙发上捧着咖啡杯，身后是书架和唱片机，茶几上有牛角包和茶壶（页面打开后会按现在的时间和天气自动换到该在的角落）" />
+        <div class="tint"></div>
+        <div class="wx-layer" aria-hidden="true">
+          <div class="wx-wash"></div>
+          <div class="wx-fx" id="wxFx"></div>
+        </div>
+        <div class="fest-layer fest-xmas" id="festXmas" aria-hidden="true"></div>
+        <div class="fest-layer fest-spring" aria-hidden="true">
+          <svg class="paper-cut left" viewBox="0 0 120 120" aria-hidden="true">
+            <g fill="#cf231c">
+              <circle cx="60" cy="60" r="40"/>
+              <circle cx="106" cy="60" r="11"/><circle cx="99.8" cy="83" r="11"/><circle cx="83" cy="99.8" r="11"/><circle cx="60" cy="106" r="11"/>
+              <circle cx="37" cy="99.8" r="11"/><circle cx="20.2" cy="83" r="11"/><circle cx="14" cy="60" r="11"/><circle cx="20.2" cy="37" r="11"/>
+              <circle cx="37" cy="20.2" r="11"/><circle cx="60" cy="14" r="11"/><circle cx="83" cy="20.2" r="11"/><circle cx="99.8" cy="37" r="11"/>
+            </g>
+            <g fill="#f6efe3">
+              <circle cx="85" cy="60" r="7.5"/><circle cx="77.7" cy="77.7" r="7.5"/><circle cx="60" cy="85" r="7.5"/><circle cx="42.3" cy="77.7" r="7.5"/>
+              <circle cx="35" cy="60" r="7.5"/><circle cx="42.3" cy="42.3" r="7.5"/><circle cx="60" cy="35" r="7.5"/><circle cx="77.7" cy="42.3" r="7.5"/>
+              <circle cx="60" cy="60" r="10"/>
+            </g>
+            <circle cx="60" cy="60" r="5.5" fill="#cf231c"/>
+          </svg>
+          <svg class="paper-cut right" viewBox="0 0 120 120" aria-hidden="true">
+            <g fill="#cf231c">
+              <circle cx="60" cy="60" r="40"/>
+              <circle cx="106" cy="60" r="11"/><circle cx="99.8" cy="83" r="11"/><circle cx="83" cy="99.8" r="11"/><circle cx="60" cy="106" r="11"/>
+              <circle cx="37" cy="99.8" r="11"/><circle cx="20.2" cy="83" r="11"/><circle cx="14" cy="60" r="11"/><circle cx="20.2" cy="37" r="11"/>
+              <circle cx="37" cy="20.2" r="11"/><circle cx="60" cy="14" r="11"/><circle cx="83" cy="20.2" r="11"/><circle cx="99.8" cy="37" r="11"/>
+            </g>
+            <g fill="#f6efe3">
+              <circle cx="85" cy="60" r="7.5"/><circle cx="77.7" cy="77.7" r="7.5"/><circle cx="60" cy="85" r="7.5"/><circle cx="42.3" cy="77.7" r="7.5"/>
+              <circle cx="35" cy="60" r="7.5"/><circle cx="42.3" cy="42.3" r="7.5"/><circle cx="60" cy="35" r="7.5"/><circle cx="77.7" cy="42.3" r="7.5"/>
+              <circle cx="60" cy="60" r="10"/>
+            </g>
+            <circle cx="60" cy="60" r="5.5" fill="#cf231c"/>
+          </svg>
+          <div class="fu"><span>福</span></div>
+        </div>
+        <div class="stage-top">
+          <span class="period-badge" id="periodBadge">此刻的房间</span>
+          <span class="stage-chips">
+            <span class="period-badge" id="wxBadge">窗外 · 小雨 16°</span>
+            <span class="period-badge fest-badge" id="festBadge" hidden></span>
+          </span>
+        </div>
+      </section>
+
+    <div class="wrap">
+      <header>
+        <div class="title-line">
+          <h1>YOYO<span class="accent">小屋</span></h1>
+        </div>
+        <div class="tagline-row">
+          <p class="tagline">YOYO 的休闲小天地 —— 不工作，只放松：喝咖啡、看书、听音乐、侍弄绿植。</p>
+          <span class="clock-chip"><span class="dot"></span><span id="clockText">正在看看现在几点…</span></span>
+        </div>
+      </header>
+
+      <!-- 十二个角落 -->
+      <h2 class="corners-title">十二个休闲角落</h2>
+      <p class="section-note corners-note">点「去这个角落」，YOYO 就挪过去；每个角落里还有个小玩法。</p>
+
+      <div class="corners">
+        <!-- 咖啡角 + 阅读角：固定左右并排一行 -->
+        <div class="corner-pair">
+        <!-- 咖啡角 -->
+        <article class="corner active" id="corner-coffee">
+          <figure>
+            <img src="assets/hero.webp" alt="YOYO 坐在房间里的白色沙发上捧着咖啡杯，身后是书架、唱片机和绿植，大窗透进阳光，茶几上有牛角包和茶壶" loading="lazy" decoding="async" />
+            <span class="corner-name">咖啡角</span>
+          </figure>
+          <div class="corner-body">
+            <p>奶白色的绒绒沙发，配一张小圆茶几。咖啡壶、可颂，还有一条搭着的针织毯。</p>
+            <button class="go-btn" data-goto="coffee">去这个角落</button>
+            <div class="play-area">
+              <span class="play-title">给 YOYO 点一杯</span>
+              <div class="chips" role="group" aria-label="选饮品">
+                <button class="chip" data-drink="拿铁" aria-pressed="true">拿铁</button>
+                <button class="chip" data-drink="手冲" aria-pressed="false">手冲</button>
+                <button class="chip" data-drink="美式" aria-pressed="false">美式</button>
+                <button class="chip" data-drink="热可可" aria-pressed="false">热可可</button>
+              </div>
+              <div class="result" id="drinkResult"><b>拿铁</b> —— 奶泡绵绵的，配可颂正好。YOYO 捧着杯子，满足地眯起眼睛。</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- 阅读角 -->
+        <article class="corner" id="corner-reading">
+          <figure>
+            <img src="assets/reading.webp" alt="YOYO 窝在圆沙发椅里看绘本，旁边小桌上放着一杯拉花咖啡" loading="lazy" decoding="async" />
+            <span class="corner-name">阅读角</span>
+          </figure>
+          <div class="corner-body">
+            <p>窗边的圆沙发椅，旁边是满满的书架和一盏暖暖的台灯。天黑了也不怕，灯一开就是一个小世界。</p>
+            <button class="go-btn" data-goto="reading">去这个角落</button>
+            <div class="play-area">
+              <span class="play-title">YOYO 在看的书</span>
+              <div class="result">
+                <span class="book-title" id="bookTitle">《小王子》</span>
+                <div id="bookNote">看到狐狸那一段了——“你为你的玫瑰花花费的时间，使你的玫瑰变得重要。”</div>
+              </div>
+              <button class="action-btn" id="nextBook">换一本</button>
+            </div>
+          </div>
+        </article>
+        </div>
+
+        <!-- 音乐角 -->
+        <article class="corner" id="corner-music">
+          <figure>
+            <img src="assets/music.webp" alt="YOYO 戴着耳机闭着眼睛听黑胶唱片，音符在身边飘" loading="lazy" decoding="async" />
+            <span class="corner-name">音乐角</span>
+          </figure>
+          <div class="corner-body">
+            <p>一台木壳黑胶唱片机，一只小音箱，一摞唱片。戴上耳机，闭上眼睛，跟着轻轻晃。</p>
+            <button class="go-btn" data-goto="music">去这个角落</button>
+            <div class="play-area">
+              <span class="play-title">放点音乐听听</span>
+              <div class="chips" role="group" aria-label="选频道">
+                <button class="chip" data-mood="午后爵士" aria-pressed="true">午后爵士</button>
+                <button class="chip" data-mood="黑胶老歌" aria-pressed="false">黑胶老歌</button>
+                <button class="chip" data-mood="雨夜钢琴" aria-pressed="false">雨夜钢琴</button>
+                <button class="chip" data-mood="钢琴纯音乐" aria-pressed="false">钢琴纯音乐</button>
+              </div>
+              <button class="action-btn" id="musicToggle">▶ 播放音乐</button>
+              <div class="result" id="musicResult">现在放的是 <b>午后爵士</b> 频道。点播放，房间里就有声音了。</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- 绿植角 -->
+        <article class="corner" id="corner-plants">
+          <figure>
+            <img src="assets/plants.webp" alt="YOYO 提着小浇水壶给多肉浇水，周围是龟背竹和垂下来的绿萝" loading="lazy" decoding="async" />
+            <span class="corner-name">绿植角</span>
+          </figure>
+          <div class="corner-body">
+            <p>靠窗一整面绿：龟背竹、绿萝、多肉、小蕨类。阳光好的时候，这里最鲜亮。</p>
+            <button class="go-btn" data-goto="plants">去这个角落</button>
+            <div class="play-area">
+              <span class="play-title">陪 YOYO 照顾绿植</span>
+              <div class="result" id="plantResult">绿植们今天精神不错，叶子都亮亮的。<span class="droplets" aria-hidden="true"><i></i><i></i><i></i></span></div>
+              <button class="action-btn" id="waterBtn">浇浇水</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 绘画角 -->
+        <article class="corner" id="corner-painting">
+          <figure>
+            <img src="assets/painting.webp" alt="YOYO 坐在小画架前画水彩花环，桌上放着水彩颜料盘和画笔" loading="lazy" decoding="async" />
+            <span class="corner-name">绘画角</span>
+          </figure>
+          <div class="corner-body">
+            <p>窗边支起小画架，水彩颜料盘、笔洗杯一字排开。画花，画绿植，也画窗边的阳光。</p>
+            <button class="go-btn" data-goto="painting">去这个角落</button>
+            <div class="play-area">
+              <span class="play-title">今天画什么</span>
+              <div class="result">
+                <span class="book-title" id="paintTitle">窗边的花环</span>
+                <div id="paintNote">粉的、蓝的小花围成一圈，叶子用水晕开，淡淡的刚刚好。</div>
+              </div>
+              <button class="action-btn" id="nextPaint">换个题材</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 烧饭角 -->
+        <article class="corner" id="corner-cooking">
+          <figure>
+            <img src="assets/cooking.webp" alt="YOYO 系着番茄围裙在小灶台前炒菜，锅里热气腾腾，砧板上有番茄和青菜" loading="lazy" decoding="async" />
+            <span class="corner-name">烧饭角</span>
+          </figure>
+          <div class="corner-body">
+            <p>小厨房 17 点开火准备晚饭。系上番茄围裙，炒两个菜，再煮一锅汤，简单又热乎。</p>
+            <button class="go-btn" data-goto="cooking">去这个角落</button>
+            <div class="play-area">
+              <span class="play-title">今天吃什么</span>
+              <div class="result">
+                <span class="book-title" id="cookTitle">番茄炒蛋</span>
+                <div id="cookNote">番茄炒出沙，鸡蛋嫩嫩的，配一碗白米饭，绝了。</div>
+              </div>
+              <button class="action-btn" id="nextDish">换个菜</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 晒太阳角 -->
+        <article class="corner" id="corner-sun">
+          <figure>
+            <img src="assets/sun.webp" alt="YOYO 躺在窗边地毯上晒太阳，闭着眼睛一脸惬意" loading="lazy" decoding="async" />
+            <span class="corner-name">晒太阳角</span>
+          </figure>
+          <div class="corner-body">
+            <p>大窗边铺一条编织毯，阳光整片洒进来。YOYO 躺下眯着眼，晒着晒着就打起盹来。</p>
+            <button class="go-btn" data-goto="sun">去这个角落</button>
+            <div class="play-area">
+              <span class="play-title">一起晒太阳</span>
+              <div class="result" id="sunResult">阳光暖烘烘的，YOYO 晒得软乎乎的。</div>
+              <button class="action-btn" id="sunBtn">翻个面</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 钢琴角 -->
+        <article class="corner" id="corner-piano">
+          <figure>
+            <img src="assets/piano.webp" alt="红头发的 YOYO 穿着蓝色衣服坐在琴凳上弹立式钢琴，手搭在琴键上，谱架上摊着乐谱，旁边是小书架、绿植和串灯" loading="lazy" decoding="async" />
+            <span class="corner-name">钢琴角</span>
+          </figure>
+          <div class="corner-body">
+            <p>窗边一架木色立式钢琴，谱架上摊着乐谱。YOYO 坐上琴凳，手搭上琴键，慢慢弹。</p>
+            <button class="go-btn" data-goto="piano">去这个角落</button>
+            <div class="play-area">
+              <span class="play-title">今天弹什么</span>
+              <div class="result">
+                <span class="book-title" id="pianoTitle">小步舞曲</span>
+                <div id="pianoNote">一小节一小节慢慢来，弹错了也不停，接着往下走。</div>
+              </div>
+              <button class="action-btn" id="nextPiano">换一首</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 吃饭角 -->
+        <article class="corner" id="corner-eating">
+          <figure>
+            <img src="assets/eating.webp" alt="红头发的 YOYO 穿着蓝色 YoYo 衣服坐在窗边小圆桌前吃饭，拿着筷子笑眯眯的，桌上有米饭、热汤和青菜" loading="lazy" decoding="async" />
+            <span class="corner-name">吃饭角</span>
+          </figure>
+          <div class="corner-body">
+            <p>窗边的小圆桌，11 点准时开饭。一碗热汤、两碟小菜，趁热慢慢吃。</p>
+            <button class="go-btn" data-goto="eating">去这个角落</button>
+            <div class="play-area">
+              <span class="play-title">午饭吃什么</span>
+              <div class="result">
+                <span class="book-title" id="eatTitle">米饭 + 豆腐汤 + 炒青菜</span>
+                <div id="eatNote">汤热乎乎的，青菜脆生生的，吃得干干净净。</div>
+              </div>
+              <button class="action-btn" id="nextEat">换个午饭</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 运动角 -->
+        <article class="corner" id="corner-exercise">
+          <figure>
+            <img src="assets/exercise.webp" alt="红头发的 YOYO 穿着蓝色 YoYo 衣服跪在窗边圆形编织垫上伸懒腰，双手高高举起，垫子边放着粉色小哑铃和一瓶水" loading="lazy" decoding="async" />
+            <span class="corner-name">运动角</span>
+          </figure>
+          <div class="corner-body">
+            <p>大窗边铺一张编织垫，下午 3 点动一动：伸伸懒腰、活动活动，出点汗正舒服。</p>
+            <button class="go-btn" data-goto="exercise">去这个角落</button>
+            <div class="play-area">
+              <span class="play-title">现在做什么动作</span>
+              <div class="result" id="exerciseResult">双爪高高举起，大大地伸个懒腰。</div>
+              <button class="action-btn" id="exerciseBtn">换个动作</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 电脑角 -->
+        <article class="corner" id="corner-computer">
+          <figure>
+            <img src="assets/computer.jpg" alt="红头发的 YOYO 穿着蓝色 YoYo 衣服坐在小木桌前用笔记本电脑，手里拿着沙锤，桌上有小盆栽和铅笔，身后是书架和暖暖的串灯" loading="lazy" decoding="async" />
+            <span class="corner-name">电脑角</span>
+          </figure>
+          <div class="corner-body">
+            <p>晚上 9 点，小木桌前打开苹果笔记本，配一杯热饮，看看今天的照片和消息。</p>
+            <button class="go-btn" data-goto="computer">去这个角落</button>
+            <div class="play-area">
+              <span class="play-title">电脑上在看什么</span>
+              <div class="result" id="computerResult">翻今天拍的照片，挑一张最好看的留下来。</div>
+              <button class="action-btn" id="computerBtn">换个看看</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 休息角 -->
+        <article class="corner" id="corner-sleep">
+          <figure>
+            <img src="assets/sleep.jpg" alt="整个房间全景里，小小的 YOYO 在完整的米色沙发右侧打盹，眼睛闭着，手里还握着沙锤，沙发整个露出来不切底部，身后是木书架和唱片机，窗外是夜色" loading="lazy" decoding="async" />
+            <span class="corner-name">休息角</span>
+          </figure>
+          <div class="corner-body">
+            <p>夜里 22 点到早上 6 点，YOYO 就窝回米色绒沙发里打盹。台灯留一盏暖黄的光，书架和唱片机都安安静静的，窗外是夜色。</p>
+            <button class="go-btn" data-goto="sleep">去这个角落</button>
+            <div class="play-area">
+              <span class="play-title">陪 YOYO 休息一下</span>
+              <div class="result" id="sleepResult">头一点一点的，困得眼睛都睁不开了。</div>
+              <button class="action-btn" id="sleepBtn">轻声哄睡</button>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- 清单 -->
+      <section class="inventory">
+        <h2>先看看，缺什么再补</h2>
+        <p class="section-note">第一版小房间先这样。左边是已经有的，右边是你可能想添的——点一点先记在心愿单上，看好了再告诉我添哪些。</p>
+        <div class="inv-grid">
+          <div>
+            <h3>房间里已经有</h3>
+            <ul class="have">
+              <li>奶白色绒绒沙发和小圆茶几</li>
+              <li>咖啡壶、杯子和点心盘</li>
+              <li>满满一架书和窗边阅读灯</li>
+              <li>黑胶唱片机、小音箱和一摞唱片</li>
+              <li>龟背竹、绿萝、多肉等一窗台绿植</li>
+              <li>暖暖的串灯和木地板</li>
+              <li>小画架、水彩颜料和一摞画纸</li>
+              <li>小厨房灶台，17 点开火准备晚饭</li>
+              <li>窗边的木色立式钢琴和小木凳</li>
+              <li>吃饭的小圆桌、汤碗和筷子</li>
+              <li>运动用的编织垫、小哑铃和水杯</li>
+              <li>小木桌上的苹果笔记本</li>
+              <li>窗边晒太阳的编织毯和软枕头</li>
+              <li>窗外天气跟着真实天气走，下雨、下雪、放晴都看得见</li>
+              <li>过节自动换装：圣诞挂彩灯，春节贴窗花</li>
+            </ul>
+          </div>
+          <div>
+            <h3>想添置的（点选记下来）</h3>
+            <div class="wish-chips">
+              <button class="wish" aria-pressed="false">吊椅</button>
+              <button class="wish" aria-pressed="false">落地灯</button>
+              <button class="wish" aria-pressed="false">香薰蜡烛</button>
+              <button class="wish" aria-pressed="false">零食小推车</button>
+              <button class="wish" aria-pressed="false">墙上挂画</button>
+              <button class="wish" aria-pressed="false">软乎乎地毯</button>
+              <button class="wish" aria-pressed="false">小茶几花瓶</button>
+            </div>
+            <p class="wish-summary" id="wishSummary">还没有选。点上面的小签，挑你想要的。</p>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <p>第一版小房间 <span class="heart">♥</span> 住在这里的 YOYO 不上班，只负责把日子过得舒服。</p>
+      </footer>
+
+      <!-- 设置选项：四组全部放在页面最下面（十二个休闲角落之后） -->
+      <div class="light-bar" role="group" aria-label="房间光线">
+        <span class="label">房间光线</span>
+        <button class="light-btn" data-light="auto" aria-pressed="true">跟随现在</button>
+        <button class="light-btn" data-light="morning" aria-pressed="false">清晨</button>
+        <button class="light-btn" data-light="afternoon" aria-pressed="false">午后</button>
+        <button class="light-btn" data-light="dusk" aria-pressed="false">黄昏</button>
+        <button class="light-btn" data-light="night" aria-pressed="false">夜晚</button>
+      </div>
+
+      <div class="light-bar" role="group" aria-label="YOYO 的活动安排">
+        <span class="label">活动安排</span>
+        <button class="light-btn" id="autoBtn" aria-pressed="true">跟随时间（自动）</button>
+        <span class="auto-status" id="autoStatus">正在看看现在该做什么…</span>
+      </div>
+      <p class="section-note" style="margin-top:2px">一天的节奏，从早上 6 点开始：6 点浇水（一小时）· 7 点看书 · 8 点画水彩 · 9 点弹钢琴 · 10 点听音乐 · 11 点吃饭 · 12 点晒太阳到 14 点（下雨、下雪、雷雨时改成看书，天一放晴自动换回晒太阳）· 14 点喝咖啡 · 15 点运动 · 16 点听音乐或看书轮换 · 17 点烧饭 · 19 点弹钢琴或看书轮换 · 20 点听音乐 · 21 点玩电脑（苹果笔记本）· 22 点回休息角睡觉，一直到早上 6 点。按上面的时间表到点换，轮换时段里交叉着来；到点 YOYO 自己换地方，天气一变也会跟着换。</p>
+
+      <div class="light-bar" role="group" aria-label="节日装饰">
+        <span class="label">节日装饰</span>
+        <button class="light-btn" data-fest-btn="auto" aria-pressed="true">跟随节日</button>
+        <button class="light-btn" data-fest-btn="xmas" aria-pressed="false">圣诞彩灯</button>
+        <button class="light-btn" data-fest-btn="spring" aria-pressed="false">春节窗花</button>
+        <button class="light-btn" data-fest-btn="none" aria-pressed="false">不装饰</button>
+        <span class="auto-status" id="festStatus"></span>
+      </div>
+
+      <div class="light-bar wx-bottom">
+        <span class="label">窗外天气</span>
+        <span class="auto-status" id="wxStatus">上海 · 小雨 16° —— 窗外正下着雨，屋里更暖和。</span>
+        <button class="light-btn" id="wxRefresh" type="button">刷新天气</button>
+      </div>
+    </div>
+
+    <script>
+      (function(){
+        "use strict";
+
+        /* ---------- 时间与光线 ---------- */
+        var PERIODS = {
+          morning:  { badge:"清晨微光" },
+          afternoon:{ badge:"午后阳光" },
+          dusk:     { badge:"黄昏时分" },
+          night:    { badge:"夜晚灯光" }
+        };
+        /* 首图左上角的文字要和窗外真实天气一致：下雨写雨、飘雪写雪、起雾写雾，
+           只有真晴天才许出现“阳光”二字；天气由下面天气区的 wxState 提供，
+           天气一刷新就重算（renderWx 里会再调一次 currentBadge） */
+        var WX_BADGE = {
+          rain:     { morning:"清晨细雨", afternoon:"午后小憩", dusk:"黄昏雨声", night:"夜雨绵绵" },
+          storm:    { morning:"清晨雷雨", afternoon:"午后雷雨", dusk:"黄昏雷雨", night:"夜半雷雨" },
+          snow:     { morning:"清晨飘雪", afternoon:"午后飘雪", dusk:"黄昏飞雪", night:"夜晚飘雪" },
+          fog:      { morning:"清晨浓雾", afternoon:"午后雾气", dusk:"黄昏雾色", night:"夜雾弥漫" },
+          overcast: { morning:"清晨阴云", afternoon:"午后阴天", dusk:"黄昏阴云", night:"夜晚阴云" },
+          cloudy:   { morning:"清晨多云", afternoon:"午后多云", dusk:"黄昏云霞", night:"夜晚多云" },
+          clear:    { morning:"清晨微光", afternoon:"午后阳光", dusk:"黄昏时分", night:"晴夜星光" }
+        };
+        /* 下午下雨按雨量分，不轮换：Open-Meteo 的 precipitation（当前降水量，mm）
+           小于 2.5 视为小雨 -> “午后小憩”；大于等于 2.5 视为大雨 -> “午后听雨”。
+           取不到降水量时退回按天气文字判断：小雨 / 毛毛雨算小，其余雨算大。 */
+        function rainAfternoonBadge(){
+          if (typeof wxState === "undefined" || !wxState) return "午后小憩";
+          var precip = (typeof wxState.precip === "number" && isFinite(wxState.precip)) ? wxState.precip : null;
+          var heavy;
+          if (precip !== null){
+            heavy = precip >= 2.5;
+          } else if (!wxState.label){
+            heavy = false;
+          } else {
+            heavy = !(wxState.label === "小雨" || wxState.label === "毛毛雨" || wxState.label === "冻毛毛雨");
+          }
+          return heavy ? "午后听雨" : "午后小憩";
+        }
+        function currentBadge(){
+          var p = currentPeriod();
+          var kind = (typeof wxState !== "undefined" && wxState && wxState.kind) ? wxState.kind : null;
+          if (kind === "rain" && p === "afternoon"){
+            return rainAfternoonBadge() + (lightMode === "auto" ? "" : "（手动）");
+          }
+          var byWx = kind ? WX_BADGE[kind] : null;
+          var text = (byWx && byWx[p]) ? byWx[p] : PERIODS[p].badge;
+          return text + (lightMode === "auto" ? "" : "（手动）");
+        }
+        var stage = document.getElementById("stage");
+        var stageImg = document.getElementById("stageImg");
+        var periodBadge = document.getElementById("periodBadge");
+        var clockText = document.getElementById("clockText");
+        var lightMode = "auto";
+        var currentCorner = "coffee";
+
+        function periodForHour(h){
+          if (h >= 5 && h < 11) return "morning";
+          if (h >= 11 && h < 17) return "afternoon";
+          if (h >= 17 && h < 20) return "dusk";
+          return "night";
+        }
+        function currentPeriod(){
+          if (lightMode !== "auto") return lightMode;
+          return periodForHour(new Date().getHours());
+        }
+        function refreshClock(){
+          var now = new Date();
+          var hh = String(now.getHours()).padStart(2,"0");
+          var mm = String(now.getMinutes()).padStart(2,"0");
+          var names = { morning:"清晨", afternoon:"午后", dusk:"黄昏", night:"夜晚" };
+          clockText.textContent = "现在 " + hh + ":" + mm + " · " + names[periodForHour(now.getHours())];
+        }
+        function applyPeriod(){
+          var p = currentPeriod();
+          stage.setAttribute("data-period", p);
+          periodBadge.textContent = currentBadge();
+          if (typeof syncWxFx === "function") syncWxFx();
+        }
+        var cornerTouched = false;
+
+        document.querySelectorAll(".light-btn[data-light]").forEach(function(btn){
+          btn.addEventListener("click", function(){
+            document.querySelectorAll(".light-btn[data-light]").forEach(function(b){ b.setAttribute("aria-pressed","false"); });
+            btn.setAttribute("aria-pressed","true");
+            lightMode = btn.getAttribute("data-light");
+            applyPeriod();
+          });
+        });
+        refreshClock(); applyPeriod();
+        setInterval(function(){ refreshClock(); if (lightMode === "auto") applyPeriod(); }, 30000);
+
+        /* ---------- 角落切换 ---------- */
+        var cornerImgs = {
+          coffee:   { src:"assets/coffee.jpg",   alt:"咖啡角：YOYO 坐在白色绒沙发上捧着咖啡杯，身后是书架和唱片机，茶几上有牛角包和茶壶" },
+          reading:  { src:"assets/reading.webp", alt:"YOYO 窝在圆沙发椅里看绘本，旁边小桌上放着一杯拉花咖啡" },
+          music:    { src:"assets/music.webp",   alt:"YOYO 戴着耳机闭着眼睛听黑胶唱片，音符在身边飘" },
+          plants:   { src:"assets/plants.webp",  alt:"YOYO 提着小浇水壶给多肉浇水，周围是龟背竹和垂下来的绿萝" },
+          painting: { src:"assets/painting.webp", alt:"YOYO 坐在小画架前画水彩花环，桌上放着水彩颜料盘和画笔" },
+          cooking:  { src:"assets/cooking.webp", alt:"YOYO 系着番茄围裙在小灶台前炒菜，锅里热气腾腾" },
+          sun:      { src:"assets/sun.webp",     alt:"YOYO 躺在房间窗边的地毯上晒太阳" },
+          piano:    { src:"assets/piano.webp",   alt:"钢琴角：红头发的 YOYO 穿着蓝色衣服坐在琴凳上弹立式钢琴，谱架上摊着乐谱" },
+          eating:   { src:"assets/eating.webp",  alt:"吃饭角：红头发的 YOYO 穿着蓝色 YoYo 衣服在窗边小圆桌前吃饭，桌上有米饭、热汤和青菜" },
+          exercise: { src:"assets/exercise.webp", alt:"运动角：红头发的 YOYO 穿着蓝色 YoYo 衣服在窗边编织垫上伸懒腰，垫子边有小哑铃和水瓶" },
+          computer: { src:"assets/computer.jpg", alt:"电脑角：红头发的 YOYO 穿着蓝色 YoYo 衣服在小木桌前用笔记本电脑，身后是书架和串灯" },
+          sleep:    { src:"assets/sleep.jpg",    alt:"休息角全景：整个房间都露出来，完整的米色沙发整个在画面里不切底部，小小的 YOYO 在沙发右侧打盹，眼睛闭着，身后是木书架和唱片机，窗外是夜色，台灯亮着暖黄的光" },
+        };
+        function goToCorner(key, scroll){
+          currentCorner = key; cornerTouched = true;
+          document.querySelectorAll(".corner").forEach(function(c){ c.classList.remove("active"); });
+          document.getElementById("corner-" + key).classList.add("active");
+          document.querySelectorAll("[data-goto]").forEach(function(b){
+            b.textContent = b.getAttribute("data-goto") === key ? "YOYO 在这里" : "去这个角落";
+          });
+          var info = cornerImgs[key];
+          stageImg.classList.add("fading");
+          setTimeout(function(){
+            stageImg.src = info.src; stageImg.alt = info.alt;
+            stageImg.onload = function(){ stageImg.classList.remove("fading"); };
+            setTimeout(function(){ stageImg.classList.remove("fading"); }, 350);
+          }, 180);
+          if (scroll) stage.scrollIntoView({ behavior:"smooth", block:"center" });
+        }
+        document.querySelectorAll("[data-goto]").forEach(function(btn){
+          btn.addEventListener("click", function(){
+            setAuto(false);
+            goToCorner(btn.getAttribute("data-goto"), true);
+            refreshAutoStatus();
+          });
+        });
+        document.querySelector('[data-goto="coffee"]').textContent = "YOYO 在这里";
+
+        /* ---------- 咖啡 ---------- */
+        var drinkNotes = {
+          "拿铁":"奶泡绵绵的，配可颂正好。YOYO 捧着杯子，满足地眯起眼睛。",
+          "手冲":"慢慢注水，香气一点点散开。YOYO 凑近闻了闻：好香。",
+          "美式":"清爽提神的一杯。YOYO 喝了一口，精神抖擞地晃晃脑袋。",
+          "热可可":"甜甜暖暖的，不含咖啡因。YOYO 双手捧着，整个人都暖和了。"
+        };
+        document.querySelectorAll("[data-drink]").forEach(function(chip){
+          chip.addEventListener("click", function(){
+            document.querySelectorAll("[data-drink]").forEach(function(c){ c.setAttribute("aria-pressed","false"); });
+            chip.setAttribute("aria-pressed","true");
+            var d = chip.getAttribute("data-drink");
+            document.getElementById("drinkResult").innerHTML = "<b>" + d + "</b> —— " + drinkNotes[d];
+          });
+        });
+
+        /* ---------- 阅读 ---------- */
+        var books = [
+          { t:"《小王子》", n:"看到狐狸那一段了——“你为你的玫瑰花花费的时间，使你的玫瑰变得重要。”" },
+          { t:"《窗边的小豆豆》", n:"小豆豆的学校在一节电车里。YOYO 看得笑出声，也想去坐坐看。" },
+          { t:"《解忧杂货店》", n:"深夜的杂货店，投进牛奶箱的烦恼信。看到一半，YOYO 舍不得放下。" },
+          { t:"《海边理发店》", n:"短短的小故事，像海风一样轻轻的。适合配一杯热可可慢慢看。" }
+        ];
+        var bookIdx = 0;
+        document.getElementById("nextBook").addEventListener("click", function(){
+          bookIdx = (bookIdx + 1) % books.length;
+          document.getElementById("bookTitle").textContent = books[bookIdx].t;
+          document.getElementById("bookNote").textContent = books[bookIdx].n;
+        });
+
+        /* ---------- 音乐（WebAudio 轻和弦） ---------- */
+        var audioCtx = null, musicTimer = null, playing = false, chordStep = 0;
+        var moodName = "午后爵士";
+        var moodNotes = {
+          "午后爵士":"懒洋洋的，适合发呆和晒太阳。",
+          "黑胶老歌":"带着一点点沙沙声，像小时候的收音机。",
+          "雨夜钢琴":"窗外好像下起了小雨，屋里更安静了。",
+          "钢琴纯音乐":"一首完整的钢琴小曲，一个音一个音慢慢弹，清清亮亮的。"
+        };
+        var moodsFreq = {
+          "午后爵士": [[220.00,261.63,329.63],[174.61,220.00,261.63],[196.00,246.94,293.66],[164.81,196.00,246.94]],
+          "黑胶老歌": [[261.63,329.63,392.00],[220.00,261.63,329.63],[174.61,220.00,349.23],[196.00,293.66,392.00]],
+          "雨夜钢琴": [[196.00,246.94,293.66],[164.81,196.00,261.63],[146.83,220.00,293.66],[174.61,220.00,329.63]]
+        };
+        function playChord(freqs){
+          if (!audioCtx) return;
+          var now = audioCtx.currentTime;
+          freqs.forEach(function(f){
+            var osc = audioCtx.createOscillator();
+            var gain = audioCtx.createGain();
+            osc.type = "sine"; osc.frequency.value = f;
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(0.045, now + 0.6);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 3.8);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(now); osc.stop(now + 4);
+          });
+        }
+
+        /* ---------- 钢琴纯音乐：一首完整的钢琴小曲 ---------- */
+        /* 音高用音名转频率，旋律按八分音符一步一步走 */
+        var NOTE_BASE = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+        function noteFreq(name){
+          var m = /^([A-G])(\d)$/.exec(name);
+          var midi = 12 * (parseInt(m[2], 10) + 1) + NOTE_BASE[m[1]];
+          return 440 * Math.pow(2, (midi - 69) / 12);
+        }
+        function playPiano(freq, delay, vol, dur){
+          if (!audioCtx) return;
+          var t = audioCtx.currentTime + (delay || 0);
+          var master = audioCtx.createGain();
+          master.gain.setValueAtTime(0.0001, t);
+          master.gain.exponentialRampToValueAtTime(vol, t + 0.012);
+          master.gain.exponentialRampToValueAtTime(vol * 0.32, t + 0.35);
+          master.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+          master.connect(audioCtx.destination);
+          [[1, 1], [2, 0.42], [3, 0.16], [4, 0.06]].forEach(function(part){
+            var osc = audioCtx.createOscillator();
+            var g = audioCtx.createGain();
+            osc.type = "sine"; osc.frequency.value = freq * part[0];
+            g.gain.value = part[1];
+            osc.connect(g); g.connect(master);
+            osc.start(t); osc.stop(t + dur + 0.1);
+          });
+        }
+        /* 旋律（C 大调，C–G/B–Am–F 进行），null 是休止 */
+        var pianoMelody = [
+          "E5", null, "G5", null, "E5", null, "C5", null,
+          "D5", null, "B4", null, "G4", null, "B4", null,
+          "C5", null, "A4", null, "E5", null, "C5", null,
+          "D5", null, "E5", null, "D5", null, "B4", null,
+          "C5", null, "E5", null, "G5", null, "E5", null,
+          "A5", null, "G5", null, "E5", null, "D5", null,
+          "C5", null, "D5", null, "B4", null, "D5", null,
+          "C5", null, null, null, "G4", null, null, null
+        ];
+        /* 左手：每个小节一个低音 + 分解和弦 */
+        var pianoBars = [
+          { bass:"C3", arp:["E3","G3","C4","G3"] },
+          { bass:"G2", arp:["D3","G3","B3","G3"] },
+          { bass:"A2", arp:["E3","A3","C4","A3"] },
+          { bass:"F2", arp:["C3","F3","A3","F3"] },
+          { bass:"C3", arp:["E3","G3","C4","G3"] },
+          { bass:"F2", arp:["C3","F3","A3","F3"] },
+          { bass:"G2", arp:["D3","G3","B3","G3"] },
+          { bass:"C3", arp:["E3","G3","C4","G3"] }
+        ];
+        var pianoStep = 0;
+        var PIANO_STEP_SEC = 0.36;
+        function playPianoStep(){
+          if (!audioCtx || !playing) return;
+          var stepInBar = pianoStep % 8;
+          var bar = pianoBars[Math.floor(pianoStep / 8) % pianoBars.length];
+          if (stepInBar === 0) playPiano(noteFreq(bar.bass), 0, 0.16, 3.2);
+          playPiano(noteFreq(bar.arp[stepInBar % 4]), 0, 0.05, 1.2);
+          var mel = pianoMelody[pianoStep % pianoMelody.length];
+          if (mel) playPiano(noteFreq(mel), 0, 0.14, 1.9);
+          pianoStep++;
+        }
+        var musicBtn = document.getElementById("musicToggle");
+        var musicResult = document.getElementById("musicResult");
+        function startMusic(){
+          if (!audioCtx){
+            var AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC){ musicResult.innerHTML = "这个浏览器放不了声音，YOYO 就在心里哼歌啦。"; return; }
+            audioCtx = new AC();
+          }
+          if (audioCtx.state === "suspended") audioCtx.resume();
+          playing = true; chordStep = 0;
+          if (moodName === "钢琴纯音乐"){
+            pianoStep = 0;
+            playPianoStep();
+            musicTimer = setInterval(playPianoStep, PIANO_STEP_SEC * 1000);
+          } else {
+            playChord(moodsFreq[moodName][0]);
+            musicTimer = setInterval(function(){
+              chordStep = (chordStep + 1) % 4;
+              playChord(moodsFreq[moodName][chordStep]);
+            }, 4000);
+          }
+          musicBtn.textContent = "⏸ 暂停音乐"; musicBtn.classList.add("playing");
+          musicResult.innerHTML = "正在放 <b>" + moodName + "</b> —— " + moodNotes[moodName] + " YOYO 跟着轻轻晃。";
+        }
+        function stopMusic(){
+          playing = false;
+          if (musicTimer){ clearInterval(musicTimer); musicTimer = null; }
+          musicBtn.textContent = "▶ 播放音乐"; musicBtn.classList.remove("playing");
+          musicResult.innerHTML = "音乐停啦。现在放的是 <b>" + moodName + "</b> 频道，想听再点播放。";
+        }
+        musicBtn.addEventListener("click", function(){ playing ? stopMusic() : startMusic(); });
+        document.querySelectorAll("[data-mood]").forEach(function(chip){
+          chip.addEventListener("click", function(){
+            document.querySelectorAll("[data-mood]").forEach(function(c){ c.setAttribute("aria-pressed","false"); });
+            chip.setAttribute("aria-pressed","true");
+            moodName = chip.getAttribute("data-mood"); chordStep = 0;
+            if (playing){
+              if (musicTimer){ clearInterval(musicTimer); musicTimer = null; }
+              if (moodName === "钢琴纯音乐"){
+                pianoStep = 0;
+                playPianoStep();
+                musicTimer = setInterval(playPianoStep, PIANO_STEP_SEC * 1000);
+              } else {
+                playChord(moodsFreq[moodName][0]);
+                musicTimer = setInterval(function(){
+                  chordStep = (chordStep + 1) % 4;
+                  playChord(moodsFreq[moodName][chordStep]);
+                }, 4000);
+              }
+            }
+            musicResult.innerHTML = (playing ? "正在放 " : "已切换到 ") + "<b>" + moodName + "</b> —— " + moodNotes[moodName];
+          });
+        });
+
+        /* ---------- 绿植 ---------- */
+        var waterCount = 0;
+        var plantLines = [
+          "水珠落在叶子上，亮晶晶的。龟背竹好像又舒展了一点。",
+          "多肉喝饱了水，胖嘟嘟的更可爱了。",
+          "绿萝的藤蔓轻轻晃了晃，像在说谢谢。",
+          "小蕨类最喜欢水雾了，整盆都精神起来。"
+        ];
+        var waterBtn = document.getElementById("waterBtn");
+        var plantResult = document.getElementById("plantResult");
+        waterBtn.addEventListener("click", function(){
+          waterCount++;
+          var line = plantLines[(waterCount - 1) % plantLines.length];
+          plantResult.innerHTML = line + "（今天浇了 " + waterCount + " 次）" +
+            '<span class="droplets" aria-hidden="true"><i></i><i></i><i></i></span>';
+          plantResult.classList.remove("watering");
+          void plantResult.offsetWidth;
+          plantResult.classList.add("watering");
+        });
+
+        /* ---------- 绘画 / 烧饭 / 晒太阳小玩法 ---------- */
+        var paints = [
+          { t:"窗边的花环", n:"粉的、蓝的小花围成一圈，叶子用水晕开，淡淡的刚刚好。" },
+          { t:"窗台上的多肉", n:"圆滚滚的叶片一层叠一层，阳光打过去，边缘透着光。" },
+          { t:"龟背竹写生", n:"对着窗边那盆画，大叶子裂开的口子最难，也最有趣。" },
+          { t:"一杯拿铁", n:"奶泡的白、咖啡的棕，画着画着就想真喝一杯了。" }
+        ];
+        var paintIdx = 0;
+        document.getElementById("nextPaint").addEventListener("click", function(){
+          paintIdx = (paintIdx + 1) % paints.length;
+          document.getElementById("paintTitle").textContent = paints[paintIdx].t;
+          document.getElementById("paintNote").textContent = paints[paintIdx].n;
+        });
+        var dishes = [
+          { t:"番茄炒蛋", n:"番茄炒出沙，鸡蛋嫩嫩的，配一碗白米饭，绝了。" },
+          { t:"葱油拌面", n:"小葱炸出香味，面条裹满酱汁，再卧一个荷包蛋。" },
+          { t:"香菇青菜 + 排骨汤", n:"汤炖得白白的，青菜脆生生的，清淡又暖胃。" },
+          { t:"西兰花炒虾仁", n:"虾仁弹牙，西兰花碧绿，出锅前撒一点蒜末。" }
+        ];
+        var dishIdx = 0;
+        document.getElementById("nextDish").addEventListener("click", function(){
+          dishIdx = (dishIdx + 1) % dishes.length;
+          document.getElementById("cookTitle").textContent = dishes[dishIdx].t;
+          document.getElementById("cookNote").textContent = dishes[dishIdx].n;
+        });
+        var sunLines = [
+          "翻个面，背上也晒得暖暖的。",
+          "阳光挪了一小格，YOYO 跟着挪了一小格。",
+          "晒得迷迷糊糊，快睡着了。",
+          "肚皮晒得热乎乎，起来喝口水，再躺回去。"
+        ];
+        var sunIdx = 0;
+        document.getElementById("sunBtn").addEventListener("click", function(){
+          var line = sunLines[sunIdx % sunLines.length]; sunIdx++;
+          document.getElementById("sunResult").textContent = line;
+        });
+        var sleepLines = [
+          "头一点一点的，困得眼睛都睁不开了。",
+          "靠在沙发里，呼吸慢慢匀了下来，睡熟啦。",
+          "手里还握着沙锤呢，就这么睡着了。",
+          "台灯调暗一点，晚安，YOYO。"
+        ];
+        var sleepIdx = 0;
+        document.getElementById("sleepBtn").addEventListener("click", function(){
+          sleepIdx++;
+          document.getElementById("sleepResult").textContent = sleepLines[sleepIdx % sleepLines.length];
+        });
+
+        /* ---------- 钢琴 / 吃饭 / 运动 / 电脑小玩法 ---------- */
+        var pianoPieces = [
+          { t:"小步舞曲", n:"一小节一小节慢慢来，弹错了也不停，接着往下走。" },
+          { t:"小星星变奏", n:"从单音开始，一遍比一遍热闹，YOYO 弹得摇头晃脑。" },
+          { t:"致爱丽丝（开头）", n:"就练最熟的那几句，来来回回弹了好几遍。" },
+          { t:"自己瞎弹的一段", n:"没有谱，想到哪儿弹到哪儿，居然还挺好听。" }
+        ];
+        var pianoIdx = 0;
+        document.getElementById("nextPiano").addEventListener("click", function(){
+          pianoIdx = (pianoIdx + 1) % pianoPieces.length;
+          document.getElementById("pianoTitle").textContent = pianoPieces[pianoIdx].t;
+          document.getElementById("pianoNote").textContent = pianoPieces[pianoIdx].n;
+        });
+        var lunches = [
+          { t:"米饭 + 豆腐汤 + 炒青菜", n:"汤热乎乎的，青菜脆生生的，吃得干干净净。" },
+          { t:"番茄鸡蛋面", n:"面条吸满了番茄汤汁，再配一小碟黄瓜。" },
+          { t:"香菇菜饭 + 紫菜蛋花汤", n:"菜饭油润润的，汤里飘着蛋花，简单又满足。" },
+          { t:"小馄饨 + 凉拌木耳", n:"馄饨皮薄馅小，一口一个，木耳酸酸脆脆的。" }
+        ];
+        var eatIdx = 0;
+        document.getElementById("nextEat").addEventListener("click", function(){
+          eatIdx = (eatIdx + 1) % lunches.length;
+          document.getElementById("eatTitle").textContent = lunches[eatIdx].t;
+          document.getElementById("eatNote").textContent = lunches[eatIdx].n;
+        });
+        var exerciseLines = [
+          "双手高高举起，大大地伸个懒腰。",
+          "慢慢转转脖子，左三圈，右三圈。",
+          "原地踏步走，小脚丫踩得哒哒响。",
+          "举起小哑铃，一、二、三……举到十下啦。",
+          "坐下来压压腿，够一够自己的小脚尖。"
+        ];
+        var exerciseIdx = 0;
+        document.getElementById("exerciseBtn").addEventListener("click", function(){
+          exerciseIdx++;
+          document.getElementById("exerciseResult").textContent = exerciseLines[exerciseIdx % exerciseLines.length];
+        });
+        var computerLines = [
+          "翻今天拍的照片，挑一张最好看的留下来。",
+          "看看今天的消息，慢慢回，不着急。",
+          "打开相册，把白天画的水彩拍下来存好。",
+          "听着歌翻翻网页，看到有意思的就停一会儿。"
+        ];
+        var computerIdx = 0;
+        document.getElementById("computerBtn").addEventListener("click", function(){
+          computerIdx++;
+          document.getElementById("computerResult").textContent = computerLines[computerIdx % computerLines.length];
+        });
+
+        /* ---------- 按实际时间自动安排（新时间表：从早上 6 点起） ---------- */
+        var activityNames = { plants:"给绿植浇水", coffee:"喝咖啡", sun:"晒太阳", reading:"看书", painting:"画水彩", cooking:"烧饭", music:"听音乐", piano:"弹钢琴", eating:"吃饭", exercise:"运动", computer:"玩电脑", sleep:"回休息角睡觉" };
+        /* 晒太阳要看天：下雨、下雪、雷雨时晒不了，12–14 点改成看书；
+           天一放晴（晴、多云、阴、雾等非雨雪雷天气）自动换回晒太阳。
+           判断用的是下面天气区从 Open-Meteo 取到的 wxState.kind，天气一更新就重算，不是定死的。 */
+        function isSunWeatherBlocked(){
+          if (typeof wxState === "undefined" || !wxState || !wxState.kind) return false;
+          return wxState.kind === "rain" || wxState.kind === "snow" || wxState.kind === "storm";
+        }
+        /* 同一时段里两件活动交叉轮换：每半小时换一次，
+           而且隔天起头的活动也换——今天 16 点先听音乐，明天 16 点先看书 */
+        function rotatePair(date, a, b){
+          var dayIdx = Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
+          var halfIdx = Math.floor((date.getHours() * 60 + date.getMinutes()) / 30);
+          return (dayIdx + halfIdx) % 2 === 0 ? a : b;
+        }
+        function scheduledCorner(date){
+          var mins = date.getHours() * 60 + date.getMinutes();
+          if (mins >= 22 * 60 || mins < 6 * 60) return "sleep";
+          if (mins < 7 * 60) return "plants";
+          if (mins < 8 * 60) return "reading";
+          if (mins < 9 * 60) return "painting";
+          if (mins < 10 * 60) return "piano";
+          if (mins < 11 * 60) return "music";
+          if (mins < 12 * 60) return "eating";
+          if (mins < 14 * 60) return isSunWeatherBlocked() ? "reading" : "sun";
+          if (mins < 15 * 60) return "coffee";
+          if (mins < 16 * 60) return "exercise";
+          if (mins < 17 * 60) return rotatePair(date, "music", "reading");
+          if (mins < 19 * 60) return "cooking";
+          if (mins < 20 * 60) return rotatePair(date, "piano", "reading");
+          if (mins < 21 * 60) return "music";
+          if (mins < 22 * 60) return "computer";
+          return "sleep";
+        }
+        var autoMode = true;
+        var autoBtn = document.getElementById("autoBtn");
+        var autoStatus = document.getElementById("autoStatus");
+        function refreshAutoStatus(){
+          if (!autoMode){
+            autoStatus.textContent = "已手动切换到「" + activityNames[currentCorner] + "」。点「跟随时间（自动）」回到自动安排。";
+            return;
+          }
+          var text = "按时间自动安排中：现在 YOYO 正在" + activityNames[currentCorner] + "，到点自己换下一件。";
+          var minsNow = new Date().getHours() * 60 + new Date().getMinutes();
+          if (minsNow >= 12 * 60 && minsNow < 14 * 60 && isSunWeatherBlocked()){
+            var label = (typeof wxState !== "undefined" && wxState && wxState.label) ? wxState.label : "下雨";
+            text += "窗外天气是" + label + "，晒不了太阳，这个时段改成看书；天一放晴就自动换回晒太阳。";
+          }
+          autoStatus.textContent = text;
+        }
+        /* 天气一变就立刻按最新天气重排（天气区取到新天气后会调用它）：
+           只在自动模式下换角落，手动选的角落不动 */
+        function syncScheduledActivity(){
+          if (!autoMode){ refreshAutoStatus(); return; }
+          var key = scheduledCorner(new Date());
+          if (key !== currentCorner) goToCorner(key, false);
+          refreshAutoStatus();
+        }
+        function setAuto(on){
+          autoMode = on;
+          autoBtn.setAttribute("aria-pressed", on ? "true" : "false");
+          refreshAutoStatus();
+        }
+        autoBtn.addEventListener("click", function(){
+          setAuto(true);
+          goToCorner(scheduledCorner(new Date()), false);
+          refreshAutoStatus();
+        });
+        setInterval(function(){
+          if (!autoMode) return;
+          var key = scheduledCorner(new Date());
+          if (key !== currentCorner) goToCorner(key, false);
+          refreshAutoStatus();
+        }, 30000);
+        /* 打开页面，先按电脑上的实际时间就位 */
+        goToCorner(scheduledCorner(new Date()), false);
+        setAuto(true);
+        /* 页面全部加载完后再对一次排班：首图必须跟着现在的时间走，
+           睡觉图只许在 22 点到早上 6 点出现，其他时间段不许停在休息角 */
+        window.addEventListener("load", function(){
+          if (autoMode) syncScheduledActivity();
+        });
+
+        /* ---------- 窗外天气：跟着真实天气变（Open-Meteo，免密钥） ---------- */
+        var wxBadge = document.getElementById("wxBadge");
+        var wxStatus = document.getElementById("wxStatus");
+        var wxFx = document.getElementById("wxFx");
+        /* 初始值是 2026-11-13 凌晨查到的上海实况（小雨 16°）；打开页面会再取最新天气刷新 */
+        var wxState = { kind:"rain", label:"小雨", temp:16, precip:0.2, place:"上海", lat:31.2304, lon:121.4737 };
+        var wxFxKey = "";
+        function wxFromCode(code){
+          if (code === 0) return { kind:"clear", label:"晴" };
+          if (code === 1) return { kind:"clear", label:"晴间多云" };
+          if (code === 2) return { kind:"cloudy", label:"多云" };
+          if (code === 3) return { kind:"overcast", label:"阴" };
+          if (code === 45 || code === 48) return { kind:"fog", label:"有雾" };
+          if (code === 51 || code === 53 || code === 55) return { kind:"rain", label:"毛毛雨" };
+          if (code === 56 || code === 57) return { kind:"rain", label:"冻毛毛雨" };
+          if (code === 61) return { kind:"rain", label:"小雨" };
+          if (code === 63) return { kind:"rain", label:"中雨" };
+          if (code === 65) return { kind:"rain", label:"大雨" };
+          if (code === 66 || code === 67) return { kind:"rain", label:"冻雨" };
+          if (code === 80) return { kind:"rain", label:"阵雨" };
+          if (code === 81 || code === 82) return { kind:"rain", label:"暴雨阵雨" };
+          if (code === 71 || code === 73 || code === 75 || code === 77) return { kind:"snow", label:"下雪" };
+          if (code === 85 || code === 86) return { kind:"snow", label:"阵雪" };
+          if (code === 95 || code === 96 || code === 99) return { kind:"storm", label:"雷阵雨" };
+          return { kind:"cloudy", label:"多云" };
+        }
+        function wxPhrase(){
+          var night = stage.getAttribute("data-period") === "night";
+          switch (wxState.kind){
+            case "clear": return night ? "窗外星星亮晶晶" : "窗外阳光正好";
+            case "cloudy": return "窗外云朵慢慢飘";
+            case "overcast": return "窗外灰蒙蒙的";
+            case "fog": return "窗外雾蒙蒙的";
+            case "rain": return "窗外正下着雨，屋里更暖和";
+            case "snow": return "窗外飘着雪";
+            case "storm": return "窗外雷雨交加，屋里躲好";
+            default: return "";
+          }
+        }
+        function buildWxFx(){
+          var night = stage.getAttribute("data-period") === "night";
+          var key = wxState.kind + (night ? "-n" : "-d");
+          if (key === wxFxKey) return;
+          wxFxKey = key;
+          var html = "", i;
+          if (wxState.kind === "rain" || wxState.kind === "storm"){
+            if (wxState.kind === "storm") html += '<div class="wx-flash"></div>';
+            var n = wxState.label === "毛毛雨" ? 14 : 30;
+            for (i = 0; i < n; i++){
+              html += '<span class="wx-drop" style="left:' + (Math.random() * 100).toFixed(1) + '%;animation-duration:' + (0.55 + Math.random() * 0.45).toFixed(2) + 's;animation-delay:-' + (Math.random() * 1.2).toFixed(2) + 's"></span>';
+            }
+          } else if (wxState.kind === "snow"){
+            for (i = 0; i < 24; i++){
+              var s = 3 + Math.random() * 5;
+              html += '<span class="wx-flake" style="left:' + (Math.random() * 100).toFixed(1) + '%;width:' + s.toFixed(0) + 'px;height:' + s.toFixed(0) + 'px;animation-duration:' + (5 + Math.random() * 4).toFixed(1) + 's;animation-delay:-' + (Math.random() * 6).toFixed(1) + 's"></span>';
+            }
+          } else if (wxState.kind === "clear"){
+            if (night){
+              for (i = 0; i < 20; i++){
+                html += '<span class="wx-star" style="left:' + (Math.random() * 100).toFixed(1) + '%;top:' + (Math.random() * 45).toFixed(0) + '%;animation-delay:-' + (Math.random() * 2.4).toFixed(1) + 's"></span>';
+              }
+            } else {
+              html += '<div class="wx-sun"></div>';
+            }
+          } else if (wxState.kind === "cloudy" || wxState.kind === "overcast"){
+            for (i = 0; i < 3; i++){
+              html += '<div class="wx-cloud" style="top:' + (4 + i * 13) + '%;left:' + (i * 22) + '%;width:' + (38 + i * 9) + '%;animation-duration:' + (26 + i * 9) + 's;animation-delay:-' + (i * 7) + 's"></div>';
+            }
+          } else if (wxState.kind === "fog"){
+            for (i = 0; i < 3; i++){
+              html += '<div class="wx-fogband" style="top:' + (16 + i * 24) + '%;animation-delay:-' + (i * 2.6).toFixed(1) + 's"></div>';
+            }
+          }
+          wxFx.innerHTML = html;
+        }
+        function syncWxFx(){ if (typeof wxState !== "undefined" && wxState) buildWxFx(); }
+        function renderWx(){
+          stage.setAttribute("data-wx", wxState.kind);
+          var t = (wxState.temp === null || wxState.temp === undefined) ? "" : " " + Math.round(wxState.temp) + "°";
+          wxBadge.textContent = "窗外 · " + wxState.label + t;
+          /* 天气变了，左上角的时段文字跟着一起变，不许再出现“下雨配阳光” */
+          periodBadge.textContent = currentBadge();
+          wxStatus.textContent = wxState.place + " · " + wxState.label + t + " —— " + wxPhrase() + "。";
+          wxFxKey = "";
+          buildWxFx();
+        }
+        function loadWx(lat, lon, place){
+          var url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=temperature_2m,weather_code,precipitation&timezone=auto";
+          fetch(url).then(function(r){ return r.json(); }).then(function(d){
+            if (d && d.current && typeof d.current.weather_code === "number"){
+              var w = wxFromCode(d.current.weather_code);
+              wxState.kind = w.kind; wxState.label = w.label;
+              wxState.temp = d.current.temperature_2m; wxState.place = place;
+              wxState.precip = (typeof d.current.precipitation === "number" && isFinite(d.current.precipitation)) ? d.current.precipitation : null;
+              wxState.lat = lat; wxState.lon = lon;
+              renderWx();
+              /* 天气刚更新，立刻按新天气重排 12–14 点的活动：雨雪雷改看书，放晴换回晒太阳 */
+              if (typeof syncScheduledActivity === "function") syncScheduledActivity();
+            }
+          }).catch(function(){ /* 取不到就保留上一次的天气 */ });
+        }
+        renderWx();
+        if (typeof syncScheduledActivity === "function") syncScheduledActivity();
+        loadWx(wxState.lat, wxState.lon, "上海");
+        if (navigator.geolocation){
+          navigator.geolocation.getCurrentPosition(function(pos){
+            loadWx(Number(pos.coords.latitude.toFixed(4)), Number(pos.coords.longitude.toFixed(4)), "这里");
+          }, function(){}, { timeout:6000, maximumAge:1800000 });
+        }
+        document.getElementById("wxRefresh").addEventListener("click", function(){
+          wxStatus.textContent = "正在看看窗外天气…";
+          loadWx(wxState.lat, wxState.lon, wxState.place);
+        });
+        setInterval(function(){ loadWx(wxState.lat, wxState.lon, wxState.place); }, 1800000);
+
+        /* ---------- 节日装饰：圣诞彩灯、春节窗花 ---------- */
+        var festBadge = document.getElementById("festBadge");
+        var festStatus = document.getElementById("festStatus");
+        var festXmas = document.getElementById("festXmas");
+        var festMode = "auto";
+        var lightsBuilt = false;
+        var CNY = { 2025:[1,29], 2026:[2,17], 2027:[2,6], 2028:[1,26], 2029:[2,13], 2030:[2,3] };
+        function autoFestival(date){
+          var m = date.getMonth() + 1, d = date.getDate();
+          if (m === 12 && d >= 20 && d <= 26) return "xmas";
+          var y = date.getFullYear();
+          for (var yy = y - 1; yy <= y; yy++){
+            var c = CNY[yy]; if (!c) continue;
+            var start = new Date(yy, c[0] - 1, c[1] - 7);
+            var end = new Date(yy, c[0] - 1, c[1] + 15);
+            if (date >= start && date <= end) return "spring";
+          }
+          return "none";
+        }
+        function buildLights(){
+          if (lightsBuilt) return;
+          lightsBuilt = true;
+          var colors = ["#ff5a4d", "#ffc93c", "#57c84d", "#4da3ff", "#ff8ad4"];
+          var html = '<svg class="wire" viewBox="0 0 1000 72" preserveAspectRatio="none" aria-hidden="true"><path d="M0,8 Q250,66 500,8 Q750,66 1000,8" fill="none" stroke="#2e4a2a" stroke-width="3"/></svg>';
+          var ci = 0;
+          [0, 50].forEach(function(off){
+            for (var t = 0.07; t < 0.97; t += 0.089){
+              var x = off + t * 50;
+              var y = (1 - t) * (1 - t) * 8 + 2 * (1 - t) * t * 66 + t * t * 8;
+              var col = colors[ci % colors.length];
+              html += '<span class="bulb" style="left:' + x.toFixed(1) + '%;top:' + (y + 5).toFixed(0) + 'px;background:' + col + ';box-shadow:0 0 12px 3px ' + col + ';animation-delay:-' + (ci * 0.17).toFixed(2) + 's"></span>';
+              ci++;
+            }
+          });
+          festXmas.innerHTML = html;
+        }
+        function applyFest(){
+          var f = festMode === "auto" ? autoFestival(new Date()) : festMode;
+          stage.setAttribute("data-fest", f);
+          if (f === "xmas"){ buildLights(); festBadge.hidden = false; festBadge.textContent = "圣诞快乐"; }
+          else if (f === "spring"){ festBadge.hidden = false; festBadge.textContent = "新春快乐"; }
+          else { festBadge.hidden = true; festBadge.textContent = ""; }
+          festStatus.textContent = festMode === "auto"
+            ? (f === "none" ? "现在不是节日，房间是日常的样子；圣诞、春节到了会自动换上装饰。" : "节日到了，房间自己换上装饰啦。")
+            : (f === "none" ? "装饰先收起来了。" : "正在预览这套装饰，点「跟随节日」回到自动。");
+        }
+        document.querySelectorAll("[data-fest-btn]").forEach(function(btn){
+          btn.addEventListener("click", function(){
+            document.querySelectorAll("[data-fest-btn]").forEach(function(b){ b.setAttribute("aria-pressed","false"); });
+            btn.setAttribute("aria-pressed","true");
+            festMode = btn.getAttribute("data-fest-btn");
+            applyFest();
+          });
+        });
+        applyFest();
+        setInterval(applyFest, 1800000);
+
+        /* ---------- 心愿单 ---------- */
+        var wishSummary = document.getElementById("wishSummary");
+        document.querySelectorAll(".wish").forEach(function(w){
+          w.addEventListener("click", function(){
+            var on = w.getAttribute("aria-pressed") === "true";
+            w.setAttribute("aria-pressed", on ? "false" : "true");
+            var picked = [];
+            document.querySelectorAll('.wish[aria-pressed="true"]').forEach(function(x){ picked.push(x.textContent.trim()); });
+            wishSummary.textContent = picked.length
+              ? "心愿单（" + picked.length + " 样）：" + picked.join("、") + "。看好了告诉我，就给房间添上。"
+              : "还没有选。点上面的小签，挑你想要的。";
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
