@@ -1967,9 +1967,7 @@
           im.removeEventListener("load", ok);
           im.removeEventListener("error", bad);
           thumbActive--;
-          if (tries < 3) {
-            setTimeout(function () { thumbActive++; loadThumb(job, tries + 1); }, 500 * (tries + 1));
-          } else if (!job.triedFull) {
+          if (!job.triedFull) {
             job.triedFull = true;
             thumbActive++;
             im.addEventListener("load", ok);
