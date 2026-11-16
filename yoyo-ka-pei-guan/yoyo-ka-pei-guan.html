@@ -618,16 +618,32 @@
         function load(lat, lon, city) {
           var url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat +
             "&longitude=" + lon + "&current=temperature_2m,weather_code&timezone=auto";
-          fetch(url).then(function (r) { return r.json(); }).then(function (j) {
-            if (!j || !j.current) return;
-            var w = WMO[j.current.weather_code] || ["🌡️", "—"];
-            wx = { icon: w[0], label: w[1], temp: Math.round(j.current.temperature_2m), city: city };
-            wxFailed = false;
-            renderWx();
-          }).catch(function () {
-            wxFailed = true;
-            renderWx();
-          });
+          var attempt = 0;
+          function tryOnce() {
+            attempt++;
+            var controller = new AbortController();
+            var timeoutId = window.setTimeout(function () { controller.abort(); }, 8000);
+            fetch(url, { signal: controller.signal }).then(function (r) {
+              if (!r.ok) throw new Error("HTTP " + r.status);
+              return r.json();
+            }).then(function (j) {
+              window.clearTimeout(timeoutId);
+              if (!j || !j.current) throw new Error("no current");
+              var w = WMO[j.current.weather_code] || ["🌡️", "—"];
+              wx = { icon: w[0], label: w[1], temp: Math.round(j.current.temperature_2m), city: city };
+              wxFailed = false;
+              renderWx();
+            }).catch(function () {
+              window.clearTimeout(timeoutId);
+              if (attempt < 3) {
+                window.setTimeout(tryOnce, 2000);
+              } else {
+                wxFailed = true;
+                renderWx();
+              }
+            });
+          }
+          tryOnce();
         }
         function begin(lat, lon, city) {
           if (timer !== null) window.clearInterval(timer);
@@ -639,16 +655,24 @@
           settled = { lat: lat, lon: lon };
           var gen = ++generation;
           var fallbackCity = realPosition ? "" : "上海";
+          if (!realPosition) {
+            begin(lat, lon, "上海");
+            return;
+          }
+          var controller = new AbortController();
+          var timeoutId = window.setTimeout(function () { controller.abort(); }, 8000);
           fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + lat +
-            "&longitude=" + lon + "&localityLanguage=zh")
+            "&longitude=" + lon + "&localityLanguage=zh", { signal: controller.signal })
             .then(function (r) { return r.json(); })
             .then(function (j) {
+              window.clearTimeout(timeoutId);
               if (gen !== generation) return;
               var city = ((j && j.city) || "").trim();
               if (city.length > 2 && city.charAt(city.length - 1) === "市") city = city.slice(0, -1);
               begin(lat, lon, city || fallbackCity);
             })
             .catch(function () {
+              window.clearTimeout(timeoutId);
               if (gen === generation) begin(lat, lon, fallbackCity);
             });
         }
